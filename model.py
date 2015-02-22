@@ -39,6 +39,7 @@ class Function(object):
     arguments = [x.spelling for x in cursor.get_arguments()]
     argument_types = [x.spelling for x in cursor.type.argument_types()]
     self.type = cursor.type.spelling
+    self.return_type = cursor.type.get_result().spelling
     self.arguments = []
     self.annotations = _get_annotations(cursor)
     
