@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import model
 from django.template import Context, Template
@@ -5,27 +7,29 @@ import django
 if not django.conf.settings.configured : django.conf.settings.configure()
 
 def collect_api_and_obj_classes(classes, api_annotation):
-  api_classes = []
-  api_classes.extend([c for c in classes if api_annotation in c.annotations])
-  obj_classes = []
-  #for c in classes:
-  #  for b in c.base_classes:
-  #    if b in [x.name for x in api_classes]:
-  #      obj_classes.append((c,b))
+  class APIClass:
+    def __init__(self,model_class):
+      self.api_class = model_class
+      self.impls = []
 
-  return obj_classes, api_classes
+  api_classes = {c.name:APIClass(c) for c in classes if api_annotation in c.annotations}
+  
+  for c in classes:
+    for b in c.base_classes:
+      if api_classes.has_key(b):
+        api_classes[b].impls.append(c)
 
-def render_api_and_obj_classes(obj_classes,api_classes,template):
+  return [c for k,c in api_classes.iteritems()]
+
+def render_api_and_obj_classes(api_classes,template):
 
   for c in api_classes:
-    print(template.render(Context({"class": c})))
-  #for c,b in obj_classes:
-  #  print(template.render(Context({"class": c, "base": b})))
+    print(template.render(Context({"class": c.api_class, "impl_classes":c.impls})))
 
 def generate_c_api(class_file, template, api_annotation='GENERATE_C_API'):
   classes = model.parse_classes(class_file)
-  obj_classes,api_classes = collect_api_and_obj_classes(classes, api_annotation)
-  render_api_and_obj_classes(obj_classes,api_classes,template)
+  api_classes = collect_api_and_obj_classes(classes, api_annotation)
+  render_api_and_obj_classes(api_classes,template)
 
 if __name__ == "__main__":
   s=""
