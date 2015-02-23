@@ -4,8 +4,8 @@
 struct Shape
 {
   virtual ~Shape() {}
-  virtual double area(double r) const = 0;
-  virtual double perimeter(double r) const = 0;
+  virtual double area() const = 0;
+  virtual double perimeter() const = 0;
 } C_API;
 
 static const double pi = 3.14159265359;
