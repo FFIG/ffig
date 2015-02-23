@@ -10,7 +10,8 @@ functionList = [
     [c_double],
     c_void_p),
     ("Shape_dispose",
-    [c_void_p]),
+    [c_void_p],
+    None),
     ("Shape_area",
     [c_void_p],
     c_double),
@@ -42,8 +43,8 @@ class Shape:
 
 class Square(Shape):
   def __init__(self,x):
-    self.ptr = lib.Shape_Square_create(x)
+    self.ptr = self._as_parameter_ = lib.Shape_Square_create(x)
 
 class Circle(Shape):
   def __init__(self,x):
-    self.ptr = lib.Shape_Circle_create(x)
+    self.ptr = self._as_parameter_ = lib.Shape_Circle_create(x)
