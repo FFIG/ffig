@@ -1,0 +1,49 @@
+{% autoescape off %}
+
+from ctypes import *
+
+lib = cdll.LoadLibrary("{{class.name}}.dylib")
+
+functionList = [
+
+  ("{{class.name}}_dispose",
+  [c_void_p],
+  None),{% for impl in impl_classes %} {% for function in impl.constructors %}
+  
+  ("{{class.name}}_{{ impl.name }}_create",
+  [{% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type}}{% endfor %}],
+  c_void_p),{% endfor %}{% endfor %} {% for function in class.functions %}
+  
+  ("{{ class.name }}_{{function.name}}",
+  [{% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type}} {% endfor %}],
+  {{function.return_type}}){% if not forloop.last %},{% endif %}{% endfor %}
+]
+
+def register_function(item):
+  func = getattr(lib, item[0])
+
+  if len(item) >= 2:
+    func.argtypes = item[1]
+
+  if len(item) >= 3:
+    func.restype = item[2]
+
+map(register_function, functionList)
+
+
+class {{class.name}}:
+
+  def __del__(self):
+    lib.{{class.name}}_dispose(self.ptr)
+  {% for function in class.functions %}
+  def {{function.name}}(self {% for arg in function.arguments %}, {{arg.name}} {% endfor %}):
+    lib.{{class.name}}_{{function.name}}(self.ptr{% for arg in function.arguments %}, {{arg.name}}{% endfor %})
+    {% endfor %}
+
+{% for impl in impl_classes %}class {{impl.name}}({{class.name}}): {% for function in impl.constructors %}
+  def __init__(self{% for arg in function.arguments %}, {{arg.name}}{% endfor %}):
+    self.ptr = lib.{{class.name}}_{{ impl.name }}_create({% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}{{arg.name}}{% endfor %})
+
+{% endfor %} 
+{% endfor %}
+{% endautoescape %}
