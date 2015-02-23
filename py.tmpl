@@ -11,12 +11,12 @@ functionList = [
   None),{% for impl in impl_classes %} {% for function in impl.constructors %}
   
   ("{{class.name}}_{{ impl.name }}_create",
-  [{% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type}}{% endfor %}],
+  [{% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}c_{{arg.type}}{% endfor %}],
   c_void_p),{% endfor %}{% endfor %} {% for function in class.functions %}
   
   ("{{ class.name }}_{{function.name}}",
-  [{% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type}} {% endfor %}],
-  {{function.return_type}}){% if not forloop.last %},{% endif %}{% endfor %}
+  [c_void_p, {% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}c_{{arg.type}} {% endfor %}],
+  c_{{function.return_type}}){% if not forloop.last %},{% endif %}{% endfor %}
 ]
 
 def register_function(item):
@@ -37,7 +37,7 @@ class {{class.name}}:
     lib.{{class.name}}_dispose(self.ptr)
   {% for function in class.functions %}
   def {{function.name}}(self {% for arg in function.arguments %}, {{arg.name}} {% endfor %}):
-    lib.{{class.name}}_{{function.name}}(self.ptr{% for arg in function.arguments %}, {{arg.name}}{% endfor %})
+    return lib.{{class.name}}_{{function.name}}(self.ptr{% for arg in function.arguments %}, {{arg.name}}{% endfor %})
     {% endfor %}
 
 {% for impl in impl_classes %}class {{impl.name}}({{class.name}}): {% for function in impl.constructors %}

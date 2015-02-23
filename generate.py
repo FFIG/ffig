@@ -4,7 +4,10 @@ import sys
 import model
 from django.template import Context, Template
 import django
+
 if not django.conf.settings.configured : django.conf.settings.configure()
+django.setup()
+
 
 def collect_api_and_obj_classes(classes, api_annotation):
   class APIClass:
