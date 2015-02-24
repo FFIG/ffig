@@ -39,6 +39,8 @@ def generate_c_api(class_file, template, api_annotation='GENERATE_C_API'):
 
 if __name__ == "__main__":
   s=""
+  if len(sys.argv) != 3:
+    raise Exception("Requires 2 arguments: annotated_header template")
   with open(sys.argv[2]) as template_file:
     for line in template_file:
       s=s+line
