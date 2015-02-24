@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
-./generate.py Shape.h h.tmpl > c_shape.h
-./generate.py Shape.h cpp.tmpl > c_shape.cpp
-./generate.py Shape.h py.tmpl > Shape.py
+INPUT=${1:-Shape.h}
+OUTPUT=${INPUT%.h}
 
-clang++ -std=c++11 -shared -Wl, -o shape.dylib -fPIC c_shape.cpp
+./generate.py $INPUT h.tmpl > c_${OUTPUT}.h
+./generate.py $INPUT cpp.tmpl > c_${OUTPUT}.cpp
+./generate.py $INPUT py.tmpl > ${OUTPUT}.py
+
+clang++ -std=c++11 -shared -Wl, -o ${OUTPUT}.dylib -fPIC c_${OUTPUT}.cpp
