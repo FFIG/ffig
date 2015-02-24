@@ -2,21 +2,41 @@
 {% load ctypes_filter %}
 
 from ctypes import *
+c_object_p = POINTER(c_void_p)
 
 lib = cdll.LoadLibrary("{{class.name}}.dylib")
+
+class {{class.name}}:
+
+  def __del__(self):
+    lib.{{class.name}}_dispose(self)
+  {% for function in class.functions %}
+  def {{function.name}}(self {% for arg in function.arguments %}, {{arg.name}} {% endfor %}):
+    return lib.{{class.name}}_{{function.name}}(self{% for arg in function.arguments %}, {{arg.name}}{% endfor %})
+    {% endfor %}
+
+  def from_param(self):
+      return self.ptr
+
+{% for impl in impl_classes %}class {{impl.name}}({{class.name}}): {% for function in impl.constructors %}
+  def __init__(self{% for arg in function.arguments %}, {{arg.name}}{% endfor %}):
+    self.ptr = lib.{{class.name}}_{{ impl.name }}_create({% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}{{arg.name}}{% endfor %})
+
+{% endfor %} 
+{% endfor %}
 
 functionList = [
 
   ("{{class.name}}_dispose",
-  [c_void_p],
+  [{{class.name}}],
   None),{% for impl in impl_classes %} {% for function in impl.constructors %}
   
   ("{{class.name}}_{{ impl.name }}_create",
   [{% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|to_ctype}}{% endfor %}],
-  c_void_p),{% endfor %}{% endfor %} {% for function in class.functions %}
+  c_object_p),{% endfor %}{% endfor %} {% for function in class.functions %}
   
   ("{{ class.name }}_{{function.name}}",
-  [c_void_p{% for arg in function.arguments %}{% if not forloop.last %}, {% endif %}{{arg.type|to_ctype}} {% endfor %}],
+  [{{class.name}}{% for arg in function.arguments %}{% if not forloop.last %}, {% endif %}{{arg.type|to_ctype}} {% endfor %}],
   {{function.return_type|to_ctype}}){% if not forloop.last %},{% endif %}{% endfor %}
 ]
 
@@ -31,20 +51,4 @@ def register_function(item):
 
 map(register_function, functionList)
 
-
-class {{class.name}}:
-
-  def __del__(self):
-    lib.{{class.name}}_dispose(self.ptr)
-  {% for function in class.functions %}
-  def {{function.name}}(self {% for arg in function.arguments %}, {{arg.name}} {% endfor %}):
-    return lib.{{class.name}}_{{function.name}}(self.ptr{% for arg in function.arguments %}, {{arg.name}}{% endfor %})
-    {% endfor %}
-
-{% for impl in impl_classes %}class {{impl.name}}({{class.name}}): {% for function in impl.constructors %}
-  def __init__(self{% for arg in function.arguments %}, {{arg.name}}{% endfor %}):
-    self.ptr = lib.{{class.name}}_{{ impl.name }}_create({% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}{{arg.name}}{% endfor %})
-
-{% endfor %} 
-{% endfor %}
 {% endautoescape %}
