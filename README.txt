@@ -1,7 +1,12 @@
-Usage (prints generated source to standard output)
+Description
+===========
+A very simple clang-ast-powered code-generator.
 
-./generate.py Shapes.h h.tmpl
-./generate.py Shapes.h cpp.tmpl
+Usage
+=====
+./build.sh
 
-clang++ -std=c++11 -shared -Wl, -o shape.dylib -fPIC c_shape.cpp
-clang++ -std=c++11 -shared -Wl, -o shape.dylib -fPIC c_shape.cpp
+Ouput
+=====
+A dynamic library and python module that can be run in-situ
+
