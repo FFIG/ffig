@@ -2,10 +2,13 @@
 
 import sys
 import model
+import django_apps
 from django.template import Context, Template
 import django
 
-if not django.conf.settings.configured : django.conf.settings.configure()
+if not django.conf.settings.configured : 
+  django.conf.settings.configure(INSTALLED_APPS=('django_apps',),)                                 
+
 django.setup()
 
 

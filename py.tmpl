@@ -1,4 +1,5 @@
 {% autoescape off %}
+{% load ctypes_filter %}
 
 from ctypes import *
 
@@ -11,12 +12,12 @@ functionList = [
   None),{% for impl in impl_classes %} {% for function in impl.constructors %}
   
   ("{{class.name}}_{{ impl.name }}_create",
-  [{% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}c_{{arg.type}}{% endfor %}],
+  [{% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|to_ctype}}{% endfor %}],
   c_void_p),{% endfor %}{% endfor %} {% for function in class.functions %}
   
   ("{{ class.name }}_{{function.name}}",
-  [c_void_p, {% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}c_{{arg.type}} {% endfor %}],
-  c_{{function.return_type}}){% if not forloop.last %},{% endif %}{% endfor %}
+  [c_void_p{% for arg in function.arguments %}{% if not forloop.last %}, {% endif %}{{arg.type|to_ctype}} {% endfor %}],
+  {{function.return_type|to_ctype}}){% if not forloop.last %},{% endif %}{% endfor %}
 ]
 
 def register_function(item):
