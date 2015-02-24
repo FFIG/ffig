@@ -1,3 +1,4 @@
+#include <cmath>
 
 #define C_API __attribute__((annotate("GENERATE_C_API")))
 
@@ -37,4 +38,18 @@ public:
   const char* name() const override { return "Square"; }
 
   Square(double s) : side_(s) {}
+};
+
+class Pentagon : public Shape
+{
+  const double side_;
+
+public:
+  double area() const override { return 0.25 * sqrt(5.*(5.+2.*sqrt(5.))) * side_ * side_; }
+
+  double perimeter() const override { return 5.0 * side_; }
+  
+  const char* name() const override { return "Pentagon"; }
+
+  Pentagon(double s) : side_(s) {}
 };
