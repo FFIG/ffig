@@ -1,2 +1,5 @@
 *.pyc
 shape.dylib
+c_shape.h
+c_shape.cpp
+Shape.py
