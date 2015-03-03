@@ -7,6 +7,8 @@ match_pointer_to_type = re.compile("const [A-Za-z0-9]+\s*\*$")
 
 @register.filter
 def to_ctype(s):
+  if s=='void':
+    return None
   if s=='bool':
     return 'bool'
   if s=='int':
