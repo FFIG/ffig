@@ -4,5 +4,9 @@ class TestPythonBindings(unittest.TestCase):
   def test(self):
     pass
 
-if __name__ == "__main__":
-      unittest.main()
+def main():
+  unittest.main()
+
+if __name__ == '__main__':
+  main()
+
