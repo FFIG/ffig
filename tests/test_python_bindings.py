@@ -12,28 +12,25 @@ import Shape
 Shape.Config.set_library_path(modulepath)
 
 class TestPythonBindings(unittest.TestCase):
-  def test_Shape_Circle_is_called_Circle(self):
-    radius = 2.0
+  def setUp(self):
+    self.radius = 3.0
+    self.circle = Shape.Circle(self.radius)
 
-    c = Shape.Circle(radius)
-    
-    self.assertEqual("Circle", c.name())
+  def tearDown(self):
+    del self.circle
+  
+  def test_Shape_Circle_is_called_Circle(self):
+    self.assertEqual("Circle", self.circle.name())
 
   def test_Shape_Circle_has_expected_area(self):
-    radius = 2.0
-    area = radius * radius * math.pi
-
-    c = Shape.Circle(radius)
+    area = self.radius * self.radius * math.pi
     
-    self.assertAlmostEqual(area, c.area())
+    self.assertAlmostEqual(area, self.circle.area())
 
   def test_Shape_Circle_has_expected_perimeter(self):
-    radius = 2.0
-    perimeter = 2.0 * math.pi * radius
-
-    c = Shape.Circle(radius)
+    perimeter = 2.0 * math.pi * self.radius
     
-    self.assertAlmostEqual(perimeter, c.perimeter())
+    self.assertAlmostEqual(perimeter, self.circle.perimeter())
 
 def main():
   unittest.main()
