@@ -12,6 +12,13 @@ import Shape
 Shape.Config.set_library_path(modulepath)
 
 class TestPythonBindings(unittest.TestCase):
+  def test_Shape_Circle_is_called_Circle(self):
+    radius = 2.0
+
+    c = Shape.Circle(radius)
+    
+    self.assertEqual("Circle", c.name())
+
   def test_Shape_Circle_has_expected_area(self):
     radius = 2.0
     area = radius * radius * math.pi
