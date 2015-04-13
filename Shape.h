@@ -8,7 +8,6 @@ struct Shape
   virtual double area() const = 0;
   virtual double perimeter() const = 0;
   virtual const char* name() const = 0;
-  virtual void Dummy(const Shape* s) const = 0;
 } C_API;
 
 static const double pi = 3.14159265359;
@@ -23,8 +22,6 @@ public:
   double perimeter() const override { return 2 * pi * radius_; }
   
   const char* name() const override { return "Circle"; }
-  
-  void Dummy(const Shape* s) const override {}
 
   Circle(double r) : radius_(r) {}
 };
@@ -40,8 +37,6 @@ public:
   
   const char* name() const override { return "Square"; }
 
-  void Dummy(const Shape* s) const override {}
-  
   Square(double s) : side_(s) {}
 };
 
@@ -55,8 +50,6 @@ public:
   double perimeter() const override { return 5.0 * side_; }
   
   const char* name() const override { return "Pentagon"; }
-
-  void Dummy(const Shape* s) const override {}
   
   Pentagon(double s) : side_(s) {}
 };

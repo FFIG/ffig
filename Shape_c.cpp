@@ -22,11 +22,6 @@ const char* Shape_name(const void* myShape)
 {
   return reinterpret_cast<const Shape*>(myShape)->name();
 }
-
-void Shape_Dummy(const void* myShape, const void * s)
-{
-  return reinterpret_cast<const Shape*>(myShape)->Dummy((const Shape *)s);
-}
   
 const void* Shape_Circle_create(double r)
 {
