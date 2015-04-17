@@ -19,6 +19,7 @@ class Field:
     self.name = cursor.spelling
     self.type = cursor.type.spelling
 
+
 class FunctionArgument:
   def __repr__(self):
     return str(self.type)+":\""+str(self.name)+"\""
@@ -29,7 +30,6 @@ class FunctionArgument:
 
 
 class Function(object):
-
   def __repr__(self):
     return "Function:"+str(self.name)
 
@@ -46,8 +46,8 @@ class Function(object):
     for t,n in zip(argument_types,arguments):
       self.arguments.append(FunctionArgument(t,n))
 
-class Class(object):
 
+class Class(object):
   def __repr__(self):
     return "Class:%s"%str(self.name)
 
@@ -73,6 +73,7 @@ class Class(object):
 
     self.constructors = [x for x in self.functions if x.name == self.name]
 
+
 def build_classes(cursor):
   result = []
   for c in cursor.get_children():
@@ -87,6 +88,7 @@ def build_classes(cursor):
       result.extend(child_classes)
 
   return result
+
 
 def parse_classes(class_file):
   index = clang.cindex.Index.create()
