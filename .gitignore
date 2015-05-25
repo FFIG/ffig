@@ -1,4 +1,5 @@
 *.pyc
 *.dylib
-*_c.*
+*_c.h
+*_c.cpp
 Shape.py

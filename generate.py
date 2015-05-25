@@ -40,8 +40,8 @@ def get_class_name(header_path):
   return re.sub(".h$","",header_name)
 
 def get_template_name(template_path):
-  template_name = os.path.basename(t)
-  return re.sub(".tmpl$","",t)
+  template_name = os.path.basename(template_path)
+  return re.sub(".tmpl$","",template_name)
 
 def get_template_output(class_name, template_name):
   split_name = template_name.split('.')
@@ -57,6 +57,7 @@ if __name__ == "__main__":
   
   class_name = get_class_name(sys.argv[1])
   #for t in sys.argv[2:]:
+  #  print get_template_name(t)
   #  print get_template_output(class_name, get_template_name(t))
 
   classes = model.parse_classes(sys.argv[1])

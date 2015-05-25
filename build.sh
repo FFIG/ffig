@@ -3,7 +3,7 @@
 INPUT=${1:-Shape.h}
 OUTPUT=${INPUT%.h}
 
-./generate.py $INPUT _c.h.tmpl _c.cpp.tmpl py.tmpl
+./generate.py $INPUT templates/*
 
 clang++ -std=c++11 -shared -Wl, -o ${OUTPUT}_c.dylib -fPIC ${OUTPUT}_c.cpp
 
