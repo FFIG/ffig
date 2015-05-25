@@ -86,11 +86,11 @@ class Config:
         name = platform.system()
 
         if name == 'Darwin':
-            file = '{{class.name}}.dylib'
+            file = '{{class.name}}_c.dylib'
         elif name == 'Windows':
-            file = '{{class.name}}.dll'
+            file = '{{class.name}}_c.dll'
         else:
-            file = '{{class.name}}.so'
+            file = '{{class.name}}_c.so'
 
         if Config.library_path:
             file = Config.library_path + '/' + file
