@@ -33,17 +33,17 @@ def render_api_and_obj_classes(api_classes,template):
     s+=str(template.render(Context({"class": c.api_class, "impl_classes":c.impls})))
   return s
 
-def generate_c_api(class_file, template, api_annotation='GENERATE_C_API'):
-  classes = model.parse_classes(class_file)
-  api_classes = collect_api_and_obj_classes(classes, api_annotation)
-  return render_api_and_obj_classes(api_classes,template)
-
 if __name__ == "__main__":
   if len(sys.argv) == 1:
     raise Exception("Requires 3 arguments: annotated_header template output. Did you mean to run 'build.sh'?")
-  if len(sys.argv) != 4:
+  if len(sys.argv) < 4:
     raise Exception("Requires 3 arguments: annotated_header template output")
-  with open(sys.argv[2]) as template_file:
-    s=generate_c_api(sys.argv[1], Template(template_file.read()))
-    with open(sys.argv[3],"w") as output_file:
+  
+  classes = model.parse_classes(sys.argv[1])
+  api_classes = collect_api_and_obj_classes(classes, 'GENERATE_C_API')
+
+  for t,o in zip(sys.argv[2::2], sys.argv[3::2]):
+    with open(t) as template_file, open(o,"w") as output_file:                
+      template = Template(template_file.read())
+      s=render_api_and_obj_classes(api_classes, template)
       output_file.write(s)
