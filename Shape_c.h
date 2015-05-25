@@ -15,4 +15,3 @@ extern "C" const void* Shape_Square_create(double s);
   
 extern "C" const void* Shape_Pentagon_create(double s);
  
-

@@ -1,7 +1,7 @@
 #include <new>
 #include "Shape_c.h"
 #include "Shape.h"
- #include <new>
+ 
 
 void Shape_dispose(const void* myShape)
 {
@@ -38,4 +38,3 @@ const void* Shape_Pentagon_create(double s)
   return new (std::nothrow) Pentagon(s);
 }
  
-

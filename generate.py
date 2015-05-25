@@ -28,22 +28,22 @@ def collect_api_and_obj_classes(classes, api_annotation):
   return [c for k,c in api_classes.iteritems()]
 
 def render_api_and_obj_classes(api_classes,template):
-
+  s=""
   for c in api_classes:
-    print(template.render(Context({"class": c.api_class, "impl_classes":c.impls})))
+    s+=str(template.render(Context({"class": c.api_class, "impl_classes":c.impls})))
+  return s
 
 def generate_c_api(class_file, template, api_annotation='GENERATE_C_API'):
   classes = model.parse_classes(class_file)
   api_classes = collect_api_and_obj_classes(classes, api_annotation)
-  render_api_and_obj_classes(api_classes,template)
+  return render_api_and_obj_classes(api_classes,template)
 
 if __name__ == "__main__":
-  s=""
   if len(sys.argv) == 1:
-    raise Exception("Requires 2 arguments: annotated_header template. Did you mean to run 'build.sh'?")
-  if len(sys.argv) != 3:
-    raise Exception("Requires 2 arguments: annotated_header template")
+    raise Exception("Requires 3 arguments: annotated_header template output. Did you mean to run 'build.sh'?")
+  if len(sys.argv) != 4:
+    raise Exception("Requires 3 arguments: annotated_header template output")
   with open(sys.argv[2]) as template_file:
-    for line in template_file:
-      s=s+line
-  generate_c_api(sys.argv[1], Template(s))
+    s=generate_c_api(sys.argv[1], Template(template_file.read()))
+    with open(sys.argv[3],"w") as output_file:
+      output_file.write(s)
