@@ -3,7 +3,7 @@ sys.path.insert(0,'/Users/jon/DEV/clang-llvm-git/llvm/tools/clang/bindings/pytho
 
 import clang.cindex
 if not clang.cindex.Config.library_file:
-  clang.cindex.Config.set_library_file('/opt/local/libexec/llvm-3.6/lib/libclang.dylib')
+  clang.cindex.Config.set_library_file('/opt/local/libexec/llvm-3.7/lib/libclang.dylib')
 
 
 def _get_annotations(node):
