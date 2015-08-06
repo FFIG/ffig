@@ -1,10 +1,8 @@
 import sys
-sys.path.insert(0,'/Users/jon/DEV/clang-llvm-git/llvm/tools/clang/bindings/python/')
-
+sys.path.insert(0,'/usr/local/Cellar/llvm36/3.6.2/lib/python2.7/site-packages/clang-3.6')
 import clang.cindex
 if not clang.cindex.Config.library_file:
-  clang.cindex.Config.set_library_file('/opt/local/libexec/llvm-3.7/lib/libclang.dylib')
-
+  clang.cindex.Config.set_library_file('/usr/local//Cellar/llvm36/3.6.2/lib/llvm-3.6/lib/libclang.dylib')
 
 def _get_annotations(node):
   return [c.displayname for c in node.get_children()
