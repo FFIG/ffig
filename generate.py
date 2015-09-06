@@ -50,8 +50,8 @@ def get_template_output(class_name, template_name):
   return "{}{}.{}".format(class_name, suffix_name, extension)
 
 if __name__ == "__main__":
-  if len(sys.argv) != 3:
-      raise Exception("Requires 2 arguments: got {}".format(str(sys.argv[1:])))
+  if len(sys.argv) != 4:
+      raise Exception("Requires 3 arguments: got {}".format(str(sys.argv[1:])))
   
   class_name = get_class_name(sys.argv[1])
 
@@ -59,8 +59,10 @@ if __name__ == "__main__":
   api_classes = collect_api_and_obj_classes(classes, 'GENERATE_C_API')
 
   template_dir = sys.argv[2];
+  output_dir = sys.argv[3];
+
   for t in [os.path.join(template_dir,x) for x in os.listdir(template_dir) if x.endswith(".tmpl")]:
-    with open(t) as template_file, open(get_template_output(class_name, get_template_name(t)),"w") as output_file:                
+    with open(t) as template_file, open(os.path.join(output_dir,get_template_output(class_name, get_template_name(t))),"w") as output_file:                
       template = Template(template_file.read())
       s=render_api_and_obj_classes(api_classes, template)
       output_file.write(s)

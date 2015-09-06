@@ -4,7 +4,7 @@ import os
 import math
 
 testdir = os.path.dirname(__file__)
-moduledir = '../'
+moduledir = '../output'
 modulepath = os.path.abspath(os.path.join(testdir, moduledir))
 sys.path.insert(0, modulepath)
 

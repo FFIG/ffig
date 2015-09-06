@@ -6,7 +6,7 @@ mkdir output
 echo " [OK]" 
 
 HEADERS=Shape.h
-for HEADER in ${HEADERS}
+for HEADER in input/*
   do echo -n Generating bindings for ${HEADER}
   ./build.sh ${HEADER} templates || exit 1
   echo " [OK]" 

@@ -1,6 +1,2 @@
+output/*
 *.pyc
-*.dylib
-*_c.h
-*_c.cpp
-Shape.py
-Shape_cpp.h

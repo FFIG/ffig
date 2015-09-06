@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+INPUT=$1
 
-INPUT=${1:-Shape.h}
-OUTPUT=${INPUT%.h}
+./generate.py $INPUT templates output || exit 1
+cp $INPUT output/
 
-./generate.py $INPUT templates || exit 1
-
-clang++ -std=c++14 -shared -Wl, -o ${OUTPUT}_c.dylib -fPIC ${OUTPUT}_c.cpp
-
+pushd output > /dev/null
+INPUT_FILE=$(basename $INPUT)
+OUTPUT=${INPUT_FILE%.h}
+clang++ -std=c++14 -shared -Wl, -o ${OUTPUT}_c.dylib -fPIC ${OUTPUT}_c.cpp || exit 1
+popd > /dev/null
