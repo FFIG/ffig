@@ -50,20 +50,16 @@ def get_template_output(class_name, template_name):
   return "{}{}.{}".format(class_name, suffix_name, extension)
 
 if __name__ == "__main__":
-  if len(sys.argv) == 1:
-    raise Exception("Requires 3 arguments: annotated_header template output. Did you mean to run 'build.sh'?")
-  if len(sys.argv) < 4:
-    raise Exception("Requires 3 arguments: annotated_header template output")
+  if len(sys.argv) != 3:
+      raise Exception("Requires 2 arguments: got {}".format(str(sys.argv[1:])))
   
   class_name = get_class_name(sys.argv[1])
-  #for t in sys.argv[2:]:
-  #  print get_template_name(t)
-  #  print get_template_output(class_name, get_template_name(t))
 
   classes = model.parse_classes(sys.argv[1])
   api_classes = collect_api_and_obj_classes(classes, 'GENERATE_C_API')
 
-  for t in sys.argv[2:]:
+  template_dir = sys.argv[2];
+  for t in [os.path.join(template_dir,x) for x in os.listdir(template_dir) if x.endswith(".tmpl")]:
     with open(t) as template_file, open(get_template_output(class_name, get_template_name(t)),"w") as output_file:                
       template = Template(template_file.read())
       s=render_api_and_obj_classes(api_classes, template)
