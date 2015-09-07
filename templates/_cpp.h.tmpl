@@ -15,7 +15,7 @@ public:
     {{class.name}}_dispose(object_);
   }
 {% for function in class.functions %}  
-  {{function.return_type|to_c}} {{function.name}}(const void* my{{class.name}}{% for arg in function.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}) const
+  {{function.return_type|to_c}} {{function.name}}({% for arg in function.arguments %}{%if not forloop.first %}, {% endif %}{{arg.type|to_c}} {{arg.name}}{% endfor %}) const
   {
     return {{class.name}}_{{function.name}}(object_{% if function.arguments %},{% endif %}{% for arg in function.arguments %}, {{arg.name}}{% endfor %});
   } 
