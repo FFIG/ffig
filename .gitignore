@@ -1,2 +1,4 @@
 output/*
 *.pyc
+tests/bin
+tests/build
