@@ -12,8 +12,16 @@ for HEADER in input/*
   echo " [OK]" 
 done
 
-
-echo
-
 echo Running tests
-python -m unittest discover -v tests/
+python -m unittest discover -v tests/ || exit 1
+
+echo Running CPP tests
+mkdir -p tests/build
+pushd tests/build > /dev/null
+cmake -DCMAKE_INSTALL_PREFIX:PATH=.. ../src/ 
+make && make install 
+popd > /dev/null
+pushd tests/bin > /dev/null
+for var in Test* ; do ./$var; done
+popd > /dev/null
+
