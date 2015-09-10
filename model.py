@@ -8,7 +8,6 @@ def _get_annotations(node):
   return [c.displayname for c in node.get_children()
       if c.kind == clang.cindex.CursorKind.ANNOTATE_ATTR]
 
-
 class Field:
   def __repr__(self):
     return str(self.type)+":\""+str(self.name)+"\""
@@ -38,11 +37,9 @@ class Function(object):
     argument_types = [x.spelling for x in cursor.type.argument_types()]
     self.type = cursor.type.spelling
     self.return_type = cursor.type.get_result().spelling
-    self.arguments = []
     self.annotations = _get_annotations(cursor)
     
-    for t,n in zip(argument_types,arguments):
-      self.arguments.append(FunctionArgument(t,n))
+    self.arguments = [FunctionArgument(t,n) for (t,n) in zip(argument_types,arguments)]
 
 
 class Class(object):
@@ -90,7 +87,7 @@ def build_classes(cursor):
 
 def parse_classes(class_file):
   index = clang.cindex.Index.create()
-  translation_unit = index.parse(class_file, ['-x', 'c++', '-std=c++11'])
+  translation_unit = index.parse(class_file, ['-x', 'c++', '-std=c++14'])
   classes = build_classes(translation_unit.cursor)
   return classes
 
