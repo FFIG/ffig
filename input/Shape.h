@@ -1,5 +1,7 @@
 #include <cmath>
 
+// Any class annotated with this macro will be exposed and have all functions exposed.
+// Any class deriving from an exposed class will have its constructors exposed.
 #define C_API __attribute__((annotate("GENERATE_C_API")))
 
 struct Shape
