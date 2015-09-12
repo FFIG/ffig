@@ -6,6 +6,10 @@ class {{class.name}}
 {
   const void* object_;
 
+  {{class.name}}(const {{class.name}}&) = delete;
+  
+  {{class.name}}& operator = (const {{class.name}}&) = delete;
+
 protected:
   {{class.name}}(const void* o) : object_(o) {}
 
