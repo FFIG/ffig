@@ -3,3 +3,5 @@ output/*
 tests/bin
 tests/build
 sandbox/CircleTest
+sandbox/Shape_c.h 
+sandbox/libShape_c.dylib

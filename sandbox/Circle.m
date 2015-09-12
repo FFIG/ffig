@@ -1,10 +1,9 @@
 #import "Circle.h"
-
-static const double my_pi = 3.14159265359;
+#import "Shape_c.h"
 
 @implementation Circle
 {
-  double radius_;
+  const void* obj_;
 }
 
 - (id)init
@@ -12,7 +11,7 @@ static const double my_pi = 3.14159265359;
   self = [super init];
   if (self)
   {
-    radius_ = 1.0;
+    obj_ = nil;
   }
   return self;
 }
@@ -22,19 +21,21 @@ static const double my_pi = 3.14159265359;
   self = [super init];
   if (self)
   {
-    radius_ = radius;
+    obj_ = Shape_Circle_create(radius);
   }
   return self;
 }
 
 - (double)area;
 {
-  return my_pi * radius_ * radius_;
+  if ( obj_ ) return Shape_area(obj_);
+  return 0.0;
 }
 
 - (double)perimeter;
 {
-  return 2.0 * my_pi * radius_;
+  if ( obj_ ) return Shape_perimeter(obj_);
+  return 0.0;
 }
 
 @end
