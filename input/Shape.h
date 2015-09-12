@@ -25,7 +25,7 @@ public:
   
   const char* name() const override { return "Circle"; }
 
-  Circle(double r) : radius_(r) {}
+  Circle(double radius) : radius_(radius) {}
 };
 
 class Square : public Shape
@@ -39,7 +39,7 @@ public:
   
   const char* name() const override { return "Square"; }
 
-  Square(double s) : side_(s) {}
+  Square(double side) : side_(side) {}
 };
 
 class Pentagon : public Shape
@@ -53,5 +53,5 @@ public:
   
   const char* name() const override { return "Pentagon"; }
   
-  Pentagon(double s) : side_(s) {}
+  Pentagon(double side) : side_(side) {}
 };
