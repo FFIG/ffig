@@ -26,6 +26,13 @@
   return self;
 }
 
+- (void)dealloc
+{
+  if (self && obj_)
+      Shape_dispose(obj_);
+  [super dealloc];
+}
+
 - (double)area;
 {
   if ( obj_ ) return Shape_area(obj_);

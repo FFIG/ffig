@@ -8,6 +8,8 @@
 
 - (id)initWithRadius:(double)radius;
 
+- (void)dealloc;
+
 - (double)area;
 
 - (double)perimeter;
