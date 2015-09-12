@@ -40,11 +40,7 @@
 
 - (NSString*)name
 {
-  if ( obj_ ) 
-  {
-    const char* n = Shape_name(obj_);
-    return [[NSString alloc] initWithUTF8String:n];
-  }
+  if ( obj_ ) return [[NSString alloc] initWithUTF8String:Shape_name(obj_)];
   return nil;
 }
 
