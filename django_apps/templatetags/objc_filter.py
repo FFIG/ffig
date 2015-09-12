@@ -15,3 +15,13 @@ def to_objc(s):
     error = 'Type {} has no known obj-c equivalent'.format(s)
     raise Exception(error)
  
+@register.filter
+def wrap_obj_return_type(s):
+  if s=='void' or s=='int' or s=='bool' or s=='double':
+    return s
+  if re.match(match_pointer_to_char,s):
+      return '[[NSString alloc] initWithUTF8String:{}]'.format(s)
+  else:
+    error = 'Type {} has no known obj-c wrapper type'.format(s)
+    raise Exception(error)
+ 

@@ -1,0 +1,23 @@
+#import <Foundation/Foundation.h>
+{% load objc_filter %}
+@interface {{class.name}} : NSObject
+{
+}
+
+- (id)init;
+
+- (void)dealloc;
+{% for function in class.functions %}
+- ({{function.return_type|to_objc}}){{function.name}}{% if function.arguments %}:{% endif %}{%for arg in function.arguments %}({{arg.type|to_objc}}){{arg.name}}{% if not forloop.last %} {% endif %}{% endfor %};
+{% endfor %}
+@end
+
+{% for impl in impl_classes %}
+@interface {{impl.name}} : {{class.name}}
+{
+}
+{% for function in impl.constructors %} 
+- (id)initWith{% for arg in function.arguments %}{{arg.name|title}}{% endfor %}:{%for arg in function.arguments %}({{arg.type|to_objc}}){{arg.name}}{% if not forloop.last %} {% endif %}{% endfor %}; 
+{% endfor %}
+@end
+{% endfor %}
