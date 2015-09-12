@@ -12,4 +12,6 @@
 
 - (double)perimeter;
 
+- (NSString*)name;
+
 @end
