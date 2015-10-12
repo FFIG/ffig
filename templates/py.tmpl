@@ -2,9 +2,9 @@
 c_object_p = POINTER(c_void_p)
 
 class {{class.name}}:
-  {% for function in class.functions %}
-  def {{function.name}}(self{% for arg in function.arguments %}, {{arg.name}} {% endfor %}):
-    return conf.lib.{{class.name}}_{{function.name}}(self{% for arg in function.arguments %}, {{arg.name}}{% endfor %})
+  {% for method in class.methods %}
+  def {{method.name}}(self{% for arg in method.arguments %}, {{arg.name}} {% endfor %}):
+    return conf.lib.{{class.name}}_{{method.name}}(self{% for arg in method.arguments %}, {{arg.name}}{% endfor %})
     {% endfor %}
   def from_param(self):
     return self.ptr
@@ -12,31 +12,31 @@ class {{class.name}}:
   def __del__(self):
     conf.lib.{{class.name}}_dispose(self)
 
-{% for impl in impl_classes %}class {{impl.name}}({{class.name}}): {% for function in impl.constructors %}
-  def __init__(self{% for arg in function.arguments %}, {{arg.name}}{% endfor %}):
-    self.ptr=conf.lib.{{class.name}}_{{ impl.name }}_create({% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}{{arg.name}}{% endfor %})
+{% for impl in impl_classes %}class {{impl.name}}({{class.name}}): {% for method in impl.constructors %}
+  def __init__(self{% for arg in method.arguments %}, {{arg.name}}{% endfor %}):
+    self.ptr=conf.lib.{{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.name}}{% endfor %})
 {% endfor %} 
 {% endfor %}
 
-functionList = [
+methodList = [
 
   ("{{class.name}}_dispose",
   [{{class.name}}],
-  None),{% for impl in impl_classes %} {% for function in impl.constructors %}
+  None),{% for impl in impl_classes %} {% for method in impl.constructors %}
   
   ("{{class.name}}_{{ impl.name }}_create",
-  [{% for arg in function.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|to_ctype}}{% endfor %}],
-  c_object_p),{% endfor %}{% endfor %} {% for function in class.functions %}
+  [{% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|to_ctype}}{% endfor %}],
+  c_object_p),{% endfor %}{% endfor %} {% for method in class.methods %}
   
-  ("{{ class.name }}_{{function.name}}",
-  [{{class.name}}{% for arg in function.arguments %}, {{arg.type|to_ctype}} {% endfor %}],
-  {{function.return_type|to_ctype}}){% if not forloop.last %},{% endif %}{% endfor %}
+  ("{{ class.name }}_{{method.name}}",
+  [{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_ctype}} {% endfor %}],
+  {{method.return_type|to_ctype}}){% if not forloop.last %},{% endif %}{% endfor %}
 ]
 
-# library loading and function registrations
+# library loading and method registrations
 # based on clang python bindings approach
 
-def register_function(lib, item):
+def register_method(lib, item):
   func = getattr(lib, item[0])
 
   if len(item) >= 2:
@@ -77,7 +77,7 @@ class Config:
     @CachedProperty
     def lib(self):
         lib = self._get_library()
-        map(lambda x:register_function(lib,x), functionList)
+        map(lambda x:register_method(lib,x), methodList)
         Config.loaded = True
         return lib
 
