@@ -3,7 +3,7 @@ language: python
 python:
   - "2.7"
 
-# command to install dependencies
+# command to install dependencies - needs clang 3.6
 before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - curl http://llvm.org/apt/llvm-snapshot.gpg.key|sudo apt-key add -
