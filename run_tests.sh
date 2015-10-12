@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+export PYTHONPATH=$(pwd)/externals:$PYTHONPATH
+
 echo -n Cleaning output
 rm -rf output || exit 1
 mkdir output

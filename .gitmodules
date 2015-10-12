@@ -4,3 +4,6 @@
 [submodule "externals/catch"]
 	path = externals/catch
 	url = https://github.com/philsquared/catch.git
+[submodule "externals/clang_cpp_code_model"]
+	path = externals/clang_cpp_code_model
+	url = https://github.com/jbcoe/clang_cpp_code_model.git
