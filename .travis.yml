@@ -11,7 +11,7 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install libclang-3.6-dev
   - export LIBCLANG_PATH=$(find /usr/lib -name libclang.so)
-  - export PYTHONPATH=externals;${PYTHONPATH}
+  - export PYTHONPATH="./externals;${PYTHONPATH}"
 
 install: "pip install -r requirements.txt"
 
