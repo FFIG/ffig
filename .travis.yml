@@ -10,10 +10,12 @@ before_install:
   - echo "deb http://llvm.org/apt/precise/ llvm-toolchain-precise-3.6 main" | sudo tee -a /etc/apt/sources.list
   - sudo apt-get update -qq
   - sudo apt-get install libclang-3.6-dev
+  - export PYTHONPATH=externals:$PYTHONPATH
   - export LIBCLANG_PATH=$(find /usr/lib -name libclang.so)
 
 install: "pip install -r requirements.txt"
-
+         "pushd cd externals/clang_cpp_code_model"
+         "pip install -e ."
 # command to run tests
 script: ./run_tests.sh
 

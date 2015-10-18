@@ -3,7 +3,7 @@
 import os
 import re
 import sys
-from clang_cpp_code_model import model
+import cppmodel as model
 import django_apps
 from django.template import Context, Template
 import django
