@@ -13,9 +13,11 @@ before_install:
   - export PYTHONPATH=externals:$PYTHONPATH
   - export LIBCLANG_PATH=$(find /usr/lib -name libclang.so)
 
-install: "pip install -r requirements.txt"
-         "pushd cd externals/clang_cpp_code_model"
-         "pip install -e ."
+install: 
+  - pip install -r requirements.txt
+  - pushd cd externals/clang_cpp_code_model
+  - pip install -e .
+
 # command to run tests
 script: ./run_tests.sh
 
