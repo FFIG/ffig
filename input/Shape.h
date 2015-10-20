@@ -10,6 +10,7 @@ struct Shape
   virtual double area() const = 0;
   virtual double perimeter() const = 0;
   virtual const char* name() const = 0;
+  virtual bool IsEqual(const Shape* s) const = 0;
 } C_API;
 
 static const double pi = 3.14159265359;
@@ -25,6 +26,13 @@ public:
   
   const char* name() const override { return "Circle"; }
 
+  bool IsEqual(const Shape* s) const override
+  {
+    auto c = dynamic_cast<const Circle*>(s);
+    if ( ! c ) return false;
+    return c->radius_ == radius_;
+  }
+
   Circle(double radius) : radius_(radius) {}
 };
 
@@ -39,6 +47,13 @@ public:
   
   const char* name() const override { return "Square"; }
 
+  bool IsEqual(const Shape* s) const override
+  {
+    auto sq = dynamic_cast<const Square*>(s);
+    if ( ! sq ) return false;
+    return sq->side_ == side_;
+  }
+  
   Square(double side) : side_(side) {}
 };
 
@@ -52,6 +67,13 @@ public:
   double perimeter() const override { return 5.0 * side_; }
   
   const char* name() const override { return "Pentagon"; }
+  
+  bool IsEqual(const Shape* s) const override
+  {
+    auto p = dynamic_cast<const Pentagon*>(s);
+    if ( ! p ) return false;
+    return p->side_ == side_;
+  }
   
   Pentagon(double side) : side_(side) {}
 };

@@ -3,6 +3,8 @@ import re
 
 register = template.Library()
 
+match_pointer_to_class = re.compile("const\s+(.*)\s*\*$")
+
 @register.filter
 def to_ctype(s):
   if s=='void':
@@ -17,7 +19,10 @@ def to_ctype(s):
     return 'c_double'
   if s=='const char *':
     return 'c_char_p'
-  else:
-    error = 'Type {} has no known ctypes equivalent'.format(s)
-    raise Exception(error)
+  m = match_pointer_to_class.match(s)
+  if m: 
+    return m.group(1) 
+  
+  error = 'Type {} has no known ctypes equivalent'.format(s)
+  raise Exception(error)
 
