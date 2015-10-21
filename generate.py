@@ -7,6 +7,8 @@ import cppmodel as model
 import django_apps
 from django.template import Context, Template
 import django
+import HTMLParser
+html_parser = HTMLParser.HTMLParser()
 
 if not django.conf.settings.configured : 
   django.conf.settings.configure(INSTALLED_APPS=('django_apps',),)                                 
@@ -33,7 +35,7 @@ def render_api_and_obj_classes(api_classes,template):
   s=""
   for c in api_classes:
     s+=str(template.render(Context({"class": c.api_class, "impl_classes":c.impls})))
-  return s
+  return html_parser.unescape(s)
 
 def get_class_name(header_path):
   header_name = os.path.basename(header_path)
