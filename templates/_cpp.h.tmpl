@@ -21,7 +21,7 @@ public:
 {% for method in class.methods %}  
   {{method.return_type|to_c}} {{method.name}}({% for arg in method.arguments %}{%if not forloop.first %}, {% endif %}{{arg.type|to_c}} {{arg.name}}{% endfor %}) const
   {
-    return {{class.name}}_{{method.name}}(object_{% if method.arguments %},{% endif %}{% for arg in method.arguments %}, {{arg.name}}{% endfor %});
+    return {{class.name}}_{{method.name}}(object_{% for arg in method.arguments %}, {{arg.name}}{% endfor %});
   } 
 {%endfor%}
 };
