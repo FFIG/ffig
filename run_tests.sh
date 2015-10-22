@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export PYTHONPATH=$(pwd)/externals:$PYTHONPATH
+export PYTHONPATH=$(pwd)/externals/clang_cpp_code_model:$PYTHONPATH
 
 echo -n Cleaning output
 rm -rf output || exit 1
