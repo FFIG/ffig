@@ -1,4 +1,4 @@
-{% autoescape off %}{% load ctypes_filter %}from ctypes import *
+{% autoescape off %}{% load capi_filter %}from ctypes import *
 c_object_p = POINTER(c_void_p)
 
 class {{class.name}}:
