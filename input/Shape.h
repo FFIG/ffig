@@ -3,7 +3,11 @@
 // Any class annotated with this macro will be exposed and have all functions
 // exposed.
 // Any class deriving from an exposed class will have its constructors exposed.
+#ifdef __clang__
 #define C_API __attribute__((annotate("GENERATE_C_API")))
+#else
+#define C_API
+#endif
 
 struct Shape
 {
