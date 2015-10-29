@@ -9,7 +9,7 @@ struct {{class.name}}
   struct MockMethodResultNotSpecified : std::logic_error
   {
     using std::logic_error::logic_error ;
-  }
+  };
 {% for method in class.methods %}  
   std::experimental::optional<{{method.return_type}}> {{method.name}}_;
 {%endfor%}

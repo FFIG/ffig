@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
-#include "catch.hpp"
-#include "Shape_cpp.h"
+#include <catch.hpp>
 #include <string>
+#include "Shape_cpp.h"
 
 using CPP_API::Circle;
 using CPP_API::Square;
