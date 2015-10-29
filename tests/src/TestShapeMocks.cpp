@@ -4,31 +4,31 @@
 #include <string>
 #include "Shape_mocks.h"
 
-TEST_CASE("MockShape", "[mocks::Shape]")
+TEST_CASE("MockShape", "[mocks::MockShape]")
 {
   GIVEN("A mock shape with no expected values set")
   {
-    mocks::Shape shape;
+    mocks::MockShape shape;
 
     THEN("All method invocations lead to exceptions")
     {
       REQUIRE_THROWS_AS(shape.name(),
-                        mocks::Shape::MockMethodResultNotSpecified);
+                        mocks::MockShape::MockMethodResultNotSpecified);
 
       REQUIRE_THROWS_AS(shape.area(),
-                        mocks::Shape::MockMethodResultNotSpecified);
+                        mocks::MockShape::MockMethodResultNotSpecified);
 
       REQUIRE_THROWS_AS(shape.perimeter(),
-                        mocks::Shape::MockMethodResultNotSpecified);
+                        mocks::MockShape::MockMethodResultNotSpecified);
 
       REQUIRE_THROWS_AS(shape.is_equal(&shape),
-                        mocks::Shape::MockMethodResultNotSpecified);
+                        mocks::MockShape::MockMethodResultNotSpecified);
     }
   }
 
   GIVEN("A mock shape with expected values set")
   {
-    mocks::Shape shape;
+    mocks::MockShape shape;
     shape.area_ = 10;
     shape.perimeter_ = 25;
     shape.name_ = "Mock";

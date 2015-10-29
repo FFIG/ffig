@@ -5,19 +5,7 @@
 // Any class deriving from an exposed class will have its constructors exposed.
 #define C_API __attribute__((annotate("GENERATE_C_API")))
 
-enum class ShapeKind
-{
-  Circle,
-  Square,
-  Pentagon
-};
-
-struct ShapeBase
-{
-  virtual ShapeKind kind() const = 0;
-};
-
-struct Shape : ShapeBase
+struct Shape
 {
   virtual ~Shape()
   {
@@ -52,18 +40,13 @@ public:
 
   bool is_equal(const Shape* s) const override
   {
-    if (s->kind() != kind()) return false;
-    auto c = static_cast<const Circle*>(s);
-    return c->radius_ == radius_;
+    if ( auto c = dynamic_cast<const Circle*>(s) )
+      return c->radius_ == radius_;
+    return false;
   }
 
   Circle(double radius) : radius_(radius)
   {
-  }
-
-  ShapeKind kind() const override final
-  {
-    return ShapeKind::Circle;
   }
 };
 
@@ -89,18 +72,13 @@ public:
 
   bool is_equal(const Shape* s) const override
   {
-    if (s->kind() != kind()) return false;
-    auto sq = static_cast<const Square*>(s);
-    return sq->side_ == side_;
+    if ( auto sq = dynamic_cast<const Square*>(s) )
+      return sq->side_ == side_;
+    return false;
   }
 
   Square(double side) : side_(side)
   {
-  }
-
-  ShapeKind kind() const override final
-  {
-    return ShapeKind::Square;
   }
 };
 
@@ -126,17 +104,12 @@ public:
 
   bool is_equal(const Shape* s) const override
   {
-    if (s->kind() != kind()) return false;
-    auto p = static_cast<const Pentagon*>(s);
-    return p->side_ == side_;
+    if ( auto p = dynamic_cast<const Pentagon*>(s) )
+      return p->side_ == side_;
+    return false;
   }
 
   Pentagon(double side) : side_(side)
   {
-  }
-
-  ShapeKind kind() const override final
-  {
-    return ShapeKind::Pentagon;
   }
 };
