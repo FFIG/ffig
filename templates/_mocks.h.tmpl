@@ -1,0 +1,35 @@
+#include "{{class.name}}.h"
+#include <exception>
+#include <experimental/optional>
+{% load capi_filter %}
+namespace mocks {
+
+struct Mock{{class.name}} : {{class.name}}
+{
+  struct MockMethodResultNotSpecified : std::logic_error
+  {
+    using std::logic_error::logic_error ;
+  };
+
+  struct MockMethodResult
+  {
+    template <typename Value, typename ...Args>
+    auto operator()(const char* method_name, const Value& v, Args&& ...args) const
+    {
+      if(v) return *v;
+      throw MockMethodResultNotSpecified(method_name);
+    }
+  };
+
+{% for method in class.methods %}  
+  std::experimental::optional<{{method.return_type}}> {{method.name}}_;
+{%endfor%}
+
+{% for method in class.methods %}  
+  {{method.return_type}} {{method.name}}({% for arg in method.arguments %}{%if not forloop.first %}, {% endif %}{{arg.type}} {{arg.name}}{% endfor %}) const override
+  {
+    return MockMethodResult()("{{method.name}}", {{method.name}}_);
+  } 
+{%endfor%}
+};
+} // end namespace mocks
