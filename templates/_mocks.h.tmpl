@@ -1,0 +1,27 @@
+#include "{{class.name}}_c.h"
+#include <exception>
+#include <experimental/optional>
+{% load capi_filter %}
+namespace mocks {
+
+struct {{class.name}}
+{
+  struct MockMethodResultNotSpecified : std::logic_error
+  {
+    using std::logic_error::logic_error ;
+  }
+{% for method in class.methods %}  
+  std::experimental::optional<{{method.return_type}}> {{method.name}}_;
+{%endfor%}
+  {{class.name}}() = default;
+
+{% for method in class.methods %}  
+  {{method.return_type|to_c}} {{method.name}}({% for arg in method.arguments %}{%if not forloop.first %}, {% endif %}{{arg.type}} {{arg.name}}{% endfor %}) const
+  {
+    if ({{method.name}}_)
+      return *{{method.name}}_;
+    throw MockMethodResultNotSpecified("{{method.name}}");
+  } 
+{%endfor%}
+};
+} // end namespace mocks
