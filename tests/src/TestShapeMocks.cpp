@@ -2,10 +2,13 @@
                           // in one cpp file
 #include <catch.hpp>
 #include <string>
+#include <type_traits>
 #include "Shape_mocks.h"
 
 TEST_CASE("MockShape", "[mocks::MockShape]")
 {
+  static_assert(std::is_base_of<Shape,mocks::MockShape>::value,"");
+
   GIVEN("A mock shape with no expected values set")
   {
     mocks::MockShape shape;
