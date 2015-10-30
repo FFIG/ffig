@@ -7,3 +7,6 @@
 [submodule "externals/clang_cpp_code_model"]
 	path = externals/clang_cpp_code_model
 	url = https://github.com/jbcoe/clang_cpp_code_model.git
+[submodule "externals/variant"]
+	path = externals/variant
+	url = https://github.com/eggs-cpp/variant.git
