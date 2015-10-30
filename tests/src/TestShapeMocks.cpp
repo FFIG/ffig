@@ -24,8 +24,8 @@ TEST_CASE("MockShape", "[mocks::MockShape]")
       REQUIRE_THROWS_AS(shape.perimeter(),
                         mocks::MockShape::MockMethodResultNotSpecified);
 
-      REQUIRE_THROWS_AS(shape.is_equal(&shape),
-                        mocks::MockShape::MockMethodResultNotSpecified);
+      //REQUIRE_THROWS_AS(shape.is_equal(&shape),
+      //                  mocks::MockShape::MockMethodResultNotSpecified);
     }
   }
 
@@ -43,6 +43,19 @@ TEST_CASE("MockShape", "[mocks::MockShape]")
       REQUIRE(shape.is_equal(nullptr) == false);
       REQUIRE(strcmp(shape.name(), "Mock")==0);
       REQUIRE(shape.perimeter() == 25);
+    }
+  }
+  
+  GIVEN("A mock shape with function objects returning values")
+  {
+    mocks::MockShape shape;
+    size_t area_f_count = 0;
+    shape.area_ = [&area_f_count]{ ++area_f_count; return 0.0;};
+
+    THEN("All method invocations return expected values through function invocations")
+    {
+      REQUIRE(shape.area() == 0.0);
+      REQUIRE(area_f_count == 1);
     }
   }
 }

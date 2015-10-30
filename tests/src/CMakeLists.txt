@@ -3,7 +3,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 project (TestCppGeneratedOutput)
 
-include_directories(../../externals/catch/include/ ../../output/)
+include_directories(../../externals/catch/include/ ../../externals/variant/include ../../output/)
 
 add_executable(TestCppCircle TestCppCircle.cpp)
 add_executable(TestShapeMocks TestShapeMocks.cpp)
