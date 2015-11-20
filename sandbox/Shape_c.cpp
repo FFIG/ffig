@@ -1,71 +1,128 @@
 #include <new>
-#include "Shape_c.h"
+#include <string>
 #include "Shape.h"
 
+#define Shape_EXPORT __attribute__((visibility("default")))
 #define RC_SUCCESS 0
 #define RC_FAIL 1
 
+// Won't work on Apple clang as they claim ABI issues
+// http://stackoverflow.com/questions/28094794/why-does-apple-clang-disallow-c11-thread-local-when-official-clang-supports/29929949#29929949
 static thread_local std::string Shape_error_;
 
-void Shape_clear_error()
+extern "C" {
+
+Shape_EXPORT void Shape_clear_error()
 {
   Shape_error_.clear();
 }
 
-const char* Shape_error()
+Shape_EXPORT const char* Shape_error()
 {
-  if ( ! Shape_error_.empty() )
-  {
-    return Shape_error_.str();
-  }
+  return Shape_error_.c_str();
 }
 
-void Shape_dispose(const void* myShape, int* rc)
+Shape_EXPORT void Shape_dispose(const void* myShape)
 {
   delete reinterpret_cast<const Shape*>(myShape);
 }
 
-double Shape_area(const void* myShape)
+Shape_EXPORT int Shape_area(const void* myShape, double* rv)
 {
   try 
   {
-    return reinterpret_cast<const Shape*>(myShape)->area();
+    *rv = reinterpret_cast<const Shape*>(myShape)->area();
+    return RC_SUCCESS;
   }
   catch(const std::exception& e)
   {
     Shape_error_ = e.what();
-    *rc = RC_FAIL;
   }
-  *rc = RC_SUCCESS;
+  return RC_FAIL;
 }
 
-double Shape_perimeter(const void* myShape)
+Shape_EXPORT int Shape_perimeter(const void* myShape, double* rv)
 {
-  return reinterpret_cast<const Shape*>(myShape)->perimeter();
+  try 
+  {
+    *rv = reinterpret_cast<const Shape*>(myShape)->perimeter();
+    return RC_SUCCESS;
+  }
+  catch(const std::exception& e)
+  {
+    Shape_error_ = e.what();
+  }
+  return RC_FAIL;
 }
 
-const char* Shape_name(const void* myShape)
+Shape_EXPORT int Shape_name(const void* myShape, const char** rv)
 {
-  return reinterpret_cast<const Shape*>(myShape)->name();
+  try 
+  {
+    *rv = reinterpret_cast<const Shape*>(myShape)->name();
+    return RC_SUCCESS;
+  }
+  catch(const std::exception& e)
+  {
+    Shape_error_ = e.what();
+  }
+  return RC_FAIL;
 }
 
-bool Shape_is_equal(const void* myShape, const void* s)
+Shape_EXPORT int Shape_is_equal(const void* myShape, const void* s, int* rv)
 {
-  return reinterpret_cast<const Shape*>(myShape)->is_equal((const Shape *)s);
+  try 
+  {
+    *rv = reinterpret_cast<const Shape*>(myShape)->is_equal((const Shape *)s);
+    return RC_SUCCESS;
+  }
+  catch(const std::exception& e)
+  {
+    Shape_error_ = e.what();
+  }
+  return RC_FAIL;
 }
 
-const void* Shape_Circle_create(double radius)
+Shape_EXPORT int Shape_Circle_create(double radius, const void** rv)
 {
-  return new (std::nothrow) Circle(radius);
+  try 
+  {
+    *rv = new Circle(radius);
+    return RC_SUCCESS;
+  }
+  catch(const std::exception& e)
+  {
+    Shape_error_ = e.what();
+  }
+  return RC_FAIL;
 }
 
-const void* Shape_Square_create(double side)
+Shape_EXPORT int Shape_Square_create(double side, const void** rv)
 {
-  return new (std::nothrow) Square(side);
+  try 
+  {
+    *rv = new Square(side);
+    return RC_SUCCESS;
+  }
+  catch(const std::exception& e)
+  {
+    Shape_error_ = e.what();
+  }
+  return RC_FAIL;
 }
 
-const void* Shape_Pentagon_create(double side)
+Shape_EXPORT int Shape_Pentagon_create(double side, const void** rv)
 {
-  return new (std::nothrow) Pentagon(side);
+  try 
+  {
+    *rv = new Pentagon(side);
+    return RC_SUCCESS;
+  }
+  catch(const std::exception& e)
+  {
+    Shape_error_ = e.what();
+  }
+  return RC_FAIL;
 }
 
+}
