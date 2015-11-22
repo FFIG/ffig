@@ -1,19 +1,22 @@
 from ctypes import *
 c_object_p = POINTER(c_void_p)
 
-def current_Shape_error():
-  e = conf.lib.Shape_error()
-  conf.lib.Shape_clear_error()
-  return e
+class Shape_error(Exception):
+    def __init__(self):
+        self.value = conf.lib.Shape_error()
+        conf.lib.Shape_clear_error()
+    
+    def __str__(self):
+        return self.value
 
 class Shape:
   
   def area(self):
     rv = c_double()
     rc = conf.lib.Shape_area(self,byref(rv))
-    if rc != 0:
-      raise Exception(current_Shape_error())
-    return rv.value
+    if rc == 0: 
+      return rv.value
+    raise Shape_error()
 
   def perimeter(self):
     return conf.lib.Shape_perimeter(self)
@@ -35,7 +38,7 @@ class Circle(Shape):
     self.ptr = c_object_p()
     rc = conf.lib.Shape_Circle_create(radius,byref(self.ptr))
     if rc != 0:
-      raise Exception(current_Shape_error())
+      raise Shape_error()
  
 class Square(Shape): 
   def __init__(self, side):
