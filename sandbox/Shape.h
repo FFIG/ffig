@@ -1,4 +1,5 @@
 #include <cmath>
+#include <exception>
 
 // Any class annotated with this macro will be exposed and have all functions
 // exposed.
@@ -51,6 +52,7 @@ public:
 
   Circle(double radius) : radius_(radius)
   {
+    if ( radius < 0 ) throw std::runtime_error("Radius cannot be negative");
   }
 };
 
