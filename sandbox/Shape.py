@@ -19,13 +19,25 @@ class Shape:
     raise Shape_error()
 
   def perimeter(self):
-    return conf.lib.Shape_perimeter(self)
+    rv = c_double()
+    rc = conf.lib.Shape_perimeter(self,byref(rv))
+    if rc == 0: 
+      return rv.value
+    raise Shape_error()
     
   def name(self):
-    return conf.lib.Shape_name(self)
+    rv = c_char_p()
+    rc = conf.lib.Shape_name(self,byref(rv))
+    if rc == 0: 
+      return rv.value
+    raise Shape_error()
     
-  def is_equal(self, s ):
-    return conf.lib.Shape_is_equal(self, s)
+  def is_equal(self, s):
+    rv = c_int()
+    rc = conf.lib.Shape_is_equal(self,s,byref(rv))
+    if rc == 0: 
+      return rv.value
+    raise Shape_error()
     
   def from_param(self):
     return self.ptr
@@ -42,43 +54,52 @@ class Circle(Shape):
  
 class Square(Shape): 
   def __init__(self, side):
-    self.ptr=conf.lib.Shape_Square_create(side)
+    self.ptr = c_object_p()
+    rc = conf.lib.Shape_Square_create(side,byref(self.ptr))
+    if rc != 0:
+      raise Shape_error()
  
 class Pentagon(Shape): 
   def __init__(self, side):
-    self.ptr=conf.lib.Shape_Pentagon_create(side)
- 
+    self.ptr = c_object_p()
+    rc = conf.lib.Shape_Pentagon_create(side,byref(self.ptr))
+    if rc != 0:
+      raise Shape_error()
 
 
 methodList = [
 
-  ("Shape_dispose",
-  [Shape],
-  None), 
-  
   ("Shape_Circle_create",
   [c_double, POINTER(c_object_p)],
   c_int), 
   
   ("Shape_Square_create",
-  [c_double],
-  c_object_p), 
+  [c_double, POINTER(c_object_p)],
+  c_int), 
   
   ("Shape_Pentagon_create",
-  [c_double],
-  c_object_p), 
+  [c_double, POINTER(c_object_p)],
+  c_int), 
   
   ("Shape_area",
   [Shape, POINTER(c_double)],
   c_int),
   
   ("Shape_perimeter",
-  [Shape],
-  c_double),
+  [Shape, POINTER(c_double)],
+  c_int),
   
   ("Shape_name",
+  [Shape, POINTER(c_char_p)],
+  c_int),
+  
+  ("Shape_is_equal",
+  [Shape, Shape, POINTER(c_int)],
+  c_int),
+ 
+  ("Shape_dispose",
   [Shape],
-  c_char_p),
+  None), 
   
   ("Shape_clear_error",
   [],
@@ -87,10 +108,6 @@ methodList = [
   ("Shape_error",
   [],
   c_char_p),
-  
-  ("Shape_is_equal",
-  [Shape, Shape  ],
-  bool)
 ]
 
 # library loading and method registrations
