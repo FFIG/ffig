@@ -51,6 +51,11 @@ public:
 
   Circle(double radius) : radius_(radius)
   {
+    if ( radius_ <= 0.0 )
+    {
+      std::string s = "Circle radius \"" + std::to_string(radius_) + "\" must be non-negative.";
+      throw std::runtime_error(s);
+    }
   }
 };
 
@@ -83,6 +88,11 @@ public:
 
   Square(double side) : side_(side)
   {
+    if ( side_ <= 0.0 )
+    {
+      std::string s = "Square side \"" + std::to_string(side_) + "\" must be non-negative.";
+      throw std::runtime_error(s);
+    }
   }
 };
 
@@ -115,5 +125,10 @@ public:
 
   Pentagon(double side) : side_(side)
   {
+    if ( side_ <= 0.0 )
+    {
+      std::string s = "Pentagon side \"" + std::to_string(side_) + "\" must be non-negative.";
+      throw std::runtime_error(s);
+    }
   }
 };

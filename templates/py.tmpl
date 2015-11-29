@@ -35,6 +35,14 @@ class {{class.name}}:
 
 methodList = [
 
+  ("{{class.name}}_error",
+  [],
+  c_char_p),
+  
+  ("{{class.name}}_clear_error",
+  [],
+  None),
+  
   ("{{class.name}}_dispose",
   [{{class.name}}],
   None),{% for impl in impl_classes %} {% for method in impl.constructors %}
