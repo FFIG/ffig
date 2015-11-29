@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iostream>
 
 // Any class annotated with this macro will be exposed and have all functions
 // exposed.
@@ -51,10 +52,11 @@ public:
 
   Circle(double radius) : radius_(radius)
   {
-    if ( radius_ <= 0.0 )
-    {
-      std::string s = "Circle radius \"" + std::to_string(radius_) + "\" must be non-negative.";
-      throw std::runtime_error(s);
+    if ( radius < 0 ) 
+    { 
+      std::stringstream ss;
+      ss << name() << " radius \"" << radius << "\" cannot be negative";
+      throw std::runtime_error(ss.str());
     }
   }
 };
