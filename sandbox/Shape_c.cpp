@@ -21,25 +21,18 @@ struct Shape_block
     return block.release();
   }
 
-  template<typename T>
-  static Shape_block* create_subobject(const T* parent, const Shape* object)
+  template<typename ParentBlock>
+  static Shape_block* create_subobject(const ParentBlock* parent, const Shape* object)
   {
     auto block = std::make_unique<Shape_block>();
     //use aliasing constructor of shared_ptr to keep parent alive
-    block->object_ = std::shared_ptr<T>(parent, object);
+    block->object_ = std::shared_ptr<const Shape>(parent->object_, object);
     return block.release();
   }
 };
 
 }
 
-void Shape_dispose(const void* myShape)
-{
-  auto block = reinterpret_cast<const Shape_block*>(myShape);
-  delete block;
-}
-
-/*
 const void* Shape_component(const void* myShape, int i)
 {
   auto block = reinterpret_cast<const Shape_block*>(myShape);
@@ -51,7 +44,12 @@ double Shape_component_count(const void* myShape)
   auto block = reinterpret_cast<const Shape_block*>(myShape);
   return block->object_->component_count();
 }
-*/
+
+void Shape_dispose(const void* myShape)
+{
+  auto block = reinterpret_cast<const Shape_block*>(myShape);
+  delete block;
+}
 
 double Shape_area(const void* myShape)
 {
