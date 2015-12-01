@@ -1,6 +1,5 @@
 #include <memory>
 #include <random>
-#include <iostream>
 
 static std::mt19937 mt;
 static std::uniform_int_distribution<int> d(1,10);
@@ -17,7 +16,6 @@ class Tree
   Tree(int levels=0)
   {
     data_ = gen();
-    std::cout << "Building a tree with data " << data_ << " and " << levels << " more levels" << std::endl;
     if ( levels <= 0 ) return;
     left_ = std::make_shared<Tree>(levels-1);
     right_ = std::make_shared<Tree>(levels-1);
