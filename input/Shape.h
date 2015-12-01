@@ -39,7 +39,7 @@ public:
 
   const char* name() const override
   {
-    return "Dave's Circle";
+    return "Circle";
   }
 
   bool is_equal(const Shape* s) const override
