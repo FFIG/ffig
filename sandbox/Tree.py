@@ -4,13 +4,17 @@ c_object_p = POINTER(c_void_p)
 class Tree:
   
   def right(self):   
-    t = Tree(None)
-    t.ptr = conf.lib.Tree_right_subtree(self);
+    t = Tree(owner=False)
+    return conf.lib.Tree_right_subtree(self);
+    if t.ptr.value == 0:
+        return None
     return t
     
   def left(self):   
-    t = Tree(None)
-    t.ptr = conf.lib.Tree_left_subtree(self);
+    t = Tree(owner=False)
+    return conf.lib.Tree_left_subtree(self);
+    if t.ptr.value == 0:
+        return None
     return t
 
   def data(self):   
@@ -20,10 +24,12 @@ class Tree:
     return self.ptr
 
   def __del__(self):
-    conf.lib.Tree_dispose(self)
+    if self.owner:
+        conf.lib.Tree_dispose(self)
 
-  def __init__(self, n=None):
-      if not n: 
+  def __init__(self,n=0,owner=True):
+      self.owner = owner
+      if not owner: 
           return
       self.ptr = conf.lib.Tree_create(n)
 

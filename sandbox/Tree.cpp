@@ -62,6 +62,7 @@ namespace {
     template<typename ParentBlock>
       static Tree_block* create_subobject(const ParentBlock* parent, const Tree* object)
       {
+        if (!object) return nullptr;
         auto block = std::make_unique<Tree_block>();
         //use aliasing constructor of shared_ptr to keep parent alive
         block->object_ = std::shared_ptr<const Tree>(parent->object_, object);
