@@ -6,7 +6,6 @@ class Tree:
   def right(self):   
     t = Tree(owner=False)
     t.ptr = conf.lib.Tree_right_subtree(self);
-    print t.ptr
     if not bool(t.ptr):
         return None
     return t
@@ -14,7 +13,6 @@ class Tree:
   def left(self):   
     t = Tree(owner=False)
     t.ptr = conf.lib.Tree_left_subtree(self);
-    print t.ptr
     if not bool(t.ptr):
         return None
     return t
