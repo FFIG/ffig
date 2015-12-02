@@ -21,12 +21,12 @@ class Tree
     right_ = std::make_shared<Tree>(levels-1);
   }
 
-  const Tree* left_subtree() const
+  const Tree* left() const
   {
     return left_.get();
   }
 
-  const Tree* right_subtree() const
+  const Tree* right() const
   {
     return right_.get();
   }
@@ -84,16 +84,16 @@ extern "C" {
     delete reinterpret_cast<const Tree_block*>(tree);
   }
 
-  const void* Tree_left_subtree(const void* tree)
+  const void* Tree_left(const void* tree)
   {
     auto block = reinterpret_cast<const Tree_block*>(tree);
-    return Tree_block::create_subobject(block, block->object_->left_subtree());
+    return Tree_block::create_subobject(block, block->object_->left());
   }
 
-  const void* Tree_right_subtree(const void* tree)
+  const void* Tree_right(const void* tree)
   {
     auto block = reinterpret_cast<const Tree_block*>(tree);
-    return Tree_block::create_subobject(block, block->object_->right_subtree());
+    return Tree_block::create_subobject(block, block->object_->right());
   }
 
   int Tree_data(const void* tree)

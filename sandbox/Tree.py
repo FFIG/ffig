@@ -6,7 +6,7 @@ class Tree:
   @property
   def right(self):   
     t = Tree(owner=False)
-    t.ptr = conf.lib.Tree_right_subtree(self);
+    t.ptr = conf.lib.Tree_right(self);
     if not bool(t.ptr):
         return None
     return t
@@ -14,7 +14,7 @@ class Tree:
   @property
   def left(self):   
     t = Tree(owner=False)
-    t.ptr = conf.lib.Tree_left_subtree(self);
+    t.ptr = conf.lib.Tree_left(self);
     if not bool(t.ptr):
         return None
     return t
@@ -47,11 +47,11 @@ methodList = [
   [c_int],
   c_object_p), 
   
-  ("Tree_right_subtree",
+  ("Tree_right",
   [Tree],
   c_object_p),
   
-  ("Tree_left_subtree",
+  ("Tree_left",
   [Tree],
   c_object_p),
   
