@@ -3,38 +3,38 @@ from Tree import *
 def test_root_node_is_non_null():
     t = Tree(2)
     assert(t)
-    assert(t.data())
+    assert(t.data)
 
 def test_left_node_is_non_null():
     t = Tree(2)
-    lt = t.left()
+    lt = t.left
     assert(lt)
-    assert(lt.data())
+    assert(lt.data)
 
 def test_right_node_is_non_null():
     t = Tree(2)
-    rt = t.right()
+    rt = t.right
     assert(rt)
-    assert(rt.data())
+    assert(rt.data)
 
 def test_right_3_node_is_null():
     t = Tree(2)
-    r3t = t.right().right().right()
+    r3t = t.right.right.right
     assert(r3t==None)
 
 def test_use_of_null_node_is_caught():
     t = Tree(2)
-    r3t = t.right().right().right()
+    r3t = t.right.right.right
     error_thrown = False
     try:
-        r3t.data()
+        r3t.data
     except Exception as e:
         error_thrown = True
     assert(error_thrown)
 
 def test_subtree_handle_keeps_tree_alive():
     t = Tree(2)
-    st = t.left()
-    x = st.data()
+    st = t.left
+    x = st.data
     del t
-    assert(st.data()==x)
+    assert(st.data==x)

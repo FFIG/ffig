@@ -3,6 +3,7 @@ c_object_p = POINTER(c_void_p)
 
 class Tree:
   
+  @property
   def right(self):   
     t = Tree(owner=False)
     t.ptr = conf.lib.Tree_right_subtree(self);
@@ -10,13 +11,15 @@ class Tree:
         return None
     return t
     
+  @property
   def left(self):   
     t = Tree(owner=False)
     t.ptr = conf.lib.Tree_left_subtree(self);
     if not bool(t.ptr):
         return None
     return t
-
+  
+  @property
   def data(self):   
     return conf.lib.Tree_data(self);
     
