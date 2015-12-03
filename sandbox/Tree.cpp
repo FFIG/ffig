@@ -5,6 +5,8 @@ static std::mt19937 mt;
 static std::uniform_int_distribution<int> d(1,10);
 static auto gen = []{return d(mt);};
 
+static int global_tree_count = 0;
+
 class Tree
 {
   int data_;
@@ -15,10 +17,16 @@ class Tree
 
   Tree(int levels=0)
   {
+    ++global_tree_count;
     data_ = gen();
     if ( levels <= 0 ) return;
     left_ = std::make_shared<Tree>(levels-1);
     right_ = std::make_shared<Tree>(levels-1);
+  }
+
+  ~Tree()
+  {
+    --global_tree_count;
   }
 
   const Tree* left() const
@@ -102,5 +110,10 @@ extern "C" {
   {
     auto block = reinterpret_cast<const Tree_block*>(tree);
     return block->object_->data();
+  }
+
+  int Tree_count()
+  {
+    return global_tree_count;
   }
 }
