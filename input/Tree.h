@@ -1,6 +1,12 @@
 #include <memory>
 #include <random>
 
+#ifdef __clang__
+#define C_API __attribute__((annotate("GENERATE_C_API")))
+#else
+#define C_API
+#endif
+
 static std::mt19937 mt;
 static std::uniform_int_distribution<int> d(1,10);
 static auto gen = []{return d(mt);};
@@ -36,5 +42,5 @@ class Tree
     return data_;
   }
 
-};
+} C_API;
 

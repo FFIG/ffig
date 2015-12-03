@@ -42,32 +42,34 @@ class Tree
 
 namespace {
 
-  struct Tree_block
+  template <typename T>
+  struct Block
   {
-    std::shared_ptr<const Tree> object_;
-    Tree_block(const Tree_block&) = delete;
+    std::shared_ptr<const T> object_;
+    Block(const Block&) = delete;
 
-    Tree_block() = default;
+    Block() = default;
 
-    template<typename T, typename ...Ts>
-      static Tree_block* create(Ts&&...ts)
+    template<typename ...Ts>
+      static Block* create(Ts&&...ts)
       {
-        auto block = std::make_unique<Tree_block>();
+        auto block = std::make_unique<Block>();
         block->object_ = std::make_shared<T>(std::forward<Ts>(ts)...);
         return block.release();
       }
 
     template<typename ParentBlock>
-      static Tree_block* create_subobject(const ParentBlock* parent, const Tree* object)
+      static Block* subobject(const ParentBlock* parent, const T* object)
       {
         if (!object) return nullptr;
-        auto block = std::make_unique<Tree_block>();
+        auto block = std::make_unique<Block>();
         //use aliasing constructor of shared_ptr to keep parent alive
-        block->object_ = std::shared_ptr<const Tree>(parent->object_, object);
+        block->object_ = std::shared_ptr<const T>(parent->object_, object);
         return block.release();
       }
   };
 
+  using Tree_block = Block<Tree>;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +78,7 @@ extern "C" {
 
   const void* Tree_create(int n)
   {
-    return Tree_block::create<Tree>(n);
+    return Tree_block::create(n);
   }
 
   void Tree_dispose(const void* tree)
@@ -87,13 +89,13 @@ extern "C" {
   const void* Tree_left(const void* tree)
   {
     auto block = reinterpret_cast<const Tree_block*>(tree);
-    return Tree_block::create_subobject(block, block->object_->left());
+    return Tree_block::subobject(block, block->object_->left());
   }
 
   const void* Tree_right(const void* tree)
   {
     auto block = reinterpret_cast<const Tree_block*>(tree);
-    return Tree_block::create_subobject(block, block->object_->right());
+    return Tree_block::subobject(block, block->object_->right());
   }
 
   int Tree_data(const void* tree)
