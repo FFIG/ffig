@@ -48,37 +48,24 @@ class Tree
 
 ////////////////////////////////////////////////////////////////////////////////
 
-namespace {
+namespace api_obj {
 
-  template <typename T>
-  struct Block
-  {
-    std::shared_ptr<const T> object_;
-    Block(const Block&) = delete;
+  template<typename T, typename ...Ts>
+    static std::shared_ptr<T>* create(Ts&&...ts)
+    {
+      return new std::shared_ptr<T>(std::make_shared<T>(std::forward<Ts>(ts)...));
+    }
 
-    Block() = default;
+  template<typename Parent, typename Subobject>
+    static std::shared_ptr<const Subobject>* subobject(const std::shared_ptr<const Parent>* parent, const Subobject* object)
+    {
+      if (!object) return nullptr;
+      //use aliasing constructor of shared_ptr to keep parent alive
+      return new std::shared_ptr<const Subobject>(*parent, object);
+    }
+} // end namespace api_obj
 
-    template<typename ...Ts>
-      static Block* create(Ts&&...ts)
-      {
-        auto block = std::make_unique<Block>();
-        block->object_ = std::make_shared<T>(std::forward<Ts>(ts)...);
-        return block.release();
-      }
-
-    template<typename ParentBlock>
-      static Block* subobject(const ParentBlock* parent, const T* object)
-      {
-        if (!object) return nullptr;
-        auto block = std::make_unique<Block>();
-        //use aliasing constructor of shared_ptr to keep parent alive
-        block->object_ = std::shared_ptr<const T>(parent->object_, object);
-        return block.release();
-      }
-  };
-
-  using Tree_block = Block<Tree>;
-}
+using Tree_ptr = const std::shared_ptr<const Tree>*;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -86,30 +73,30 @@ extern "C" {
 
   const void* Tree_create(int n)
   {
-    return Tree_block::create(n);
+    return api_obj::create<Tree>(n);
   }
 
   void Tree_dispose(const void* tree)
   {
-    delete reinterpret_cast<const Tree_block*>(tree);
+    delete reinterpret_cast<const Tree_ptr>(tree);
   }
 
   const void* Tree_left(const void* tree)
   {
-    auto block = reinterpret_cast<const Tree_block*>(tree);
-    return Tree_block::subobject(block, block->object_->left());
+    auto ptr = reinterpret_cast<const Tree_ptr>(tree);
+    return api_obj::subobject(ptr, (*ptr)->left());
   }
 
   const void* Tree_right(const void* tree)
   {
-    auto block = reinterpret_cast<const Tree_block*>(tree);
-    return Tree_block::subobject(block, block->object_->right());
+    auto ptr = reinterpret_cast<const Tree_ptr>(tree);
+    return api_obj::subobject(ptr, (*ptr)->right());
   }
 
   int Tree_data(const void* tree)
   {
-    auto block = reinterpret_cast<const Tree_block*>(tree);
-    return block->object_->data();
+    auto ptr = reinterpret_cast<const Tree_ptr>(tree);
+    return (*ptr)->data();
   }
 
   int Tree_count()
