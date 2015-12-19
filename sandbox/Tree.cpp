@@ -1,11 +1,12 @@
 #include <memory>
 #include <random>
+#include <atomic>
 
 static std::mt19937 mt;
 static std::uniform_int_distribution<int> d(1,10);
 static auto gen = []{return d(mt);};
 
-static int global_tree_count = 0;
+static std::atomic<unsigned> global_tree_count{0};
 
 class Tree
 {
@@ -99,7 +100,7 @@ extern "C" {
     return (*ptr)->data();
   }
 
-  int Tree_count()
+  unsigned Tree_count()
   {
     return global_tree_count;
   }
