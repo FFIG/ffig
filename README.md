@@ -2,6 +2,18 @@
 
 A very simple clang-ast-powered code-generator.
 
+# Setup
+
+Set LD_LIBRARY_PATH so that libclang can be found.
+
+Set LLVM_SRC_DIR to the root of LLVM source with clang.
+OR install clang modules for python using pip.
+
+libclang and the python bindings will need to be compatible (libclang will need to be new enough).
+As of writing the pip clnag bindings required clang3.5.
+
+You can use homebrew (on OS X) to install clang3.6.
+
 
 # Usage
 
