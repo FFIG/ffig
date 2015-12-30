@@ -44,6 +44,10 @@ class TestPythonBindings(unittest.TestCase):
   def test_Shape_Circle_is_not_equal_to_square(self):
     self.assertFalse(self.circle.is_equal(Shape.Square(4)))
 
+  def test_exception_on_negative_radius(self):
+    with self.assertRaisesRegexp(Shape.Shape_error, 'Circle radius "-1.000000" must be non-negative.'):
+      Shape.Circle(-1)
+
 def main():
   unittest.main()
 

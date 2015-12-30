@@ -1,10 +1,22 @@
 {% autoescape off %}{% load capi_filter %}from ctypes import *
 c_object_p = POINTER(c_void_p)
 
+class {{class.name}}_error(Exception):
+    def __init__(self):
+        self.value = conf.lib.{{class.name}}_error()
+        conf.lib.{{class.name}}_clear_error()
+    
+    def __str__(self):
+        return self.value
+
 class {{class.name}}:
   {% for method in class.methods %}
   def {{method.name}}(self{% for arg in method.arguments %}, {{arg.name}} {% endfor %}):
-    return conf.lib.{{class.name}}_{{method.name}}(self{% for arg in method.arguments %}, {{arg.name}}{% endfor %})
+    rv = {{method.return_type|to_ctype}}()
+    rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
+    if rc == 0: 
+      return rv.value
+    raise {{class.name}}_error()
     {% endfor %}
   def from_param(self):
     return self.ptr
@@ -14,23 +26,34 @@ class {{class.name}}:
 
 {% for impl in impl_classes %}class {{impl.name}}({{class.name}}): {% for method in impl.constructors %}
   def __init__(self{% for arg in method.arguments %}, {{arg.name}}{% endfor %}):
-    self.ptr=conf.lib.{{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.name}}{% endfor %})
+    self.ptr = c_object_p()
+    rc = conf.lib.{{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.name}},{% endfor %} byref(self.ptr))
+    if rc != 0:
+      raise Shape_error()
 {% endfor %} 
 {% endfor %}
 
 methodList = [
 
+  ("{{class.name}}_error",
+  [],
+  c_char_p),
+  
+  ("{{class.name}}_clear_error",
+  [],
+  None),
+  
   ("{{class.name}}_dispose",
   [{{class.name}}],
   None),{% for impl in impl_classes %} {% for method in impl.constructors %}
   
   ("{{class.name}}_{{ impl.name }}_create",
-  [{% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|to_ctype}}{% endfor %}],
-  c_object_p),{% endfor %}{% endfor %} {% for method in class.methods %}
+  [{% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|to_ctype}}{% endfor %}, POINTER(c_object_p)],
+  c_int),{% endfor %}{% endfor %} {% for method in class.methods %}
   
   ("{{ class.name }}_{{method.name}}",
-  [{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_ctype}} {% endfor %}],
-  {{method.return_type|to_ctype}}){% if not forloop.last %},{% endif %}{% endfor %}
+  [{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_ctype}} {% endfor %}, POINTER({{method.return_type|to_ctype}})],
+  c_int){% if not forloop.last %},{% endif %}{% endfor %}
 ]
 
 # library loading and method registrations
