@@ -3,6 +3,8 @@
 export PYTHONPATH=${LLVM_SRC_ROOT}/tools/clang/bindings/python:$PYTHONPATH
 export PYTHONPATH=$(pwd)/externals/clang_cpp_code_model:$PYTHONPATH
 
+export LD_LIBRARY_PATH="$(pwd)/output:${LD_LIBRARY_PATH}"
+
 echo -n Cleaning output
 rm -rf output || exit 1
 mkdir output
@@ -11,12 +13,12 @@ echo " [OK]"
 HEADERS=Shape.h
 for HEADER in input/*
   do echo -n Generating bindings for ${HEADER}
-  ./build.sh ${HEADER} templates || exit 1
+  ./_build.sh ${HEADER} templates || exit 1
   echo " [OK]" 
 done
 
 echo Running tests
-python -m unittest discover -v tests/ || exit 1
+python -m nose -v tests/ || exit 1
 
 echo Running CPP tests
 mkdir -p tests/build

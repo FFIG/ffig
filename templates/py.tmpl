@@ -12,7 +12,7 @@ class {{class.name}}_error(Exception):
 class {{class.name}}:
   {% for method in class.methods %}
   def {{method.name}}(self{% for arg in method.arguments %}, {{arg.name}} {% endfor %}):
-    rv = {{method.return_type|to_ctype}}()
+    rv = {{method.return_type|to_output_ctype}}()
     rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
     if rc == 0: 
       return rv.value
@@ -25,11 +25,14 @@ class {{class.name}}:
     conf.lib.{{class.name}}_dispose(self)
 
 {% for impl in impl_classes %}class {{impl.name}}({{class.name}}): {% for method in impl.constructors %}
-  def __init__(self{% for arg in method.arguments %}, {{arg.name}}{% endfor %}):
-    self.ptr = c_object_p()
-    rc = conf.lib.{{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.name}},{% endfor %} byref(self.ptr))
-    if rc != 0:
-      raise Shape_error()
+  def __init__(self{% for arg in method.arguments %}, {{arg.name}}=None, _p=None{% endfor %}):
+    if _p:
+      self.ptr = _p
+    else:
+      self.ptr = c_object_p()
+      rc = conf.lib.{{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.name}},{% endfor %} byref(self.ptr))
+      if rc != 0:
+        raise Shape_error()
 {% endfor %} 
 {% endfor %}
 
@@ -52,7 +55,7 @@ methodList = [
   c_int),{% endfor %}{% endfor %} {% for method in class.methods %}
   
   ("{{ class.name }}_{{method.name}}",
-  [{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_ctype}} {% endfor %}, POINTER({{method.return_type|to_ctype}})],
+  [{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_ctype}} {% endfor %}, POINTER({{method.return_type|to_output_ctype}})],
   c_int){% if not forloop.last %},{% endif %}{% endfor %}
 ]
 
