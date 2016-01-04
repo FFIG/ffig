@@ -101,43 +101,36 @@ def c_object(v,t):
 
 #Python filter to translate C-type to Python ctype type
 @register.filter
-def to_ctype(s):
-    if s=='void':
+def to_ctype(t):
+    if t.kind == TypeKind.VOID:
         return None
-    if s=='bool':
-        return 'bool'
-    if s=='int':
+    if t.kind == TypeKind.INT:
         return 'c_int'
-    if s=='void*':
-        return 'c_void_p'
-    if s=='double':
+    if t.kind == TypeKind.DOUBLE:
         return 'c_double'
-    if s=='const char *':
-        return 'c_char_p'
-    m = match_pointer_to_class.match(s)
-    if m:
-        return m.group(1)
-
-    error = 'Type {} has no known ctypes equivalent'.format(s)
-    raise Exception(error)
+    if t.kind == TypeKind.BOOL:
+        return 'bool'
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return 'c_char_p'
+        if t.pointee.kind == TypeKind.RECORD:
+            return match_pointer_to_class.match(t.name).group(1)
+    raise Exception('No ctypes equivalent is defined for type {}'.format(t.name))
 
 @register.filter
-def to_output_ctype(s):
-    if s=='void':
+def to_output_ctype(t):
+    if t.kind == TypeKind.VOID:
         return None
-    if s=='bool':
-        return 'bool'
-    if s=='int':
+    if t.kind == TypeKind.INT:
         return 'c_int'
-    if s=='void*':
-        return 'c_void_p'
-    if s=='double':
+    if t.kind == TypeKind.DOUBLE:
         return 'c_double'
-    if s=='const char *':
-        return 'c_char_p'
-    m = match_pointer_to_class.match(s)
-    if m:
-        return 'c_object_p'
+    if t.kind == TypeKind.BOOL:
+        return 'bool'
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return 'c_char_p'
+        if t.pointee.kind == TypeKind.RECORD:
+            return 'c_object_p'
+    raise Exception('No ctypes equivalent is defined for type {}'.format(t.name))
 
-    error = 'Type {} has no known ctypes equivalent'.format(s)
-    raise Exception(error)
