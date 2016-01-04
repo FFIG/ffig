@@ -17,8 +17,8 @@ for HEADER in input/*
   echo " [OK]" 
 done
 
-echo Running tests
-python -m nose -v tests/ || exit 1
+#echo Running tests
+#python -m nose -v tests/ || exit 1
 
 echo Running CPP tests
 mkdir -p tests/build
