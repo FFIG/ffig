@@ -12,12 +12,18 @@ class {{class.name}}_error(Exception):
 class {{class.name}}:
   {% for method in class.methods %}
   def {{method.name}}(self{% for arg in method.arguments %}, {{arg.name}} {% endfor %}):
-    rv = {{method.return_type|to_output_ctype}}()
+    {% if not method.returns_sub_object %}rv = {{method.return_type|to_output_ctype}}()
     rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
     if rc == 0: 
       return rv.value
     raise {{class.name}}_error()
-    {% endfor %}
+    {% else %}    
+    rv = c_object_p()
+    rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
+    if rc == 0:
+      {% if method.returns_nullable %}if not bool(rv): return None{% endif %}
+      return {{method.return_type|to_ctype}}(_p=rv)
+    {% endif  %}{% endfor %}
   def from_param(self):
     return self.ptr
 
