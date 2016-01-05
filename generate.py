@@ -9,6 +9,7 @@ import django_apps
 from django.template import Context, Template
 import django
 import HTMLParser
+import annotations
 html_parser = HTMLParser.HTMLParser()
 
 if not django.conf.settings.configured : 
@@ -20,7 +21,7 @@ django.setup()
 def collect_api_and_obj_classes(classes, api_annotation):
     class APIClass:
         def __init__(self,model_class):
-            self.api_class = model_class
+            self.api_class = annotations.apply_class_annotations(model_class)
             self.impls = []
             # If a class has no pure virtual methods it can be considered as an
             # implementation class
