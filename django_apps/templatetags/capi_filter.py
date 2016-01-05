@@ -4,40 +4,8 @@ from cppmodel import TypeKind
 
 register = template.Library()
 
-@register.filter
-def to_objc(s):
-    if s=='void' or s=='int' or s=='bool' or s=='double':
-        return s
-    if re.match(match_pointer_to_char,s):
-        return 'NSString*'
-    else:
-        error = 'Type {} has no known obj-c equivalent'.format(s)
-        raise Exception(error)
 
-
-@register.filter
-def wrap_objc_type(t,v):
-    if t=='void' or t=='int' or t=='bool' or t=='double':
-        return v
-    if re.match(match_pointer_to_char,t):
-            return '[[NSString alloc] initWithUTF8String:{}]'.format(v)
-    else:
-        error = 'Type {} has no known obj-c wrapper type'.format(t)
-        raise Exception(error)
-
-
-@register.filter
-def unwrap_objc_type(t,v):
-    if t=='void' or t=='int' or t=='bool' or t=='double':
-        return v
-    if re.match(match_pointer_to_char,t):
-            return '[s UTF8String]'.format(v)
-    else:
-        error = 'Type {} has no known obj-c wrapper type'.format(t)
-        raise Exception(error)
-
-
-#Obj-c filter to cast type if required
+#CPP filter to cast type if required
 @register.filter
 def cast_c_type(t):
     if t.kind == TypeKind.VOID:
