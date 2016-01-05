@@ -1,13 +1,8 @@
 from django import template
-import re
 import cppmodel
 from cppmodel import TypeKind
 
 register = template.Library()
-
-match_pointer_to_char = re.compile("const\s+char\s*\*$")
-match_pointer_to_class = re.compile("const\s+(.*)\s*\*$")
-
 
 @register.filter
 def to_objc(s):
@@ -114,7 +109,8 @@ def to_ctype(t):
         if t.pointee.kind == TypeKind.CHAR_S:
             return 'c_char_p'
         if t.pointee.kind == TypeKind.RECORD:
-            return match_pointer_to_class.match(t.name).group(1)
+            # This is a hack until we can get an unqualified type from libclang
+            return t.pointee.name.replace('const ','')
     raise Exception('No ctypes equivalent is defined for type {}'.format(t.name))
 
 @register.filter
