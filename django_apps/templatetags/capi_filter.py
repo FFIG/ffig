@@ -7,7 +7,7 @@ register = template.Library()
 
 #CPP filter to cast type if required
 @register.filter
-def cast_c_type(t):
+def restore_cpp_type(t):
     if t.kind == TypeKind.VOID:
         return ''
     if t.kind == TypeKind.INT:
@@ -21,7 +21,7 @@ def cast_c_type(t):
             return ''
         if t.pointee.kind == TypeKind.RECORD:
             return '({})'.format(t.name)
-    raise Exception('Type {} has no known c equivalent'.format(t.name))
+    raise Exception('Type {} has no defined C++ type restoration (adding one for primitives is trivial)'.format(t.name))
 
 
 #C filter to convert C++ type to C equivalent
