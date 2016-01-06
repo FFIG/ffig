@@ -30,35 +30,35 @@ TEST_CASE( "circle has name 'circle'", "[cpp_api::circle]" ) {
   REQUIRE(c.name() == "Circle"s);
 }
 
-//TEST_CASE( "circle is_equal to self", "[cpp_api::circle]" ) {
-//  const double r = 1.0;
-//  const Circle c(r);
-//
-//  REQUIRE(c.is_equal(&c));
-//}
-//
-//TEST_CASE( "circle is_equal to circle with same radius", "[cpp_api::circle]" ) {
-//  const double r = 1.0;
-//  const Circle c(r);
-//  const Circle c2(r);
-//
-//  REQUIRE(c.is_equal(&c2));
-//}
-//
-//TEST_CASE( "circle is not equal to circle with different radius", "[cpp_api::circle]" ) {
-//  const double r = 1.0;
-//  const Circle c(r);
-//  const Circle c2(r+1.0);
-//
-//  REQUIRE(!c.is_equal(&c2));
-//}
-//
-//TEST_CASE( "circle is not equal to square", "[cpp_api::circle]" ) {
-//  const double r = 1.0;
-//  const Circle c(r);
-//  const Square s(r);
-//  REQUIRE(!c.is_equal(&s));
-//}
+TEST_CASE( "circle is_equal to self", "[cpp_api::circle]" ) {
+  const double r = 1.0;
+  const Circle c(r);
+
+  REQUIRE(c.is_equal(&c));
+}
+
+TEST_CASE( "circle is_equal to circle with same radius", "[cpp_api::circle]" ) {
+  const double r = 1.0;
+  const Circle c(r);
+  const Circle c2(r);
+
+  REQUIRE(c.is_equal(&c2));
+}
+
+TEST_CASE( "circle is not equal to circle with different radius", "[cpp_api::circle]" ) {
+  const double r = 1.0;
+  const Circle c(r);
+  const Circle c2(r+1.0);
+
+  REQUIRE(!c.is_equal(&c2));
+}
+
+TEST_CASE( "circle is not equal to square", "[cpp_api::circle]" ) {
+  const double r = 1.0;
+  const Circle c(r);
+  const Square s(r);
+  REQUIRE(!c.is_equal(&s));
+}
 
 TEST_CASE( "circle with negative radius raises exception", "[cpp_api::circle]" ) {
   REQUIRE_THROWS_AS(Circle c(-1), Circle::exception);

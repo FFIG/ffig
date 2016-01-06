@@ -7,20 +7,22 @@ register = template.Library()
 
 #CPP filter to cast type if required
 @register.filter
-def restore_cpp_type(t):
+def restore_cpp_type(t,n):
     if t.kind == TypeKind.VOID:
-        return ''
+        return n
     if t.kind == TypeKind.INT:
-        return ''
+        return n
     if t.kind == TypeKind.DOUBLE:
-        return ''
+        return n
     if t.kind == TypeKind.BOOL:
-        return ''
+        return n
     if t.kind == TypeKind.POINTER:
         if t.pointee.kind == TypeKind.CHAR_S:
-            return ''
+            return n
         if t.pointee.kind == TypeKind.RECORD:
-            return '({})'.format(t.name)
+            # This is a hack until we can get an unqualified type from libclang
+            type_name = t.pointee.name.replace('const ','')
+            return '&(**reinterpret_cast<{}_ptr>({}))'.format(type_name, n)
     raise Exception('Type {} has no defined C++ type restoration (adding one for primitives is trivial)'.format(t.name))
 
 
