@@ -32,17 +32,17 @@ class TestPythonBindings(unittest.TestCase):
     
     self.assertAlmostEqual(perimeter, self.circle.perimeter())
 
-  def test_Shape_Circle_is_equal_to_self(self):
-    self.assertTrue(self.circle.is_equal(self.circle))
-
-  def test_Shape_Circle_is_equal_to_circle_with_same_radius(self):
-    self.assertTrue(self.circle.is_equal(Shape.Circle(self.radius)))
-  
-  def test_Shape_Circle_is_not_equal_to_circle_with_different_radius(self):
-    self.assertFalse (self.circle.is_equal(Shape.Circle(self.radius+1)))
-  
-  def test_Shape_Circle_is_not_equal_to_square(self):
-    self.assertFalse(self.circle.is_equal(Shape.Square(4)))
+#  def test_Shape_Circle_is_equal_to_self(self):
+#    self.assertTrue(self.circle.is_equal(self.circle))
+#
+#  def test_Shape_Circle_is_equal_to_circle_with_same_radius(self):
+#    self.assertTrue(self.circle.is_equal(Shape.Circle(self.radius)))
+#  
+#  def test_Shape_Circle_is_not_equal_to_circle_with_different_radius(self):
+#    self.assertFalse (self.circle.is_equal(Shape.Circle(self.radius+1)))
+#  
+#  def test_Shape_Circle_is_not_equal_to_square(self):
+#    self.assertFalse(self.circle.is_equal(Shape.Square(4)))
 
   def test_exception_on_negative_radius(self):
     with self.assertRaisesRegexp(Shape.Shape_error, 'Circle radius "-1.000000" must be non-negative.'):

@@ -49,6 +49,7 @@ class Tree
 
 ////////////////////////////////////////////////////////////////////////////////
 
+namespace {
 namespace api_obj {
 
   template<typename T, typename ...Ts>
@@ -65,6 +66,7 @@ namespace api_obj {
       return new std::shared_ptr<const Subobject>(*parent, object);
     }
 } // end namespace api_obj
+} // end anonymous namespace
 
 using Tree_ptr = const std::shared_ptr<const Tree>*;
 
