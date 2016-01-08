@@ -3,13 +3,7 @@ import sys
 import os
 import math
 
-testdir = os.path.dirname(__file__)
-moduledir = '../output'
-modulepath = os.path.abspath(os.path.join(testdir, moduledir))
-sys.path.insert(0, modulepath)
-
 import Shape
-Shape.Config.set_library_path(modulepath)
 
 class TestPythonBindings(unittest.TestCase):
   def setUp(self):

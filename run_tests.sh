@@ -2,6 +2,7 @@
 
 export PYTHONPATH=${LLVM_SRC_ROOT}/tools/clang/bindings/python:$PYTHONPATH
 export PYTHONPATH=$(pwd)/externals/clang_cpp_code_model:$PYTHONPATH
+export PYTHONPATH=$(pwd)/output:$PYTHONPATH
 
 export LD_LIBRARY_PATH="$(pwd)/output:${LD_LIBRARY_PATH}"
 

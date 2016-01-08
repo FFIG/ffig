@@ -31,7 +31,7 @@ class {{class.name}}:
     conf.lib.{{class.name}}_dispose(self)
 
 {% for impl in impl_classes %}class {{impl.name}}({{class.name}}): {% for method in impl.constructors %}
-  def __init__(self{% for arg in method.arguments %}, {{arg.name}}=None, _p=None{% endfor %}):
+  def __init__(self, {% for arg in method.arguments %} {{arg.name}}=None,{% endfor %} _p=None):
     if _p:
       self.ptr = _p
     else:
