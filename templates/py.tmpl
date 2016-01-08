@@ -57,7 +57,7 @@ methodList = [
   None),{% for impl in impl_classes %} {% for method in impl.constructors %}
   
   ("{{class.name}}_{{ impl.name }}_create",
-  [{% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|to_ctype}}{% endfor %}, POINTER(c_object_p)],
+  [{% for arg in method.arguments %}{{arg.type|to_ctype}}, {% endfor %}POINTER(c_object_p)],
   c_int),{% endfor %}{% endfor %} {% for method in class.methods %}
   
   ("{{ class.name }}_{{method.name}}",
