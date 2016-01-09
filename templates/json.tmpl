@@ -1,6 +1,6 @@
 {
-  "name" : "{{class.name}}"{% if class.methods %},  
-  "methods" : [{% for method in class.methods %}  
+  "name" : "{{class.name}}"{% if class.methods %},
+  "methods" : [{% for method in class.methods %}
     {
       "name" : "{{method.name}}",
       "return_type" : "{{method.return_type}}"

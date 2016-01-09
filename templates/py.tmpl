@@ -5,7 +5,7 @@ class {{class.name}}_error(Exception):
     def __init__(self):
         self.value = conf.lib.{{class.name}}_error()
         conf.lib.{{class.name}}_clear_error()
-    
+
     def __str__(self):
         return self.value
 
@@ -14,10 +14,10 @@ class {{class.name}}:
   def {{method.name}}(self{% for arg in method.arguments %}, {{arg.name}} {% endfor %}):
     {% if not method.returns_sub_object %}rv = {{method.return_type|to_output_ctype}}()
     rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
-    if rc == 0: 
+    if rc == 0:
       return rv.value
     raise {{class.name}}_error()
-    {% else %}    
+    {% else %}
     rv = c_object_p()
     rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
     if rc == 0:
@@ -40,7 +40,7 @@ class {{class.name}}:
       rc = conf.lib.{{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.name}},{% endfor %} byref(self.ptr))
       if rc != 0:
         raise Shape_error()
-{% endfor %} 
+{% endfor %}
 {% endfor %}
 
 methodList = [
@@ -48,19 +48,19 @@ methodList = [
   ("{{class.name}}_error",
   [],
   c_char_p),
-  
+
   ("{{class.name}}_clear_error",
   [],
   None),
-  
+
   ("{{class.name}}_dispose",
   [{{class.name}}],
   None),{% for impl in impl_classes %} {% for method in impl.constructors %}
-  
+
   ("{{class.name}}_{{ impl.name }}_create",
   [{% for arg in method.arguments %}{{arg.type|to_ctype}}, {% endfor %}POINTER(c_object_p)],
   c_int),{% endfor %}{% endfor %} {% for method in class.methods %}
-  
+
   ("{{ class.name }}_{{method.name}}",
   [{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_ctype}} {% endfor %}, POINTER({{method.return_type|to_output_ctype}})],
   c_int){% if not forloop.last %},{% endif %}{% endfor %}
@@ -137,7 +137,7 @@ class Config:
             msg = str(e) + ". To provide a path to {{class.name}} dylib use Config.set_library_path()"
             raise Exception(msg)
 
-        return library  
+        return library
 
 conf = Config()
 
