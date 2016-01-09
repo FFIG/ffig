@@ -19,25 +19,6 @@ const char* {{class.name}}_error()
 }
 
 namespace {
-namespace api_obj {
-
-  template<typename T, typename ...Ts>
-    static std::shared_ptr<T>* create(Ts&&...ts)
-    {
-      return new std::shared_ptr<T>(std::make_shared<T>(std::forward<Ts>(ts)...));
-    }
-
-  template<typename Parent, typename Subobject>
-    static std::shared_ptr<const Subobject>* subobject(const std::shared_ptr<const Parent>* parent, const Subobject* object)
-    {
-      if (!object) return nullptr;
-      //use aliasing constructor of shared_ptr to keep parent alive
-      return new std::shared_ptr<const Subobject>(*parent, object);
-    }
-} // end namespace api_obj
-} // end anonymous namespace
-
-namespace {
 using {{class.name}}_ptr = const std::shared_ptr<const {{class.name}}>*;
 } // end anonymous namespace
 
@@ -50,16 +31,15 @@ int {{ class.name }}_{{method.name}}(const void* my{{class.name}}{% for arg in m
 {
   try
   {
-    {% if not method.returns_sub_object %}*rv = (*reinterpret_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|restore_cpp_type:arg.name}}{% endfor %});{% else %}
-    auto p = reinterpret_cast<const {{class.name}}_ptr>(my{{class.name}});
+    {% if not method.returns_sub_object %}*rv = (*reinterpret_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|restore_cpp_type:arg.name}}{% endfor %});
+    {% else %}auto p = reinterpret_cast<const {{class.name}}_ptr>(my{{class.name}});
     auto subobj = (*p)->{{method.name}}({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|restore_cpp_type:arg.name}}{% endfor %});
-    {% if method.returns_nullable %}if ( ! subobj ) 
+    {% if method.returns_nullable %}if (!subobj) 
     { 
       *rv = nullptr; 
       return {{class.name}}_RC_SUCCESS; 
     }{% endif %}
-    *rv = new std::shared_ptr<{{method.return_type.pointee}}>(*p, subobj);
-    {% endif %}
+    *rv = new std::shared_ptr<{{method.return_type.pointee}}>(*p, subobj);{% endif %}
   }
   catch(const std::exception& e)
   {
@@ -75,7 +55,6 @@ int {{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg
   { 
     auto p = std::make_unique<const {{impl.name}}>({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|restore_cpp_type:arg.name}}{% endfor %});
     *rv = new std::shared_ptr<const {{class.name}}>(p.release());
-    //*rv = api_obj::create<const {{class.name}}>({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|restore_cpp_type:arg.name}}{% endfor %});
   }
   catch(const std::exception& e)
   {

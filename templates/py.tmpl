@@ -23,6 +23,7 @@ class {{class.name}}:
     if rc == 0:
       {% if method.returns_nullable %}if not bool(rv): return None{% endif %}
       return {{method.return_type|to_ctype}}(_p=rv)
+    raise {{class.name}}_error()
     {% endif  %}{% endfor %}
   def from_param(self):
     return self.ptr
