@@ -7,5 +7,6 @@ cp $INPUT output/
 pushd output > /dev/null
 INPUT_FILE=$(basename $INPUT)
 OUTPUT=${INPUT_FILE%.h}
-clang++-3.6 -std=c++14 -shared -Wl, -o lib${OUTPUT}_c.dylib -fPIC ${OUTPUT}_c.cpp || exit 1
+clang++-3.7 -fvisibility=hidden -g -std=c++14 -shared -Wl, -o lib${OUTPUT}_c.dylib -fPIC ${OUTPUT}_c.cpp || exit 1
+strip -x lib${OUTPUT}_c.dylib
 popd > /dev/null

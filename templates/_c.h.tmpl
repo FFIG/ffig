@@ -4,17 +4,19 @@
 #define {{class.name}}_RC_SUCCESS 0
 #define {{class.name}}_RC_FAIL 1
 
+#define EXPORT __attribute__((visibility("default")))
+
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-void {{class.name}}_clear_error();
-const char* {{class.name}}_error();
-void {{ class.name }}_dispose(const void* my{{class.name}});
+EXPORT void {{class.name}}_clear_error();
+EXPORT const char* {{class.name}}_error();
+EXPORT void {{ class.name }}_dispose(const void* my{{class.name}});
 {% for method in class.methods %}
-int {{ class.name }}_{{method.name}}(const void* my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}, {{method.return_type|to_c}}* rv);
+EXPORT int {{ class.name }}_{{method.name}}(const void* my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}, {{method.return_type|to_c}}* rv);
 {% endfor %} {% for impl in impl_classes %} {% for method in impl.constructors %}
-int {{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}},{% endfor %} const void** rv);
+EXPORT int {{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}},{% endfor %} const void** rv);
 {% endfor %} {% endfor %}
 #ifdef __cplusplus
 }
