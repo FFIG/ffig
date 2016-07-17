@@ -14,6 +14,7 @@ As of writing the pip clang bindings required clang-3.5.
 
 You can use homebrew (on OS X) to install clang-3.6.
 
+Update submodules with `git submodule update --init --recursive`.
 
 # Usage
 
@@ -33,3 +34,12 @@ running the following in `ipython` will exercise the generated python bindings.
     x = DERIVED_CLASS_NAME(CONSTRUCTOR_ARGUMENTS)
     x.MEMBER_FUNCTION_1(MEMBER_FUNCTION_ARGUMENTS_1)
     x.MEMBER_FUNCTION_2(MEMBER_FUNCTION_ARGUMENTS_2)
+
+# Issues 
+
+Please raise github issues if code cannot be generated where expected or if generated code does not behave as expected.
+
+
+# Contributing
+
+Contributions are very welcome, please look at unassigned github issues or raise issues for suggested improvements.
