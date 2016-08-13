@@ -24,3 +24,12 @@ sleep 1 # make sure you will see the message
         # before ruby quits
 puts "done"
 
+require 'ffi'
+
+module MyLib
+  extend FFI::Library
+  ffi_lib 'c'
+  attach_function :puts, [ :string ], :int
+end
+
+MyLib.puts 'Hello, World using libc!'
