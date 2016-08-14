@@ -12,8 +12,32 @@ module Shape_c
   attach_function :Shape_dispose, [:pointer], :void
 end
 
-class Circle
-  attr_reader :ptr
+class Shape
+  def initialize(objptr)
+    ptr = objptr.get_pointer(0)
+    @ptr = ptr
+    ObjectSpace.define_finalizer( self, self.class.finalize(ptr) )
+  end
+  
+  def area()
+    dptr = FFI::MemoryPointer.new :double
+    Shape_c.Shape_area(@ptr, dptr)
+    dptr.get_double(0)
+  end
+  
+  def perimeter()
+    dptr = FFI::MemoryPointer.new :double
+    Shape_c.Shape_perimeter(@ptr, dptr)
+    dptr.get_double(0)
+  end
+
+  def self.finalize(ptr)
+    proc { puts "disposing of Shape at #{ptr}"
+           Shape_c.Shape_dispose(ptr) }
+  end
+end
+
+class Circle < Shape
   def initialize(radius)
     objptr = FFI::MemoryPointer.new :pointer
     rc = Shape_c.Shape_Circle_create(10, objptr)
@@ -22,26 +46,33 @@ class Circle
       Shape_c.Shape_clear_error()
       raise Exception.new(msg)
     end
-    @ptr = objptr.get_pointer(0)
-
-    ObjectSpace.define_finalizer( self, self.class.finalize(ptr) )
+    super(objptr)
   end
+end
 
-  def area()
-    dptr = FFI::MemoryPointer.new :double
-    Shape_c.Shape_area(ptr, dptr)
-    dptr.get_double(0)
+class Pentagon < Shape
+  def initialize(radius)
+    objptr = FFI::MemoryPointer.new :pointer
+    rc = Shape_c.Shape_Pentagon_create(10, objptr)
+    if rc != 0
+      msg = Shape_c.Shape_error
+      Shape_c.Shape_clear_error()
+      raise Exception.new(msg)
+    end
+    super(objptr)
   end
-  
-  def perimeter()
-    dptr = FFI::MemoryPointer.new :double
-    Shape_c.Shape_perimeter(ptr, dptr)
-    dptr.get_double(0)
-  end
+end
 
-  def self.finalize(ptr)
-    proc { puts "disposing of Shape at #{ptr}"
-           Shape_c.Shape_dispose(ptr) }
+class Square < Shape
+  def initialize(radius)
+    objptr = FFI::MemoryPointer.new :pointer
+    rc = Shape_c.Shape_Square_create(10, objptr)
+    if rc != 0
+      msg = Shape_c.Shape_error
+      Shape_c.Shape_clear_error()
+      raise Exception.new(msg)
+    end
+    super(objptr)
   end
 end
 
