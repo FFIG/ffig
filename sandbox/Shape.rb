@@ -1,3 +1,5 @@
+require 'ffi'
+
 class Foo
   attr_reader :bar
   def initialize(n)
@@ -24,12 +26,32 @@ sleep 1 # make sure you will see the message
         # before ruby quits
 puts "done"
 
-require 'ffi'
 
-module MyLib
+module Shape
   extend FFI::Library
-  ffi_lib 'c'
-  attach_function :puts, [ :string ], :int
+  ffi_lib 'Shape_c'
+  attach_function :Shape_error, [], :string
+  attach_function :Shape_Circle_create, [:double, :pointer], :int
+  attach_function :Shape_area, [:pointer, :pointer], :int 
+  attach_function :Shape_perimeter, [:pointer, :pointer], :int 
+  attach_function :Shape_name, [:pointer, :pointer], :int 
+  attach_function :Shape_dispose, [:pointer], :void
 end
 
-MyLib.puts 'Hello, World using libc!'
+objptr = FFI::MemoryPointer.new :pointer
+c = Shape.Shape_Circle_create(10, objptr)
+objptr = objptr.get_pointer(0)
+
+dptr = FFI::MemoryPointer.new :double
+Shape.Shape_perimeter(objptr, dptr)
+puts "Perimeter is #{dptr.get_double(0)}"
+
+dptr = FFI::MemoryPointer.new :double
+Shape.Shape_area(objptr, dptr)
+puts "Area is #{dptr.get_double(0)}"
+
+Shape.Shape_dispose(objptr)
+
+Shape.Shape_Circle_create(-10, objptr)
+puts "Error is #{Shape.Shape_error}"
+
