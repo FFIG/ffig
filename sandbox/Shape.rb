@@ -30,13 +30,13 @@ class Circle
   def area()
     dptr = FFI::MemoryPointer.new :double
     Shape_c.Shape_area(ptr, dptr)
-    return dptr.get_double(0)
+    dptr.get_double(0)
   end
   
   def perimeter()
     dptr = FFI::MemoryPointer.new :double
     Shape_c.Shape_perimeter(ptr, dptr)
-    return dptr.get_double(0)
+    dptr.get_double(0)
   end
 
   def self.finalize(ptr)
