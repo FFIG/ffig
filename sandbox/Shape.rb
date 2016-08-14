@@ -31,6 +31,7 @@ module Shape
   extend FFI::Library
   ffi_lib 'Shape_c'
   attach_function :Shape_error, [], :string
+  attach_function :Shape_clear_error, [], :void
   attach_function :Shape_Circle_create, [:double, :pointer], :int
   attach_function :Shape_area, [:pointer, :pointer], :int 
   attach_function :Shape_perimeter, [:pointer, :pointer], :int 
@@ -54,4 +55,5 @@ Shape.Shape_dispose(objptr)
 
 Shape.Shape_Circle_create(-10, objptr)
 puts "Error is #{Shape.Shape_error}"
+Shape.Shape_clear_error()
 
