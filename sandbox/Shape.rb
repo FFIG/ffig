@@ -14,9 +14,8 @@ end
 
 class Shape
   def initialize(objptr)
-    ptr = objptr.get_pointer(0)
-    @ptr = ptr
-    ObjectSpace.define_finalizer( self, self.class.finalize(ptr) )
+    @ptr = objptr.get_pointer(0)
+    ObjectSpace.define_finalizer( self, self.class.finalize(@ptr) )
   end
   
   def area()
@@ -38,9 +37,9 @@ class Shape
 end
 
 class Circle < Shape
-  def initialize(radius)
+  def initialize(x)
     objptr = FFI::MemoryPointer.new :pointer
-    rc = Shape_c.Shape_Circle_create(10, objptr)
+    rc = Shape_c.Shape_Circle_create(x, objptr)
     if rc != 0
       msg = Shape_c.Shape_error
       Shape_c.Shape_clear_error()
@@ -51,9 +50,9 @@ class Circle < Shape
 end
 
 class Pentagon < Shape
-  def initialize(radius)
+  def initialize(x)
     objptr = FFI::MemoryPointer.new :pointer
-    rc = Shape_c.Shape_Pentagon_create(10, objptr)
+    rc = Shape_c.Shape_Pentagon_create(x, objptr)
     if rc != 0
       msg = Shape_c.Shape_error
       Shape_c.Shape_clear_error()
@@ -64,9 +63,9 @@ class Pentagon < Shape
 end
 
 class Square < Shape
-  def initialize(radius)
+  def initialize(x)
     objptr = FFI::MemoryPointer.new :pointer
-    rc = Shape_c.Shape_Square_create(10, objptr)
+    rc = Shape_c.Shape_Square_create(x, objptr)
     if rc != 0
       msg = Shape_c.Shape_error
       Shape_c.Shape_clear_error()
@@ -90,3 +89,4 @@ c = nil
 GC.start
 sleep 1 # make sure you will see the message
         # before ruby quits
+puts "Done"
