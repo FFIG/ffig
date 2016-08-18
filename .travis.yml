@@ -12,7 +12,7 @@ matrix:
       env: COMPILER='clang++-3.8'
 
 install:
-  - pip install clang
+  - pip install --user clang
 
 before_script: export CXX=${COMPILER}
 
