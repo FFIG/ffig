@@ -36,14 +36,20 @@ class Shape
   end
 end
 
+class ShapeError < Exception
+  def initialize()
+    msg = Shape_c.Shape_error
+    Shape_c.Shape_clear_error()
+    super(msg)
+  end
+end
+
 class Circle < Shape
   def initialize(x)
     objptr = FFI::MemoryPointer.new :pointer
     rc = Shape_c.Shape_Circle_create(x, objptr)
     if rc != 0
-      msg = Shape_c.Shape_error
-      Shape_c.Shape_clear_error()
-      raise Exception.new(msg)
+      raise ShapeError
     end
     super(objptr)
   end
@@ -54,9 +60,7 @@ class Pentagon < Shape
     objptr = FFI::MemoryPointer.new :pointer
     rc = Shape_c.Shape_Pentagon_create(x, objptr)
     if rc != 0
-      msg = Shape_c.Shape_error
-      Shape_c.Shape_clear_error()
-      raise Exception.new(msg)
+      raise ShapeError
     end
     super(objptr)
   end
@@ -67,9 +71,7 @@ class Square < Shape
     objptr = FFI::MemoryPointer.new :pointer
     rc = Shape_c.Shape_Square_create(x, objptr)
     if rc != 0
-      msg = Shape_c.Shape_error
-      Shape_c.Shape_clear_error()
-      raise Exception.new(msg)
+      raise ShapeError
     end
     super(objptr)
   end
@@ -85,6 +87,8 @@ puts "Area = #{c.area}"
 # In a real program you don't have to do this
 # ruby will run the GC automatically.
 c = nil
+
+c = Circle.new(-10)
 
 GC.start
 sleep 1 # make sure you will see the message
