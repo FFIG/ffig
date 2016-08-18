@@ -12,8 +12,24 @@ import HTMLParser
 import annotations
 html_parser = HTMLParser.HTMLParser()
 
-if not django.conf.settings.configured : 
-    django.conf.settings.configure(INSTALLED_APPS=('django_apps',),)                                                                 
+if not django.conf.settings.configured :
+    django.conf.settings.configure(
+            INSTALLED_APPS=('django_apps',),
+            TEMPLATES = [
+                {
+                    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                    'DIRS': [],
+                    'APP_DIRS': True,
+                    'OPTIONS': {
+                        'context_processors': [
+                            'django.template.context_processors.debug',
+                            'django.template.context_processors.request',
+                            'django.contrib.auth.context_processors.auth',
+                            'django.contrib.messages.context_processors.messages',
+                            ],
+                        },
+                    },
+                ])
 
 django.setup()
 
@@ -60,10 +76,10 @@ def get_template_output(class_name, template_name):
 if __name__ == "__main__":
     if len(sys.argv) != 4:
             raise Exception("Requires 3 arguments: got {}".format(str(sys.argv[1:])))
-    
+
     class_name = get_class_name(sys.argv[1])
 
-    tu = clang.cindex.TranslationUnit.from_source(sys.argv[1], ['-std=c++11','-x', 'c++'])    
+    tu = clang.cindex.TranslationUnit.from_source(sys.argv[1], ['-std=c++11','-x', 'c++'])
     classes = model.Model(tu).classes
     api_classes = collect_api_and_obj_classes(classes, 'GENERATE_C_API')
 
@@ -71,7 +87,7 @@ if __name__ == "__main__":
     output_dir = sys.argv[3];
 
     for t in [os.path.join(template_dir,x) for x in os.listdir(template_dir) if x.endswith(".tmpl")]:
-        with open(t) as template_file, open(os.path.join(output_dir,get_template_output(class_name, get_template_name(t))),"w") as output_file:                                
+        with open(t) as template_file, open(os.path.join(output_dir,get_template_output(class_name, get_template_name(t))),"w") as output_file:
             template = Template(template_file.read())
             s=render_api_and_obj_classes(api_classes, template)
             output_file.write(s)
