@@ -11,6 +11,9 @@ matrix:
           packages: ['clang-3.8']
       env: COMPILER='clang++-3.8'
 
+install:
+  - pip install clang
+
 before_script: export CXX=${COMPILER}
 
 script: ${TRAVIS_BUILD_DIR}/run_tests.sh
