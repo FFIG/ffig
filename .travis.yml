@@ -14,3 +14,4 @@ matrix:
 before_script: export CXX=${COMPILER}
 
 script: ${TRAVIS_BUILD_DIR}/run_tests.py
+
