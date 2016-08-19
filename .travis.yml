@@ -8,7 +8,7 @@ matrix:
       addons: &clang38
         apt:
           sources: ['llvm-toolchain-precise-3.8', 'ubuntu-toolchain-r-test']
-          packages: ['clang-3.8']
+          packages: ['clang-3.8', 'libclang-3.8-dev']
       env: COMPILER='clang++-3.8'
 
 install:
@@ -16,7 +16,7 @@ install:
 
 before_script: 
   - export CXX=${COMPILER}
-  - export LD_LIBRARY_PATH=`find /usr/libexec -name libclang.so`
+  - export LD_LIBRARY_PATH=`find /usr/lib/llvm-3.8 -name libclang.so`
 
 script: ${TRAVIS_BUILD_DIR}/run_tests.sh
 
