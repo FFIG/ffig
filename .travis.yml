@@ -14,7 +14,9 @@ matrix:
 install:
   - pip install --user clang django
 
-before_script: export CXX=${COMPILER}
+before_script: 
+  - export CXX=${COMPILER}
+  - export LD_LIBRARY_PATH=`find /usr/libexec -name libclang.so`
 
 script: ${TRAVIS_BUILD_DIR}/run_tests.sh
 
