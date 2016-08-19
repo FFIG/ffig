@@ -12,7 +12,7 @@ matrix:
       env: COMPILER='clang++-3.8'
 
 install:
-  - pip install --user clang
+  - pip install --user clang django
 
 before_script: export CXX=${COMPILER}
 
