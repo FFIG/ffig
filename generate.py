@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     class_name = get_class_name(sys.argv[1])
 
-    tu = clang.cindex.TranslationUnit.from_source(sys.argv[1], ['-std=c++11','-x', 'c++'])
+    tu = clang.cindex.TranslationUnit.from_source(sys.argv[1], ['-std=c++11','-x', 'c++','-stdlib=libc++'])
     classes = model.Model(tu).classes
     api_classes = collect_api_and_obj_classes(classes, 'GENERATE_C_API')
 
