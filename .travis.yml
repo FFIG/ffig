@@ -1,0 +1,33 @@
+sudo: false
+language: cpp
+
+matrix:
+  include:
+    - os: linux
+      compiler: clang
+      addons: &clang38
+        apt:
+          sources: ['llvm-toolchain-precise-3.8', 'ubuntu-toolchain-r-test']
+          packages: ['clang-3.8', 'libclang-3.8-dev']
+      env: COMPILER='clang++-3.8'
+
+install:
+  - pip install --user clang django nose
+  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
+  - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      CMAKE_URL="http://www.cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz"
+      mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
+      export PATH=${DEPS_DIR}/cmake/bin:${PATH}
+    elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      brew install cmake
+    fi
+  - cd ${TRAVIS_BUILD_DIR}
+
+before_script: 
+  - export CXX=${COMPILER}
+  - export LD_LIBRARY_PATH=$(dirname $(find /usr/lib/llvm-3.8 -name libclang.so))
+
+script: ${TRAVIS_BUILD_DIR}/run_tests.sh
+
