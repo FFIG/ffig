@@ -73,11 +73,22 @@ def get_template_output(class_name, template_name):
     extension = split_name[-1]
     return "{}{}.{}".format(class_name, suffix_name, extension)
 
+def collect_classes(source_files, args='-x c++ -std=c++14 -stdlib=libc++'):
+    classes = []
+    for f in source_files:
+        with open(f) as i:
+            tu = clang.cindex.TranslationUnit.from_source(i, args.split())
+            #FIXME: Handle duplicates if multiple TUs pull in the same class def.
+            classes.extend(model.Model(tu).classes)
+    return classes
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 4:
             raise Exception("Requires 3 arguments: got {}".format(str(sys.argv[1:])))
 
     class_name = get_class_name(sys.argv[1])
+
 
     tu = clang.cindex.TranslationUnit.from_source(sys.argv[1], ['-std=c++11','-x', 'c++','-stdlib=libc++'])
     classes = model.Model(tu).classes
@@ -86,7 +97,7 @@ if __name__ == "__main__":
     template_dir = sys.argv[2];
     output_dir = sys.argv[3];
 
-    for t in [os.path.join(template_dir,x) for x in os.listdir(template_dir) if x.endswith(".tmpl")]:
+    for t in [os.path.join(template_dir,x) for x in os.listdir(template_dir) if x.endswith(".templ")]:
         with open(t) as template_file, open(os.path.join(output_dir,get_template_output(class_name, get_template_name(t))),"w") as output_file:
             template = Template(template_file.read())
             s=render_api_and_obj_classes(api_classes, template)
