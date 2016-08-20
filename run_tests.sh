@@ -13,7 +13,7 @@ echo " [OK]"
 HEADERS=Shape.h
 for HEADER in input/*
   do echo -n Generating bindings for ${HEADER}
-  ./_build.sh ${HEADER} templates || exit 1
+  ./_build.sh ${HEADER} || exit 1
   echo " [OK]" 
 done
 

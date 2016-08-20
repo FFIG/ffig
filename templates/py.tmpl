@@ -123,8 +123,7 @@ class Config:
         elif name == 'Windows':
             file = '{{class.name}}_c.dll'
         else:
-            #FIXME This should be .so but generation scripts need fixing first.
-            file = 'lib{{class.name}}_c.dylib'
+            file = 'lib{{class.name}}_c.so'
 
         if Config.library_path:
             file = Config.library_path + '/' + file
