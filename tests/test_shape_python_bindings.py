@@ -1,50 +1,53 @@
-import unittest
 import sys
 import os
 import math
-
+import nose
 import Shape
 
-class TestPythonBindings(unittest.TestCase):
-  def setUp(self):
-    self.radius = 3.0
-    self.circle = Shape.Circle(self.radius)
+def test_Shape_Circle_is_called_Circle():
+    c = Shape.Circle(3)
+    assert c.name() == "Circle"
 
-  def tearDown(self):
-    del self.circle
-  
-  def test_Shape_Circle_is_called_Circle(self):
-    self.assertEqual("Circle", self.circle.name())
 
-  def test_Shape_Circle_has_expected_area(self):
-    area = self.radius * self.radius * math.pi
-    
-    self.assertAlmostEqual(area, self.circle.area())
+def test_Shape_Circle_has_expected_area():
+    r = 2.0
+    c = Shape.Circle(r)
+    a = math.pi * r * r
+    print a
+    print c.area()
+    nose.tools.assert_almost_equal(c.area(), a)
 
-  def test_Shape_Circle_has_expected_perimeter(self):
-    perimeter = 2.0 * math.pi * self.radius
-    
-    self.assertAlmostEqual(perimeter, self.circle.perimeter())
 
-  def test_Shape_Circle_is_equal_to_self(self):
-    self.assertTrue(self.circle.is_equal(self.circle))
+def test_Shape_Circle_has_expected_perimeter():
+    r = 2.0
+    c = Shape.Circle(r)
+    p = 2.0 * math.pi * r
+    nose.tools.assert_almost_equal(c.perimeter(), p)
 
-  def test_Shape_Circle_is_equal_to_circle_with_same_radius(self):
-    self.assertTrue(self.circle.is_equal(Shape.Circle(self.radius)))
-  
-  def test_Shape_Circle_is_not_equal_to_circle_with_different_radius(self):
-    self.assertFalse (self.circle.is_equal(Shape.Circle(self.radius+1)))
-  
-  def test_Shape_Circle_is_not_equal_to_square(self):
-    self.assertFalse(self.circle.is_equal(Shape.Square(4)))
 
-  def test_exception_on_negative_radius(self):
-    with self.assertRaisesRegexp(Shape.Shape_error, 'Circle radius "-1.000000" must be non-negative.'):
-      Shape.Circle(-1)
+def test_Shape_Circle_is_equal_to_itself():
+    c = Shape.Circle(2)
+    assert c.is_equal(c)
 
-def main():
-  unittest.main()
 
-if __name__ == '__main__':
-  main()
+def test_Shape_Circle_is_equal_to_another_circle_with_the_same_radius():
+    c1 = Shape.Circle(2)
+    c2 = Shape.Circle(2)
+    assert c1.is_equal(c2)
+
+
+def test_Shape_Circle_is_not_equal_to_circle_with_different_radius():
+    c1 = Shape.Circle(2)
+    c2 = Shape.Circle(3)
+    assert not c1.is_equal(c2)
+
+def test_Shape_Circle_is_not_equal_to_square():
+    c = Shape.Circle(2)
+    s = Shape.Square(2)
+    assert not c.is_equal(s)
+
+
+@nose.tools.raises(Exception)
+def test_exception_on_negative_radius():
+    Shape.Circle(-1)
 
