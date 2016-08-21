@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -u
+set -e
 
 export PYTHONPATH=$(pwd)/externals/clang_cpp_code_model:$PYTHONPATH
 export PYTHONPATH=$(pwd)/output:$PYTHONPATH
