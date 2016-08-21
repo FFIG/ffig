@@ -7,7 +7,7 @@ equivalent classes in other languages (primarily Python for now) and binds them
 to the C++ implementation.
 
 
-# Setup (Linux and MacOS)
+# Setup (Linux and macOS)
 
 You will need libclang 3.8 and clang python bindings.
 
