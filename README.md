@@ -47,7 +47,7 @@ New input files and templates are picked up automatically.
 
 # Output
 
-The 'output' directory is populated with c++, c and python bindings files along with a dynamic library.
+The 'output' directory is populated with C++, C and Python bindings files along with a dynamic library.
 
 Setting `LD_LIBRARY_PATH` so that the C-API bindings shared libraries in `output` can be found and
 running the following in `ipython` will exercise the generated python bindings.
