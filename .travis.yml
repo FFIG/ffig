@@ -31,3 +31,8 @@ before_script:
 
 script: ${TRAVIS_BUILD_DIR}/run_tests.sh
 
+notifications:
+  slack:
+    rooms:
+      - c-api:ZTxxqvEcr25iaaB8XBS7luaA#general
+      - c-api:ZTxxqvEcr25iaaB8XBS7luaA#travis-ci
