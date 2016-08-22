@@ -35,8 +35,7 @@ class Shape
   def name()
     dptr = FFI::MemoryPointer.new(:pointer, 1)
     Shape_c.Shape_name(@ptr, dptr)
-    strPtr = dptr.read_pointer()
-    return strPtr.null? ? nil : strPtr.read_string()
+    dptr.read_pointer().read_string()
   end
 
   def self.finalize(ptr)
