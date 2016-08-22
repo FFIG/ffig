@@ -85,20 +85,3 @@ class Square < Shape
   end
 end
 
-# r = 8
-# c = Circle.new(8)
-# puts "Radius = #{r}"
-# puts "Perimeter = #{c.perimeter}"
-# puts "Area = #{c.area}"
-# 
-# # Force ruby to start the Garbage Collector
-# # In a real program you don't have to do this
-# # ruby will run the GC automatically.
-# c = nil
-# 
-# c = Circle.new(-10)
-# 
-# GC.start
-# sleep 1 # make sure you will see the message
-#         # before ruby quits
-# puts "Done"
