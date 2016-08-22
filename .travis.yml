@@ -25,7 +25,7 @@ install:
     fi
   - cd ${TRAVIS_BUILD_DIR}
 
-before_script: 
+before_script:
   - export CXX=${COMPILER}
   - export LD_LIBRARY_PATH=$(dirname $(find /usr/lib/llvm-3.8 -name libclang.so))
 
@@ -35,4 +35,4 @@ notifications:
   slack:
     rooms:
       - c-api:ZTxxqvEcr25iaaB8XBS7luaA#general
-      - c-api:ZTxxqvEcr25iaaB8XBS7luaA#travis-ci
+
