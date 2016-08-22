@@ -13,6 +13,7 @@ matrix:
 
 install:
   - pip install --user clang django nose
+  - gem install ffi
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
   - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}
   - |
