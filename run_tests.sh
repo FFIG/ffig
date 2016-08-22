@@ -6,21 +6,22 @@ export PYTHONPATH=$(pwd)/output:$PYTHONPATH
 export LD_LIBRARY_PATH="$(pwd)/output:${LD_LIBRARY_PATH}"
 
 echo -n Cleaning output
-rm -rf output || exit 1
+rm -rf output
 mkdir output
 echo " [OK]" 
 
 HEADERS=Shape.h
 for HEADER in input/*
   do echo -n Generating bindings for ${HEADER}
-  ./_build.sh ${HEADER} || exit 1
+  ./_build.sh ${HEADER}
   echo " [OK]" 
 done
 
-exit 0
+echo Running python tests
+python -m nose -v tests/
 
-echo Running tests
-python -m nose -v tests/ || exit 1
+echo Running ruby tests
+ruby tests/TestShape.rb
 
 echo Running CPP tests
 mkdir -p tests/build

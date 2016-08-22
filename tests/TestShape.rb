@@ -1,5 +1,5 @@
 require "test/unit"
-require_relative "Shape"
+require_relative "../output/Shape"
 
 class TestShape < Test::Unit::TestCase
   def test_name
