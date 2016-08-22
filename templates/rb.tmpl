@@ -1,0 +1,27 @@
+{% autoescape off %}{% load capi_filter %}require 'ffi'
+
+module {{class.name}}_c
+  extend FFI::Library
+  ffi_lib '{{class.name}}_c'
+  attach_function :{{class.name}}_dispose, [:pointer], :void
+  attach_function :{{class.name}}_error, [], :string
+  attach_function :{{class.name}}_clear_error, [], :void {% for method in class.methods %}
+  attach_function :{{class.name}}_{{method.name}}, [:pointer], :void{% endfor %}
+end
+
+class {{class.name}}
+
+  def initialize(objptr)
+    @ptr = objptr.get_pointer(0)
+    ObjectSpace.define_finalizer( self, self.class.finalize(@ptr) )
+  end
+
+  def self.finalize(ptr)
+    proc { {{class.name}}_c.{{class.name}}_dispose(ptr) }
+  end
+  {% for method in class.methods %}
+  def {{method.name}}
+    {{class.name}}_c.{{method.name}}(@ptr)
+  end
+{% endfor %} end
+{% endautoescape %}
