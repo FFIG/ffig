@@ -40,8 +40,7 @@ class Shape
   end
 
   def self.finalize(ptr)
-    proc { puts "disposing of Shape at #{ptr}"
-           Shape_c.Shape_dispose(ptr) }
+    proc { Shape_c.Shape_dispose(ptr) }
   end
 end
 
