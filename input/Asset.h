@@ -7,6 +7,7 @@
 struct Asset
 {
   virtual double PV() const = 0;
+  virtual const char* name() const = 0;
   virtual ~Asset() = default;
 } C_API;
 
@@ -14,6 +15,7 @@ struct CDO : Asset
 {
   CDO() {}
 
-  double PV() const { return 0.0; }
+  double PV() const override { return 0.0; }
+  const char* name() const override { return "CDO"; }
 };
 

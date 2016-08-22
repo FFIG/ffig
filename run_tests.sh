@@ -23,7 +23,7 @@ echo Running python tests
 python -m nose -v tests/
 
 echo Running ruby tests
-ruby tests/TestShape.rb
+for t in tests/Test*.rb ; do ruby $t ; done
 
 echo Running CPP tests
 mkdir -p tests/build
