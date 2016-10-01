@@ -1,15 +1,9 @@
-import sys
-import os
+import common
 import math
 import nose
 import Shape
 
-if sys.platform == 'darwin':
-    # OS X doesn't use DYLD_LIBRARY_PATH if System Integrity Protection is
-    # enabled. Set the library path manually.
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    output_dir = script_dir + '/../output'
-    Shape.Config.set_library_path(output_dir)
+common.set_library_path(Shape.Config)
 
 def test_Shape_Circle_is_called_Circle():
     c = Shape.Circle(3)

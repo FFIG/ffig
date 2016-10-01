@@ -1,13 +1,7 @@
 from Tree import *
-import os
-import sys
+import common
 
-if sys.platform == 'darwin':
-    # OS X doesn't use DYLD_LIBRARY_PATH if System Integrity Protection is
-    # enabled. Set the library path manually.
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    output_dir = script_dir + '/../output'
-    Config.set_library_path(output_dir)
+common.set_library_path(Config)
 
 def test_root_node_is_non_null():
     t = Tree(2)
