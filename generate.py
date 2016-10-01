@@ -12,6 +12,12 @@ import HTMLParser
 import annotations
 html_parser = HTMLParser.HTMLParser()
 
+if sys.platform == 'darwin':
+    # OS X doesn't use DYLD_LIBRARY_PATH if System Integrity Protection is
+    # enabled. Set the library path for libclang manually.
+    clang.cindex.Config.set_library_path(
+        '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib')
+
 if not django.conf.settings.configured :
     django.conf.settings.configure(
             INSTALLED_APPS=('django_apps',),
