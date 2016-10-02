@@ -2,7 +2,9 @@
 
 module {{class.name}}_c
   extend FFI::Library
-  ffi_lib '{{class.name}}_c'
+  ffi_lib ['{{class.name}}_c',
+           File.dirname(__FILE__) + '/lib{{class.name}}_c.so',
+           File.dirname(__FILE__) + '/lib{{class.name}}_c.dylib' ]
   attach_function :{{class.name}}_dispose, [:pointer], :void
   attach_function :{{class.name}}_error, [], :string
   attach_function :{{class.name}}_clear_error, [], :void 
