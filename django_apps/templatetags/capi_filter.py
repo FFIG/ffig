@@ -99,6 +99,24 @@ def to_output_ctype(t):
         if t.pointee.kind == TypeKind.RECORD:
             return 'c_object_p'
     raise Exception('No ctypes equivalent is defined for type {}'.format(t.name))
+    
+@register.filter
+def to_cpp_type(t):
+    if t.kind == TypeKind.VOID:
+        return 'void'
+    if t.kind == TypeKind.INT:
+        return 'int'
+    if t.kind == TypeKind.DOUBLE:
+        return 'double'
+    if t.kind == TypeKind.BOOL:
+        return 'bool'
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return 'const char *'
+        if t.pointee.kind == TypeKind.RECORD:
+            # This is a hack until we can get an unqualified type from libclang
+            return t.pointee.name.replace('const ','')
+    raise Exception('No c++ type equivalent is defined for type {} (adding one for primitives is trivial)'.format(t.name))
 
 @register.filter
 def to_ruby_type(t):

@@ -9,22 +9,30 @@ class {{class.name}}_error(Exception):
     def __str__(self):
         return self.value
 
-class {{class.name}}:
-  {% for method in class.methods %}
-  def {{method.name}}(self{% for arg in method.arguments %}, {{arg.name}} {% endfor %}):
-    {% if not method.returns_sub_object %}rv = {{method.return_type|to_output_ctype}}()
+class {{class.name}}: 
+  {% if not class.is_abstract %} {% for method in class.constructors %}
+  def __init__(self, {% for arg in method.arguments %} {{arg.name}}=None,{% endfor %} _p=None):
+    if _p:
+      self.ptr = _p
+    else:
+      self.ptr = c_object_p()
+      rc = conf.lib.{{class.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.name}},{% endfor %} byref(self.ptr))
+      if rc != 0:
+        raise {{class.name}}_error()
+  {% endfor %} {% endif %} {% for method in class.methods %}
+  def {{method.name}}(self{% for arg in method.arguments %}, {{arg.name}} {% endfor %}):{% if not method.returns_sub_object %}
+    rv = {{method.return_type|to_output_ctype}}()
     rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
     if rc == 0:
       return rv.value
-    raise {{class.name}}_error()
-    {% else %}
+    raise {{class.name}}_error(){% else %}
     rv = c_object_p()
     rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
     if rc == 0:
       {% if method.returns_nullable %}if not bool(rv): return None{% endif %}
       return {{method.return_type|to_ctype}}(_p=rv)
-    raise {{class.name}}_error()
-    {% endif  %}{% endfor %}
+    raise {{class.name}}_error() {% endif  %} 
+    {% endfor %}
   def from_param(self):
     return self.ptr
 
@@ -39,7 +47,7 @@ class {{class.name}}:
       self.ptr = c_object_p()
       rc = conf.lib.{{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.name}},{% endfor %} byref(self.ptr))
       if rc != 0:
-        raise Shape_error()
+        raise {{class.name}}_error()
 {% endfor %}
 {% endfor %}
 

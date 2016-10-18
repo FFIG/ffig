@@ -26,7 +26,22 @@ void {{ class.name }}_dispose(const void* my{{class.name}})
 {
   delete reinterpret_cast<{{class.name}}_ptr>(my{{class.name}});
 }
-{% for method in class.methods %}
+{% if not class.is_abstract %}{% for method in class.constructors %}
+int {{class.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}},{% endfor %} const void** rv)
+{
+  try
+  {
+    auto p = std::make_unique<const {{class.name}}>({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|restore_cpp_type:arg.name}}{% endfor %});
+    *rv = new std::shared_ptr<const {{class.name}}>(p.release());
+  }
+  catch(const std::exception& e)
+  {
+    {{class.name}}_error_ = e.what();
+    return {{class.name}}_RC_FAIL;
+  }
+  return {{class.name}}_RC_SUCCESS;
+}
+{% endfor %} {% endif %} {% for method in class.methods %}
 int {{ class.name }}_{{method.name}}(const void* my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}, {{method.return_type|to_c}}* rv)
 {
   try

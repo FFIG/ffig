@@ -13,6 +13,8 @@ extern "C"
 EXPORT void {{class.name}}_clear_error();
 EXPORT const char* {{class.name}}_error();
 EXPORT void {{ class.name }}_dispose(const void* my{{class.name}});
+{% if not class.is_abstract %}{% for method in class.constructors %}
+EXPORT int {{class.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}},{% endfor %} const void** rv); {% endfor %}{% endif %}
 {% for method in class.methods %}
 EXPORT int {{ class.name }}_{{method.name}}(const void* my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}, {{method.return_type|to_c}}* rv);
 {% endfor %} {% for impl in impl_classes %} {% for method in impl.constructors %}
