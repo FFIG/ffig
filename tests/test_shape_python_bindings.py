@@ -7,15 +7,13 @@ common.set_library_path(Shape.Config)
 
 def test_Shape_Circle_is_called_Circle():
     c = Shape.Circle(3)
-    assert c.name() == "Circle"
+    assert c.name().decode("utf-8") == u"Circle"
 
 
 def test_Shape_Circle_has_expected_area():
     r = 2.0
     c = Shape.Circle(r)
     a = math.pi * r * r
-    print a
-    print c.area()
     nose.tools.assert_almost_equal(c.area(), a)
 
 

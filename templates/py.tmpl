@@ -118,7 +118,8 @@ class Config:
     @CachedProperty
     def lib(self):
         lib = self._get_library()
-        map(lambda x:register_method(lib,x), methodList)
+        for m in methodList:
+          register_method(lib,m)
         Config.loaded = True
         return lib
 
