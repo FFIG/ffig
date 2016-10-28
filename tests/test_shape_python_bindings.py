@@ -9,7 +9,6 @@ def test_Shape_Circle_is_called_Circle():
     c = Shape.Circle(3)
     assert c.name().decode("utf-8") == u"Circle"
 
-
 def test_Shape_Circle_has_expected_area():
     r = 2.0
     c = Shape.Circle(r)

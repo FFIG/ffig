@@ -77,7 +77,7 @@ def to_ctype(t):
         return 'bool'
     if t.kind == TypeKind.POINTER:
         if t.pointee.kind == TypeKind.CHAR_S:
-            return 'c_char_p'
+            return 'c_string_p'
         if t.pointee.kind == TypeKind.RECORD:
             # This is a hack until we can get an unqualified type from libclang
             return t.pointee.name.replace('const ','')
@@ -95,7 +95,7 @@ def to_output_ctype(t):
         return 'bool'
     if t.kind == TypeKind.POINTER:
         if t.pointee.kind == TypeKind.CHAR_S:
-            return 'c_char_p'
+            return 'c_string_p'
         if t.pointee.kind == TypeKind.RECORD:
             return 'c_object_p'
     raise Exception('No ctypes equivalent is defined for type {}'.format(t.name))

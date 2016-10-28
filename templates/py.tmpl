@@ -1,6 +1,28 @@
 {% autoescape off %}{% load capi_filter %}from ctypes import *
 c_object_p = POINTER(c_void_p)
 
+# Python 3 strings are unicode, translate them to/from utf8 for C-interop
+if type(u"") == str:
+    class c_string_p(c_char_p):
+        def __init__(self, p=None):
+            if p is None:
+                p = ""
+            if type(p) == str:
+                p = p.encode("utf8")
+            super(c_char_p, self).__init__(p)
+
+        @property
+        def value(self):
+            return super(c_char_p, self).value.decode("utf8")
+
+        @classmethod
+        def from_param(cls, param):
+                return cls(param)
+
+else:
+    c_string_p = c_char_p
+
+
 class {{class.name}}_error(Exception):
     def __init__(self):
         self.value = conf.lib.{{class.name}}_error()
@@ -9,7 +31,7 @@ class {{class.name}}_error(Exception):
     def __str__(self):
         return self.value
 
-class {{class.name}}: 
+class {{class.name}}:
   {% if not class.is_abstract %} {% for method in class.constructors %}
   def __init__(self, {% for arg in method.arguments %} {{arg.name}}=None,{% endfor %} _p=None):
     if _p:
@@ -31,7 +53,7 @@ class {{class.name}}:
     if rc == 0:
       {% if method.returns_nullable %}if not bool(rv): return None{% endif %}
       return {{method.return_type|to_ctype}}(_p=rv)
-    raise {{class.name}}_error() {% endif  %} 
+    raise {{class.name}}_error() {% endif  %}
     {% endfor %}
   def from_param(self):
     return self.ptr
