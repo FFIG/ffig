@@ -22,6 +22,6 @@ RUN git clone --recurse-submodules https://github.com/jbcoe/C_API_generation /ho
 EXPOSE 8888
 WORKDIR /home/c-api-user/demo/demos
 VOLUME /home/c-api-user/demo/demos
-COPY run-server.sh .
+COPY docker/run-server.sh .
 CMD ["./run-server.sh"]
 
