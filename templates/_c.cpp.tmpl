@@ -4,8 +4,6 @@
 #include "{{class.name}}.h"
 
 {% load capi_filter %}
-// thread_local won't work on Apple clang:
-// http://stackoverflow.com/questions/28094794/why-does-apple-clang-disallow-c11-thread-local-when-official-clang-supports/29929949#29929949
 static thread_local std::string {{class.name}}_error_;
 
 void {{class.name}}_clear_error()
