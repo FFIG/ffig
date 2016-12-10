@@ -77,7 +77,7 @@ running the following in `ipython` will exercise the generated python bindings.
 
 #Continuous integration
 
-**Build status (on Travis-CI):** [![Build Status](https://travis-ci.org/jbcoe/C_API_generation.svg?branch=master)](https://travis-ci.org/jbcoe/C_API_generation)
+**Build status (on Travis-CI):** [![Build Status](https://travis-ci.org/jbcoe/ffig.svg?branch=master)](https://travis-ci.org/jbcoe/ffig)
 
 
 # Issues
