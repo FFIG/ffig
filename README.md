@@ -14,14 +14,6 @@ Python2 Python3 without requiring changes.
 FFIG is in early development. We welcome feedback from users but would
 encourage anyone looking to generate language bindings to look at SWIG.
 
-# Setup (Docker)
-
-To run an interactive demo using Jupyter Notebook and Docker:
-
-`docker run -d -p 8888:8888 jbcoe/c-api`
-
-Navigate to <http://localhost:8888> in a browser.
-
 
 # Setup (Linux and macOS)
 
