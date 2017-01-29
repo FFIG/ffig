@@ -21,7 +21,7 @@ To run an interactive demo using Jupyter Notebook and Docker:
 Build the container locally
 
 ```
-docker build -t ffig .
+docker build -t ffig_cont .
 docker run --name ffig_cont -d -p 8888:8888 ffig
 ```
 
