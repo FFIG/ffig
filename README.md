@@ -14,6 +14,18 @@ Python2 Python3 without requiring changes.
 FFIG is in early development. We welcome feedback from users but would
 encourage anyone looking to generate language bindings to look at SWIG.
 
+# Setup (Docker)
+
+To run an interactive demo using Jupyter Notebook and Docker:
+
+Build the container locally
+
+```
+docker build -t ffig .
+docker run --name ffig_cont -d -p 8888:8888 ffig
+```
+
+Navigate to <http://localhost:8888> in a browser.
 
 # Setup (Linux and macOS)
 
