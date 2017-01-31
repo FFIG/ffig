@@ -1,7 +1,6 @@
 #include <exception>
 #include <string>
 #include "{{class.name}}_c.h"
-{% load capi_filter %}
 namespace CPP_API {
 
 
@@ -13,9 +12,9 @@ protected:
 
 public:
   {% if not class.is_abstract %}{% for method in class.constructors %}
-  {{class.name}}({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type}} {{arg.name}}{% endfor %})
+  {{class.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type}} {{arg.name}}{% endfor %})
   {
-    int rc = {{class.name}}_{{class.name}}_create({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.name|c_object:arg.type}}{% endfor %}, &object_);
+    int rc = {{class.name}}_{{class.name}}_create({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.name|c_object(arg.type)}}{% endfor %}, &object_);
     if ( rc == {{class.name}}_RC_SUCCESS ) return;
     throw exception();
   }{% endfor %}{% endif %}
@@ -48,11 +47,11 @@ public:
     {{class.name}}_dispose(object_);
   }
 {% for method in class.methods %}
-  {{method.return_type|to_cpp_type}} {{method.name}}({% for arg in method.arguments %}{%if not forloop.first %}, {% endif %}{{arg.type}} {{arg.name}}{% endfor %}) const
+  {{method.return_type|to_cpp_type}} {{method.name}}({% for arg in method.arguments %}{%if not loop.first %}, {% endif %}{{arg.type}} {{arg.name}}{% endfor %}) const
   {
     {{method.return_type|to_cpp_type}} rv;
-    {% if not method.returns_sub_object %}int rc = {{class.name}}_{{method.name}}(object_{% for arg in method.arguments %}, {{arg.name|c_object:arg.type}}{% endfor %}, &rv);
-    {% else %}int rc = {{class.name}}_{{method.name}}(object_{% for arg in method.arguments %}, {{arg.name|c_object:arg.type}}{% endfor %}, &rv.object_);{% endif %}
+    {% if not method.returns_sub_object %}int rc = {{class.name}}_{{method.name}}(object_{% for arg in method.arguments %}, {{arg.name|c_object(arg.type)}}{% endfor %}, &rv);
+    {% else %}int rc = {{class.name}}_{{method.name}}(object_{% for arg in method.arguments %}, {{arg.name|c_object(arg.type)}}{% endfor %}, &rv.object_);{% endif %}
     if (rc == {{class.name}}_RC_SUCCESS) return rv;
     throw exception();
   }
@@ -62,9 +61,9 @@ public:
 class {{impl.name}} : public {{class.name}}
 {
 public:
-  {% for method in impl.constructors %}{{impl.name}}({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type}} {{arg.name}}{% endfor %})
+  {% for method in impl.constructors %}{{impl.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type}} {{arg.name}}{% endfor %})
   {
-    int rc = {{class.name}}_{{impl.name}}_create({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.name|c_object:arg.type}}{% endfor %}, &object_);
+    int rc = {{class.name}}_{{impl.name}}_create({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.name|c_object(arg.type)}}{% endfor %}, &object_);
     if ( rc == {{class.name}}_RC_SUCCESS ) return;
     throw exception();
   }{% endfor %}

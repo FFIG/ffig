@@ -3,7 +3,6 @@
 #include "{{class.name}}_c.h"
 #include "{{class.name}}.h"
 
-{% load capi_filter %}
 static thread_local std::string {{class.name}}_error_;
 
 void {{class.name}}_clear_error()
@@ -29,7 +28,7 @@ int {{class.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{ar
 {
   try
   {
-    auto p = std::make_unique<const {{class.name}}>({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|restore_cpp_type:arg.name}}{% endfor %});
+    auto p = std::make_unique<const {{class.name}}>({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
     *rv = new std::shared_ptr<const {{class.name}}>(p.release());
   }
   catch(const std::exception& e)
@@ -44,9 +43,9 @@ int {{ class.name }}_{{method.name}}(const void* my{{class.name}}{% for arg in m
 {
   try
   {
-    {% if not method.returns_sub_object %}*rv = (*reinterpret_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|restore_cpp_type:arg.name}}{% endfor %});
+    {% if not method.returns_sub_object %}*rv = (*reinterpret_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
     {% else %}auto p = reinterpret_cast<const {{class.name}}_ptr>(my{{class.name}});
-    auto subobj = (*p)->{{method.name}}({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|restore_cpp_type:arg.name}}{% endfor %});
+    auto subobj = (*p)->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
     {% if method.returns_nullable %}if (!subobj)
     {
       *rv = nullptr;
@@ -66,7 +65,7 @@ int {{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg
 {
   try
   {
-    auto p = std::make_unique<const {{impl.name}}>({% for arg in method.arguments %}{% if not forloop.first %}, {% endif %}{{arg.type|restore_cpp_type:arg.name}}{% endfor %});
+    auto p = std::make_unique<const {{impl.name}}>({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
     *rv = new std::shared_ptr<const {{class.name}}>(p.release());
   }
   catch(const std::exception& e)

@@ -1,12 +1,7 @@
-from django import template
 import cppmodel
 from cppmodel import TypeKind
 
-register = template.Library()
-
-
 #CPP filter to cast type if required
-@register.filter
 def restore_cpp_type(t,n):
     if t.kind == TypeKind.VOID:
         return n
@@ -27,7 +22,6 @@ def restore_cpp_type(t,n):
 
 
 #C filter to convert C++ type to C equivalent
-@register.filter
 def to_c(t):
     if t.kind == TypeKind.VOID:
         return 'void'
@@ -46,7 +40,6 @@ def to_c(t):
 
 
 #C++ header filter to extract C type from C++ type
-@register.filter
 def c_object(v,t):
     if t.kind == TypeKind.VOID:
         return v
@@ -65,7 +58,6 @@ def c_object(v,t):
 
 
 #Python filter to translate C-type to Python ctype type
-@register.filter
 def to_ctype(t):
     if t.kind == TypeKind.VOID:
         return None
@@ -83,7 +75,6 @@ def to_ctype(t):
             return t.pointee.name.replace('const ','')
     raise Exception('No ctypes equivalent is defined for type {}'.format(t.name))
 
-@register.filter
 def to_output_ctype(t):
     if t.kind == TypeKind.VOID:
         return None
@@ -100,7 +91,6 @@ def to_output_ctype(t):
             return 'c_object_p'
     raise Exception('No ctypes equivalent is defined for type {}'.format(t.name))
     
-@register.filter
 def to_cpp_type(t):
     if t.kind == TypeKind.VOID:
         return 'void'
@@ -118,7 +108,6 @@ def to_cpp_type(t):
             return t.pointee.name.replace('const ','')
     raise Exception('No c++ type equivalent is defined for type {} (adding one for primitives is trivial)'.format(t.name))
 
-@register.filter
 def to_ruby_type(t):
     if t.kind == TypeKind.VOID:
         return 'void'
@@ -135,7 +124,6 @@ def to_ruby_type(t):
             return 'pointer'
     raise Exception('No ruby equivalent is defined for type {}'.format(t.name))
 
-@register.filter
 def to_ruby_output_type(t):
     if t.kind == TypeKind.INT:
         return 'FFI::MemoryPointer.new :int'
@@ -150,7 +138,6 @@ def to_ruby_output_type(t):
             return 'FFI::MemoryPointer.new :pointer'
     raise Exception('No ruby equivalent is defined for type {}'.format(t.name))
 
-@register.filter
 def restore_ruby_type(t):
     if t.kind == TypeKind.INT:
         return 'get_int(0)'
@@ -162,3 +149,4 @@ def restore_ruby_type(t):
         if t.pointee.kind == TypeKind.RECORD:
             return 'get_pointer(0)'
     raise Exception('Type {} has no defined C++ type restoration (adding one for primitives is trivial)'.format(t.name))
+

@@ -5,7 +5,7 @@ RUN apt-get -y update && apt-get install -y python-software-properties software-
 RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
 RUN apt-get -y update && apt-get install -y python-pip git cmake ninja-build ruby pypy python3 clang libclang-3.8-dev libc++1 libc++-dev ruby-dev
 
-RUN pip install django clang jupyter notebook asciitree
+RUN pip install jinja2 clang jupyter notebook asciitree
 RUN gem install ffi
 
 RUN apt-get autoremove -y

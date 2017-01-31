@@ -11,45 +11,21 @@ import cppmodel
 import os
 import re
 import sys
-
-# FIXME: Remove the need for HTML parser
-import HTMLParser
-html_parser = HTMLParser.HTMLParser()
+import filters.capi_filter
+import inspect
 
 from os.path import abspath, join, dirname
 
-# -- BEGIN Old code --
-
-import django
-from django.template import Context, Template
+import jinja2
+from jinja2 import Environment, FileSystemLoader
 
 if sys.platform == 'darwin':
     # OS X doesn't use DYLD_LIBRARY_PATH if System Integrity Protection is
     # enabled. Set the library path for libclang manually.
     clang.cindex.Config.set_library_path(
         '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib')
-
-if not django.conf.settings.configured:
-    django.conf.settings.configure(
-        INSTALLED_APPS=('django_apps',),
-        TEMPLATES=[
-            {
-                'BACKEND': 'django.template.backends.django.DjangoTemplates',
-                'DIRS': [],
-                'APP_DIRS': True,
-                'OPTIONS': {
-                    'context_processors': [
-                        'django.template.context_processors.debug',
-                        'django.template.context_processors.request',
-                        'django.contrib.auth.context_processors.auth',
-                        'django.contrib.messages.context_processors.messages',
-                    ],
-                },
-            },
-        ])
-
-django.setup()
-
+    
+ffig_dir = abspath(dirname(__file__))
 
 def collect_api_and_obj_classes(classes, api_annotation):
     class APIClass:
@@ -62,8 +38,7 @@ def collect_api_and_obj_classes(classes, api_annotation):
             # if all([not m.is_pure_virtual for m in model_class.methods]):
             #    self.impls.append(model_class)
 
-    api_classes = {c.name: APIClass(
-        c) for c in classes if api_annotation in c.annotations}
+    api_classes = {c.name: APIClass(c) for c in classes if api_annotation in c.annotations}
 
     for c in classes:
         for b in c.base_classes:
@@ -76,10 +51,8 @@ def collect_api_and_obj_classes(classes, api_annotation):
 def render_api_and_obj_classes(api_classes, template):
     s = ""
     for c in api_classes:
-        s += str(template.render(
-            Context({"class": c.api_class, "impl_classes": c.impls})))
-    return html_parser.unescape(s)
-
+        s += str(template.render({"class": c.api_class, "impl_classes": c.impls}))
+    return s
 
 def get_class_name(header_path):
     header_name = os.path.basename(header_path)
@@ -118,13 +91,18 @@ def main(args):
     classes = m.classes
     api_classes = collect_api_and_obj_classes(classes, 'GENERATE_C_API')
 
-    output_dir = join(cwd, args.output_dir)
+    output_dir = abspath(join(cwd, args.output_dir))
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    for t in [os.path.join(args.template_dir, x) for x in args.bindings]:
-        with open(t) as template_file, open(join(output_dir, get_template_output(args.module_name, get_template_name(t))), "w") as output_file:
-            template = Template(template_file.read())
+    env = Environment(loader=FileSystemLoader(args.template_dir))
+    for f,_ in inspect.getmembers(filters.capi_filter):
+    #for f in ['to_output_ctype', 'to_ctype']:
+        env.filters[f] = getattr(filters.capi_filter, f)
+
+    for t in args.bindings:
+        with open(join(output_dir, get_template_output(args.module_name, get_template_name(t))), "w") as output_file:
+            template = env.get_template(t)
             s = render_api_and_obj_classes(api_classes, template)
             output_file.write(s)
     # -- END Old approach
@@ -160,7 +138,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '-t', '--template-dir',
         help='directory to search for templates',
-        default=join(ffig_dir, 'templates'),
+        default=join(ffig_dir, '.'),
         dest='template_dir')
     parser.add_argument(
         '-m', '--module-name',

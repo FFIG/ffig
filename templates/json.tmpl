@@ -4,6 +4,6 @@
     {
       "name" : "{{method.name}}",
       "return_type" : "{{method.return_type}}"
-    }{% if not forloop.last %},{% endif %}{% endfor %}
+    }{% if not loop.last %},{% endif %}{% endfor %}
   ]{% endif %}
 }

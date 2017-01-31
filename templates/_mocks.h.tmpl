@@ -2,7 +2,6 @@
 #include <exception>
 #include <eggs/variant.hpp>
 #include <functional>
-{% load capi_filter %}
 namespace mocks {
 
 struct Mock{{class.name}} : {{class.name}}
@@ -35,10 +34,10 @@ struct Mock{{class.name}} : {{class.name}}
     }
   };
 {% for method in class.methods %}
-  eggs::variant<{{method.return_type}}, std::function<{{method.return_type}}({% for arg in method.arguments %}{% if not forloop.first %},{% endif %}{{arg.type}}{% endfor %})>> {{method.name}}_;
+  eggs::variant<{{method.return_type}}, std::function<{{method.return_type}}({% for arg in method.arguments %}{% if not loop.first %},{% endif %}{{arg.type}}{% endfor %})>> {{method.name}}_;
 {%endfor%}
 {% for method in class.methods %}
-  {{method.return_type}} {{method.name}}({% for arg in method.arguments %}{%if not forloop.first %}, {% endif %}{{arg.type}} {{arg.name}}{% endfor %}) const override
+  {{method.return_type}} {{method.name}}({% for arg in method.arguments %}{%if not loop.first %}, {% endif %}{{arg.type}} {{arg.name}}{% endfor %}) const override
   {
     return MockMethodResult()("{{method.name}}", {{method.name}}_{%for arg in method.arguments %}, {{arg.name}}{% endfor %});
   }

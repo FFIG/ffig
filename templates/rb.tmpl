@@ -1,4 +1,4 @@
-{% autoescape off %}{% load capi_filter %}require 'ffi'
+require 'ffi'
 
 module {{class.name}}_c
   extend FFI::Library
@@ -44,7 +44,7 @@ class {{class.name}}
 
 {% for impl in impl_classes %}{% for method in impl.constructors %}
 class {{impl.name}} < {{class.name}}
-  def initialize({% for arg in method.arguments %}{{arg.name}}{% if not forloop.last %},{% endif %}{% endfor %})
+  def initialize({% for arg in method.arguments %}{{arg.name}}{% if not loop.last %},{% endif %}{% endfor %})
     objptr = FFI::MemoryPointer.new :pointer
     rc = {{class.name}}_c.{{class.name}}_{{impl.name}}_create({% for arg in method.arguments %}{{arg.name}}, {% endfor %}objptr)
     if rc != 0
@@ -54,4 +54,4 @@ class {{impl.name}} < {{class.name}}
   end
 end
 {% endfor %}{% endfor %}
-{% endautoescape %}
+

@@ -54,10 +54,9 @@ def build(input_file):
 
     # Call the FFIG generator in the same way that a user would.
     all_templates = [x for x in os.listdir(template_dir) if x.endswith('.tmpl')]
-    generator_call = 'python FFIG.py -m {} -i {} -o output -b {}'.format(
-            strip_extension(input_file), input_file, ' '.join(all_templates))
+    generator_call = 'python FFIG.py -m {} -i {} -o output -b {} -t {}'.format(
+            strip_extension(input_file), input_file, ' '.join(all_templates), template_dir)
     subprocess.check_call(generator_call.split(), cwd=root_dir)
-    
     shutil.copy(input_file, output_dir)
     
     # Compile the generated bindings.

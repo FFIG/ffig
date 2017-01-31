@@ -12,7 +12,7 @@ matrix:
       env: COMPILER='clang++-3.8'
 
 install:
-  - pip install --user clang django nose
+  - pip install --user clang jinja2 nose
   - gem install ffi
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
   - mkdir ${DEPS_DIR} && cd ${DEPS_DIR}

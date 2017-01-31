@@ -1,4 +1,4 @@
-{% autoescape off %}{% load capi_filter %}from ctypes import *
+from ctypes import *
 c_object_p = POINTER(c_void_p)
 
 # Python 3 strings are unicode, translate them to/from utf8 for C-interop
@@ -93,7 +93,7 @@ methodList = [
 
   ("{{ class.name }}_{{method.name}}",
   [{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_ctype}} {% endfor %}, POINTER({{method.return_type|to_output_ctype}})],
-  c_int){% if not forloop.last %},{% endif %}{% endfor %}
+  c_int){% if not loop.last %},{% endif %}{% endfor %}
 ]
 
 # library loading and method registrations
@@ -172,4 +172,3 @@ class Config:
 
 conf = Config()
 
-{% endautoescape %}
