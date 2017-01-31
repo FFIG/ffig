@@ -88,23 +88,22 @@ def collect_classes(source_files, args='-x c++ -std=c++14 -stdlib=libc++'):
             classes.extend(model.Model(tu).classes)
     return classes
 
-
-if __name__ == "__main__":
-    if len(sys.argv) != 4:
-            raise Exception("Requires 3 arguments: got {}".format(str(sys.argv[1:])))
-
-    class_name = get_class_name(sys.argv[1])
+def main(header_path, template_dir, output_dir):
+    class_name = get_class_name(header_path)
 
 
-    tu = clang.cindex.TranslationUnit.from_source(sys.argv[1], ['-std=c++11','-x', 'c++','-stdlib=libc++'])
+    tu = clang.cindex.TranslationUnit.from_source(header_path, ['-std=c++11','-x', 'c++','-stdlib=libc++'])
     classes = model.Model(tu).classes
     api_classes = collect_api_and_obj_classes(classes, 'GENERATE_C_API')
-
-    template_dir = sys.argv[2];
-    output_dir = sys.argv[3];
 
     for t in [os.path.join(template_dir,x) for x in os.listdir(template_dir) if x.endswith(".tmpl")]:
         with open(t) as template_file, open(os.path.join(output_dir,get_template_output(class_name, get_template_name(t))),"w") as output_file:
             template = Template(template_file.read())
             s=render_api_and_obj_classes(api_classes, template)
             output_file.write(s)
+
+if __name__ == "__main__":
+    if len(sys.argv) != 4:
+            raise Exception("Requires 3 arguments: got {}".format(str(sys.argv[1:])))
+    main(sys.argv[1], sys.argv[2], sys.argv[3])
+
