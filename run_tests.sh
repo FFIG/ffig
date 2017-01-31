@@ -24,6 +24,7 @@ which $PYTHON2 > /dev/null || PYTHON2=python
 
 echo Running python2 tests
 $PYTHON2 -m nose -v tests/
+$PYTHON2 -m nose -v tests/cppmodel
 
 #FIXME: Get Python 3 tests running on travis-ci
 #echo Running python3 tests
