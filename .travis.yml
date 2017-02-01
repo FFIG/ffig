@@ -10,3 +10,8 @@ install:
 
 script:
   - docker run ffig_cont /bin/bash -c "cd ../ && ./run_tests.sh"
+
+notifications:
+  slack:
+    rooms:
+      - c-api:ZTxxqvEcr25iaaB8XBS7luaA#general
