@@ -2,14 +2,28 @@ sudo: required
 
 language: python
 
+cache:
+  directories:
+    - /home/travis/docker/
+
+env:
+  global:
+    - DOCKER_REPOSITORY=jbcoe/ffig
+    - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar.gz
+   
 services:
   - docker
+  
+before_install:
+  - if [ -f ${DOCKER_CACHE_FILE} ]; then gunzip -c ${DOCKER_CACHE_FILE} | docker load || true; fi
 
 install:
-  - docker build -t ffig_cont .
+  - docker build -t ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} .
 
 script:
-  - docker run ffig_cont /bin/bash -c "cd ../ && ./run_tests.sh"
+  - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "cd ../ && ./run_tests.sh"
+  - mkdir -p $(dirname ${DOCKER_CACHE_FILE}) ; docker save $(docker history -q ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} | grep -v '<missing>') | gzip > ${DOCKER_CACHE_FILE};
+
 
 notifications:
   slack:
