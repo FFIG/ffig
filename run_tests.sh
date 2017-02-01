@@ -26,9 +26,8 @@ echo Running python2 tests
 $PYTHON2 -m nose -v tests/
 $PYTHON2 -m nose -v tests/cppmodel
 
-#FIXME: Get Python 3 tests running on travis-ci
-#echo Running python3 tests
-#python3 -m nose -v tests/
+echo Running python3 tests
+python3 -m nose -v tests/
 
 echo Running ruby tests
 for t in tests/Test*.rb ; do ruby $t ; done
