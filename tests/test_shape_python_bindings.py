@@ -1,9 +1,6 @@
-import common
 import math
 import nose
 import Shape
-
-common.set_library_path(Shape.Config)
 
 def test_Shape_Circle_is_called_Circle():
     c = Shape.Circle(3)

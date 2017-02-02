@@ -22,3 +22,4 @@ demos/Shape_cpp.h
 demos/Shape_mocks.h
 demos/cmake_install.cmake
 demos/libShape_c.dylib
+build

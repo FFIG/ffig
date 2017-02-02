@@ -1,3 +1,4 @@
+import os
 from ctypes import *
 c_object_p = POINTER(c_void_p)
 
@@ -155,15 +156,27 @@ class Config:
             file = '{{class.name}}_c.dll'
         else:
             file = 'lib{{class.name}}_c.so'
-
-        if Config.library_path:
-            file = Config.library_path + '/' + file
-
         return file
+
+    def _get_filepath(self):
+        filename = self._get_filename()
+        if not Config.library_path:
+            return filename
+        return os.path.join(Config.library_path, filename)
 
     def _get_library(self):
         try:
-            library = cdll.LoadLibrary(self._get_filename())
+            # Use user-specified library path.
+            if Config.library_path:
+                library = cdll.LoadLibrary(self._get_filepath())
+            else:
+                # Use local file
+                try:
+                    this_file_dir = os.path.abspath(os.path.dirname(__file__))
+                    library = cdll.LoadLibrary(os.path.join(this_file_dir, self._get_filename()))
+                except:
+                    # Use system library path (last).
+                    library = cdll.LoadLibrary(self._get_filename())
         except OSError as e:
             msg = str(e) + ". To provide a path to {{class.name}} dylib use Config.set_library_path()"
             raise Exception(msg)

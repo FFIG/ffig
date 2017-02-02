@@ -1,5 +1,6 @@
 require "test/unit"
-require_relative "../output/Shape"
+# FIXME: Remove this hardcoded path
+require_relative "../build/generated/Shape"
 
 class TestShape < Test::Unit::TestCase
   def test_name

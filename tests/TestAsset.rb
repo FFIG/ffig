@@ -1,5 +1,6 @@
 require "test/unit"
-require_relative "../output/Asset"
+# FIXME: Remove this hardcoded path
+require_relative "../build/generated/Asset"
 
 class TestAsset < Test::Unit::TestCase
   def test_CDO_name

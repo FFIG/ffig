@@ -5,7 +5,7 @@ RUN apt-get -y update && apt-get install -y python-software-properties software-
 RUN add-apt-repository -y ppa:ubuntu-toolchain-r/test
 RUN apt-get -y update && apt-get install -y python-pip git cmake ninja-build ruby pypy python3 python3-pip clang libclang-3.8-dev libc++1 libc++-dev ruby-dev
 
-RUN pip install --upgrade pip && pip install jinja2 clang jupyter notebook asciitree nose
+RUN pip install --upgrade pip && pip install jinja2 clang nose
 RUN pip3 install --upgrade pip && pip install nose
 RUN gem install ffi
 
@@ -18,11 +18,4 @@ ENV HOME /home/c-api-user
 ENV LD_LIBRARY_PATH /usr/lib/llvm-3.8/lib:$LD_LIBRARY_PATH
 
 COPY . /home/c-api-user/demo
-RUN cd /home/c-api-user/demo
-
-EXPOSE 8888
-WORKDIR /home/c-api-user/demo/demos
-VOLUME /home/c-api-user/demo/demos
-COPY docker/run-server.sh .
-
-CMD ["./run-server.sh"]
+WORKDIR /home/c-api-user/demo/
