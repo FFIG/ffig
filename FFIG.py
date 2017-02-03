@@ -42,10 +42,10 @@ def collect_api_and_obj_classes(classes, api_annotation):
 
     for c in classes:
         for b in c.base_classes:
-            if api_classes.has_key(b):
+            if b in api_classes:
                 api_classes[b].impls.append(c)
 
-    return [c for k, c in api_classes.iteritems()]
+    return [c for k, c in api_classes.items()]
 
 
 def render_api_and_obj_classes(api_classes, template):

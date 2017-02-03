@@ -118,16 +118,16 @@ class Class(object):
         self.source_column = int(cursor.location.column)
 
         for c in cursor.get_children():
-            if (c.kind == CursorKind.CXX_METHOD):
+            if c.kind == CursorKind.CXX_METHOD and c.type.kind == TypeKind.FUNCTIONPROTO:
                 f = Method(c)
                 self.methods.append(f)
-            elif (c.kind == CursorKind.CONSTRUCTOR):
+            elif c.kind == CursorKind.CONSTRUCTOR and c.type.kind == TypeKind.FUNCTIONPROTO:
                 f = Method(c)
                 self.constructors.append(f)
-            elif (c.kind == CursorKind.FIELD_DECL):
+            elif c.kind == CursorKind.FIELD_DECL:
                 f = Member(c)
                 self.members.append(f)
-            elif (c.kind == CursorKind.CXX_BASE_SPECIFIER):
+            elif c.kind == CursorKind.CXX_BASE_SPECIFIER:
                 self.base_classes.append(c.type.spelling)
 
 class Model(object):

@@ -86,7 +86,6 @@ def test_string_representation():
     model = cppmodel.Model(tu)
     c = model.classes[0]
 
-    print str(c)
     assert str(c) == "class A"
 
 
