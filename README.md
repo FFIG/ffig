@@ -15,19 +15,18 @@ FFIG is in early development. We welcome feedback from users but would
 encourage anyone looking to generate language bindings to look at SWIG.
 
 
-# Setup (Linux and macOS)
+# Setup (Linux)
 
-You will need libclang 3.8 and clang python bindings.
+You will need libclang >=3.8.
 
 libclang can be installed from homebrew on mac or here: <http://llvm.org/releases/>
 
-You can use pip to install python bindings for libclang:
-
-`pip install clang version==3.8`
-
 Set `LD_LIBRARY_PATH` so that libclang can be found.
 
-Update submodules with `git submodule update --init --recursive`.
+
+# Setup (macOS)
+
+Install Xcode. FFIG will use the version of libclang distributed with Xcode.
 
 
 # Setup (Windows)
@@ -54,7 +53,7 @@ The build uses cmake driven by a simple Python script. To build and run tests, r
 
 #Continuous integration
 
-**Build status (on Travis-CI):** [![Build Status](https://travis-ci.org/jbcoe/ffig.svg?branch=master)](https://travis-ci.org/jbcoe/ffig)
+**Build status (on Travis-CI):** [![Build Status](https://travis-ci.org/ffig/ffig.svg?branch=master)](https://travis-ci.org/ffig/ffig)
 
 
 # Issues
@@ -69,7 +68,7 @@ Contributions are very welcome, please look at unassigned github issues or raise
 
 # Attribution
 
-I've made considerable use of the following in putting this together:
+We've made considerable use of the following in putting this together:
 
 * <http://szelei.me/code-generator>
 * <http://blog.glehmann.net/2014/12/29/Playing-with-libclang>
@@ -79,5 +78,5 @@ Design of the python bindings is taken from clang's cindex.
 
 * <https://github.com/llvm-mirror/clang/tree/master/bindings/python>
 
-Mistakes are my own.
+Mistakes are our own.
 
