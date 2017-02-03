@@ -21,6 +21,10 @@ def main():
         help="config (Debug or Release)",
         default="Debug",
         dest="config")
+    parser.add_argument(
+        "--python-path",
+        help="path to python executable ie '/usr/local/bin/python3'",
+        dest="python_path")
     args = parser.parse_args()
 
     src_dir = os.path.dirname(os.path.dirname(__file__))
@@ -28,6 +32,8 @@ def main():
     cmake_invocation = "cmake . -B{} -DCMAKE_BUILD_TYPE={}".format(args.out_dir, args.config)    
     if args.verbose:
         cmake_invocation = cmake_invocation + " -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
+    if args.python_path:
+        cmake_invocation = cmake_invocation + " -DPYTHON_EXECUTABLE={}".format(args.python_path)
 
     subprocess.check_call(cmake_invocation.split(), cwd=src_dir)
     subprocess.check_call(
