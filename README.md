@@ -19,7 +19,7 @@ encourage anyone looking to generate language bindings to look at SWIG.
 
 You will need libclang >=3.8.
 
-libclang can be installed from homebrew on mac or here: <http://llvm.org/releases/>
+libclang can be installed from here: <http://llvm.org/releases/>
 
 Set `LD_LIBRARY_PATH` so that libclang can be found.
 
