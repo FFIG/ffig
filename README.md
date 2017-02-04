@@ -53,7 +53,7 @@ The build uses cmake driven by a simple Python script. To build and run tests, r
 
 #Continuous integration
 
-**Build status (on Travis-CI):** [![Build Status](https://travis-ci.org/ffig/ffig.svg?branch=master)](https://travis-ci.org/ffig/ffig)
+**Build status (on Travis-CI):** [![Build Status](https://travis-ci.org/FFIG/ffig.svg?branch=master)](https://travis-ci.org/FFIG/ffig)
 
 
 # Issues
