@@ -31,7 +31,7 @@ Install Xcode. FFIG will use the version of libclang distributed with Xcode.
 
 # Setup (Windows)
 
-Untested, minor issues expected.
+Work in progress, minor issues expected.
 
 
 ## Submodules
