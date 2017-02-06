@@ -137,7 +137,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '-t', '--template-dir',
         help='directory to search for templates',
-        default=join(ffig_dir, '.'),
+        default=join(ffig_dir, 'templates'),
         dest='template_dir')
     parser.add_argument(
         '-m', '--module-name',

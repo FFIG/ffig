@@ -35,7 +35,7 @@ function(ffig_add_library)
   set(module ${ffig_add_library_NAME})
   set(input ${ffig_add_library_INPUTS})
 
-  set(ffig_invocation "-i;${input};-m;${module};-t;${CMAKE_SOURCE_DIR}/templates;-o;${CMAKE_BINARY_DIR}/generated;-b;_c.h.tmpl;_c.cpp.tmpl")
+  set(ffig_invocation "-i;${input};-m;${module};-o;${CMAKE_BINARY_DIR}/generated;-b;_c.h.tmpl;_c.cpp.tmpl")
   set(ffig_outputs "${CMAKE_BINARY_DIR}/generated/${module}_c.h;${CMAKE_BINARY_DIR}/generated/${module}_c.cpp")  
   set(ffig_output_dir "${CMAKE_BINARY_DIR}/generated")
 
@@ -57,7 +57,7 @@ function(ffig_add_library)
   endif()
 
   add_custom_command(OUTPUT ${ffig_outputs}
-    COMMAND ${PYTHON_EXECUTABLE} FFIG.py ${ffig_invocation}
+    COMMAND ${PYTHON_EXECUTABLE} ffig/FFIG.py ${ffig_invocation}
     DEPENDS ${input}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 

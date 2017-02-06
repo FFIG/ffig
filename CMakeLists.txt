@@ -35,7 +35,7 @@ enable_testing()
 add_test(
   NAME test_cppmodel
   COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_SOURCE_DIR}/tests/cppmodel
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ffig)
 
 add_test(
   NAME test_python_bindings
