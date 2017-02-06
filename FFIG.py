@@ -4,10 +4,9 @@
 # libclang and passes the class and function information on to templates to
 # generate a c-api and language bindings.
 
-import annotations  # FIXME: Move this into the cppmodel
 import argparse
 import clang
-import cppmodel
+from cppmodel import Model, apply_class_annotations
 import os
 import re
 import sys
@@ -31,7 +30,7 @@ def collect_api_and_obj_classes(classes, api_annotation):
     class APIClass:
 
         def __init__(self, model_class):
-            self.api_class = annotations.apply_class_annotations(model_class)
+            self.api_class = apply_class_annotations(model_class)
             self.impls = []
             # If a class has no pure virtual methods it can be considered as an
             # implementation class
@@ -83,7 +82,7 @@ def main(args):
     #FIXME: Loop over files and extend the model once we can handle multiple input files.
     i = join(cwd, args.inputs[0])
     tu = clang.cindex.TranslationUnit.from_source(i, '-x c++ -std=c++14 -stdlib=libc++'.split())
-    m = cppmodel.Model(tu)
+    m = Model(tu)
 
     m.module_name = args.module_name
 
