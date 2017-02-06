@@ -61,6 +61,6 @@ TEST_CASE( "circle is not equal to square", "[cpp_api::circle]" ) {
 }
 
 TEST_CASE( "circle with negative radius raises exception", "[cpp_api::circle]" ) {
-  REQUIRE_THROWS_AS(Circle c(-1), Circle::exception);
+  REQUIRE_THROWS_AS(Circle(-1), Circle::exception);
 }
 

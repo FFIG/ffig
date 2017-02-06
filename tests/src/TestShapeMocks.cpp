@@ -49,7 +49,7 @@ TEST_CASE("MockShape", "[mocks::MockShape]")
   GIVEN("A mock shape with function objects returning values")
   {
     mocks::MockShape shape;
-    size_t area_f_count = 0;
+    int area_f_count = 0;
     shape.area_ = [&area_f_count]{ ++area_f_count; return 0.0;};
 
     THEN("All method invocations return expected values through function invocations")

@@ -5,7 +5,11 @@ set(CMAKE_MACOSX_RPATH 1)
 
 project(test_ffig)
 
-set(CMAKE_CXX_FLAGS "-std=c++14")
+if(MSVC)
+  add_compile_options("/EHsc")
+else()
+  add_compile_options("-std=c++14")
+endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(ffig)
@@ -13,8 +17,17 @@ include(ffig)
 include_directories(externals/catch/include)
 include_directories(externals/variant/include)
 
+# Check that the found version of Python==3 on Windows.
+# Trust the user if they have supplied their own.
+# FIXME: Get to the botton of the libclang/ctypes issues with Python2.
 if(NOT PYTHON_EXECUTABLE)
   find_package(PythonInterp REQUIRED)
+  if(WIN32)
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; assert sys.version_info[0] == 3" RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
+    if(result)
+      message(FATAL_ERROR "CMake failed: Python 3 is required for Windows.")
+    endif()
+  endif()
 else()
   execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import this" RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
   if(result)
@@ -22,11 +35,16 @@ else()
   endif()
 endif()
 
-find_package(Ruby REQUIRED)
+find_package(Ruby)
+if(Ruby_FOUND)
+  set(ffig_bindings "PYTHON;RUBY;CPP;CPP_MOCKS")
+else()
+  set(ffig_bindings "PYTHON;CPP;CPP_MOCKS")
+endif()
 
-ffig_add_library(NAME Shape INPUTS input/Shape.h PYTHON RUBY CPP CPP_MOCKS)
-ffig_add_library(NAME Tree INPUTS input/Tree.h PYTHON RUBY CPP CPP_MOCKS)
-ffig_add_library(NAME Asset INPUTS input/Asset.h PYTHON RUBY CPP CPP_MOCKS)
+ffig_add_library(NAME Shape INPUTS input/Shape.h ${ffig_bindings})
+ffig_add_library(NAME Tree INPUTS input/Tree.h ${ffig_bindings})
+ffig_add_library(NAME Asset INPUTS input/Asset.h ${ffig_bindings})
 
 add_subdirectory(tests/src)
 
@@ -42,15 +60,18 @@ add_test(
   COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_SOURCE_DIR}/tests
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
 
-add_test(
-  NAME test_ruby_bindings
-  COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/TestShape.rb ${CMAKE_SOURCE_DIR}/tests/TestShape.rb
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+if(Ruby_FOUND)
+  add_test(
+    NAME test_ruby_bindings
+    COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/TestShape.rb ${CMAKE_SOURCE_DIR}/tests/TestShape.rb
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+endif()
 
 add_test(
   NAME test_cpp_mocks
   COMMAND ${CMAKE_BINARY_DIR}/tests/src/TestShapeMocks
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+
 
 add_test(
   NAME test_cpp_circle
