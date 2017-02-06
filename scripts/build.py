@@ -33,7 +33,7 @@ def main():
 
     cmake_invocation = ['cmake', '.','-B{}'.format(args.out_dir)]
     if args.platform == 'Windows':
-        cmake_invocation.append('-G"Visual Studio 14 2015 Win64"')
+        cmake_invocation.extend(['-G', '"Visual Studio 14 2015 Win64"'])
     else:
         cmake_invocation.append('-DCMAKE_BUILD_TYPE={}'.format(args.config))
 
