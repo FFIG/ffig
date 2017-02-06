@@ -6,17 +6,15 @@
 
 import argparse
 import clang
-from cppmodel import Model, apply_class_annotations
+import inspect
+import jinja2
 import os
+import os.path
 import re
 import sys
+
+import cppmodel
 import filters.capi_filter
-import inspect
-
-from os.path import abspath, join, dirname
-
-import jinja2
-from jinja2 import Environment, FileSystemLoader
 
 if sys.platform == 'darwin':
     # OS X doesn't use DYLD_LIBRARY_PATH if System Integrity Protection is
@@ -24,13 +22,13 @@ if sys.platform == 'darwin':
     clang.cindex.Config.set_library_path(
         '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib')
     
-ffig_dir = abspath(dirname(__file__))
+ffig_dir = os.path.abspath(os.path.dirname(__file__))
 
 def collect_api_and_obj_classes(classes, api_annotation):
     class APIClass:
 
         def __init__(self, model_class):
-            self.api_class = apply_class_annotations(model_class)
+            self.api_class = cppmodel.apply_class_annotations(model_class)
             self.impls = []
             # If a class has no pure virtual methods it can be considered as an
             # implementation class
@@ -40,12 +38,11 @@ def collect_api_and_obj_classes(classes, api_annotation):
     api_classes = {c.name: APIClass(c) for c in classes if api_annotation in c.annotations}
 
     for c in classes:
-        for b in c.base_classes:
-            if b in api_classes:
-                api_classes[b].impls.append(c)
+        for base in c.base_classes:
+            if base in api_classes:
+                api_classes[base].impls.append(c)
 
     return [c for k, c in api_classes.items()]
-
 
 def render_api_and_obj_classes(api_classes, template):
     s = ""
@@ -57,11 +54,9 @@ def get_class_name(header_path):
     header_name = os.path.basename(header_path)
     return re.sub(".h$", "", header_name)
 
-
 def get_template_name(template_path):
     template_name = os.path.basename(template_path)
     return re.sub(".tmpl$", "", template_name)
-
 
 def get_template_output(class_name, template_name):
     split_name = template_name.split('.')
@@ -71,7 +66,6 @@ def get_template_output(class_name, template_name):
 
 # -- END Old code --
 
-
 def main(args):
     cwd = os.getcwd()
     
@@ -80,9 +74,9 @@ def main(args):
         raise Exception("Multiple input files are currently not supported.")
 
     #FIXME: Loop over files and extend the model once we can handle multiple input files.
-    i = join(cwd, args.inputs[0])
+    i = os.path.join(cwd, args.inputs[0])
     tu = clang.cindex.TranslationUnit.from_source(i, '-x c++ -std=c++14 -stdlib=libc++'.split())
-    m = Model(tu)
+    m = cppmodel.Model(tu)
 
     m.module_name = args.module_name
 
@@ -90,26 +84,25 @@ def main(args):
     classes = m.classes
     api_classes = collect_api_and_obj_classes(classes, 'GENERATE_C_API')
 
-    output_dir = abspath(join(cwd, args.output_dir))
+    output_dir = os.path.abspath(os.path.join(cwd, args.output_dir))
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    env = Environment(loader=FileSystemLoader(args.template_dir))
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(args.template_dir))
     for f,_ in inspect.getmembers(filters.capi_filter):
     #for f in ['to_output_ctype', 'to_ctype']:
         env.filters[f] = getattr(filters.capi_filter, f)
 
     for t in args.bindings:
-        with open(join(output_dir, get_template_output(args.module_name, get_template_name(t))), "w") as output_file:
+        with open(os.path.join(output_dir, get_template_output(args.module_name, get_template_name(t))), "w") as output_file:
             template = env.get_template(t)
             s = render_api_and_obj_classes(api_classes, template)
             output_file.write(s)
     # -- END Old approach
 
-
 if __name__ == '__main__':
 
-    ffig_dir = abspath(dirname(__file__))
+    ffig_dir = os.path.abspath(os.path.dirname(__file__))
 
     parser = argparse.ArgumentParser()
 
@@ -137,7 +130,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '-t', '--template-dir',
         help='directory to search for templates',
-        default=join(ffig_dir, 'templates'),
+        default=os.path.join(ffig_dir, 'templates'),
         dest='template_dir')
     parser.add_argument(
         '-m', '--module-name',

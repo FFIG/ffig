@@ -1,5 +1,6 @@
 output/*
 *.pyc
+.*.swp
 tests/bin
 tests/build
 sandbox/CircleTest
