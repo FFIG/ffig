@@ -36,7 +36,6 @@ class FunctionArgument:
         self.type = type
         self.name = name or None
 
-
 class _Function(object):
     def __init__(self, cursor):
         self.name = cursor.spelling
@@ -53,10 +52,7 @@ class _Function(object):
     def __str__(self):
         return '{} {}({})'.format(str(self.return_type), str(self.name), ', '.join([str(a) for a in self.arguments]))
 
-
-
 class Function(_Function):
-
     def __init__(self, cursor, namespaces=[]):
         _Function.__init__(self, cursor)
         self.namespace = '::'.join(namespaces)
@@ -78,7 +74,6 @@ class Function(_Function):
         return True
 
 class Method(Function):
-
     def __init__(self, cursor):
         _Function.__init__(self, cursor)
         self.is_const = cursor.is_const_method()
@@ -131,7 +126,6 @@ class Class(object):
                 self.base_classes.append(c.type.spelling)
 
 class Model(object):
-
     def __init__(self, translation_unit=None):
        self.functions = []
        self.classes = []
@@ -176,7 +170,6 @@ class Model(object):
                 child_namespaces.append(c.spelling)
                 self.add_child_nodes(c, child_namespaces)
 
-
 def apply_class_annotations(model_class):
     for m in model_class.methods:
         if m.is_pure_virtual:
@@ -187,4 +180,3 @@ def apply_class_annotations(model_class):
     
     return model_class
 
-                
