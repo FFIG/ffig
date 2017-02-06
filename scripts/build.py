@@ -26,14 +26,25 @@ def main():
         '--python-path',
         help='path to python executable ie "/usr/local/bin/python3"',
         dest='python_path')
+
+    if platform.system() == "Windows":
+        parser.add_argument(
+            '--win32',
+            help='Build 32-bit libraries',
+            action='store_true',
+            dest='win32')
+
     args = parser.parse_args()
     args.platform = platform.system()
-    
+
     src_dir = os.path.dirname(os.path.dirname(__file__))
 
     cmake_invocation = ['cmake', '.','-B{}'.format(args.out_dir)]
     if args.platform == 'Windows':
-        cmake_invocation.extend(['-G', '"Visual Studio 14 2015 Win64"'])
+        if args.win32:
+            cmake_invocation.extend(['-G', 'Visual Studio 14 2015'])
+        else:
+            cmake_invocation.extend(['-G', 'Visual Studio 14 2015 Win64'])
     else:
         cmake_invocation.append('-DCMAKE_BUILD_TYPE={}'.format(args.config))
 
