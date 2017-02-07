@@ -23,9 +23,10 @@ install:
 
 script:
   - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -t"
+  - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -t --python-path python3"
   - mkdir -p $(dirname ${DOCKER_CACHE_FILE}) ; docker save $(docker history -q ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} | grep -v '<missing>') | gzip > ${DOCKER_CACHE_FILE};
 
 notifications:
   slack:
     rooms:
-      - c-api:ZTxxqvEcr25iaaB8XBS7luaA#general
+      - c-api:ZTxxqvEcr25iaaB8XBS7luaA#travis-ci
