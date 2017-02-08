@@ -2,6 +2,14 @@
 
 from clang.cindex import Cursor
 from clang.cindex import TranslationUnit
+from clang.cindex import Config
+
+import sys
+if sys.platform == 'darwin':
+    # OS X doesn't use DYLD_LIBRARY_PATH if System Integrity Protection is
+    # enabled. Set the library path for libclang manually.
+    Config.set_library_path(
+        '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib')
 
 def get_tu(source, lang='c', all_warnings=False, flags=[]):
     """Obtain a translation unit from source and language.
