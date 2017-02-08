@@ -39,7 +39,7 @@ def main():
     args = parser.parse_args()
     args.platform = platform.system()
 
-    src_dir = os.path.dirname(os.path.dirname(__file__))
+    src_dir = os.path.realpath(os.path.dirname(os.path.dirname(__file__)))
 
     if args.clean:
         subprocess.check_call('rm -rf {}'.format(args.out_dir).split())
