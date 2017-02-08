@@ -174,9 +174,18 @@ def apply_class_annotations(model_class):
     for m in model_class.methods:
         if m.is_pure_virtual:
             model_class.is_abstract = True
-        if m.return_type.kind == TypeKind.POINTER and m.return_type.pointee.kind != TypeKind.CHAR_S:
+        if m.return_type.kind == TypeKind.VOID:
+            m.returns_void = True 
+        elif m.return_type.kind in [TypeKind.INT, TypeKind.BOOL, TypeKind.DOUBLE]:
+            pass
+        elif m.return_type.kind == TypeKind.POINTER and m.return_type.pointee.kind == TypeKind.CHAR_S:
+            pass
+        elif m.return_type.kind == TypeKind.POINTER:
             m.returns_sub_object = True
             m.returns_nullable = True
+        elif m.return_type.kind == TypeKind.LVALUEREFERENCE:
+            m.returns_sub_object = True
+            m.returns_nullable = False
     
     return model_class
 

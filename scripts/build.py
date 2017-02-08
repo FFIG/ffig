@@ -9,6 +9,8 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        '--clean', help='remove build directory before build', action='store_true', dest='clean')
+    parser.add_argument(
         '-t', help='run tests', action='store_true', dest='run_tests')
     parser.add_argument(
         '-v', help='verbose', action='store_true', dest='verbose')
@@ -38,6 +40,9 @@ def main():
     args.platform = platform.system()
 
     src_dir = os.path.dirname(os.path.dirname(__file__))
+
+    if args.clean:
+        subprocess.check_call('rm -rf {}'.format(args.out_dir).split())
 
     cmake_invocation = ['cmake', '.','-B{}'.format(args.out_dir)]
     if args.platform == 'Windows':

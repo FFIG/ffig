@@ -49,10 +49,11 @@ public:
 {% for method in class.methods %}
   {{method.return_type|to_cpp_type}} {{method.name}}({% for arg in method.arguments %}{%if not loop.first %}, {% endif %}{{arg.type}} {{arg.name}}{% endfor %}) const
   {
-    {{method.return_type|to_cpp_type}} rv;
+    {% if method.returns_void %} int rc = {{class.name}}_{{method.name}}(object_{% for arg in method.arguments %}, {{arg.name|c_object(arg.type)}}{% endfor %});
+    {% else %}{{method.return_type|to_cpp_type}} rv;
     {% if not method.returns_sub_object %}int rc = {{class.name}}_{{method.name}}(object_{% for arg in method.arguments %}, {{arg.name|c_object(arg.type)}}{% endfor %}, &rv);
     {% else %}int rc = {{class.name}}_{{method.name}}(object_{% for arg in method.arguments %}, {{arg.name|c_object(arg.type)}}{% endfor %}, &rv.object_);{% endif %}
-    if (rc == {{class.name}}_RC_SUCCESS) return rv;
+    {% endif %}if (rc == {{class.name}}_RC_SUCCESS) return{% if not method.returns_void %} rv{% endif %};
     throw exception();
   }
 {%endfor%}

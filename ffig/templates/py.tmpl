@@ -43,19 +43,22 @@ class {{class.name}}:
       if rc != 0:
         raise {{class.name}}_error()
   {% endfor %} {% endif %} {% for method in class.methods %}
-  def {{method.name}}(self{% for arg in method.arguments %}, {{arg.name}} {% endfor %}):{% if not method.returns_sub_object %}
+  def {{method.name}}(self{% for arg in method.arguments %}, {{arg.name}} {% endfor %}): {% if method.returns_void %}
+    rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}{% if not loop.last %}, {% endif %}{% endfor %})
+    if rc != 0:
+      raise {{class.name}}_error() {% elif not method.returns_sub_object %}
     rv = {{method.return_type|to_output_ctype}}()
     rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
     if rc == 0:
       return rv.value
-    raise {{class.name}}_error(){% else %}
+    raise {{class.name}}_error() {% else %}
     rv = c_object_p()
     rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
     if rc == 0:
       {% if method.returns_nullable %}if not bool(rv): return None{% endif %}
       return {{method.return_type|to_ctype}}(_p=rv)
-    raise {{class.name}}_error() {% endif  %}
-    {% endfor %}
+    raise {{class.name}}_error() {% endif %}
+  {% endfor %}
   def from_param(self):
     return self.ptr
 
@@ -93,7 +96,7 @@ methodList = [
   c_int),{% endfor %}{% endfor %} {% for method in class.methods %}
 
   ("{{ class.name }}_{{method.name}}",
-  [{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_ctype}} {% endfor %}, POINTER({{method.return_type|to_output_ctype}})],
+  [{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_ctype}} {% endfor %}{% if not method.returns_void %}, POINTER({{method.return_type|to_output_ctype}}){% endif %}],
   c_int){% if not loop.last %},{% endif %}{% endfor %}
 ]
 

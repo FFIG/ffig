@@ -41,6 +41,11 @@ class Tree
   {
     return data_;
   }
+  
+  void set_data(int x)
+  {
+    data_ = x;
+  }
 
 } C_API;
 

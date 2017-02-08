@@ -35,16 +35,13 @@ else()
   endif()
 endif()
 
-find_package(Ruby)
 if(Ruby_FOUND)
-  set(ffig_bindings "PYTHON;RUBY;CPP;CPP_MOCKS")
+  ffig_add_library(NAME Shape INPUTS input/Shape.h PYTHON CPP_MOCKS CPP RUBY)
 else()
-  set(ffig_bindings "PYTHON;CPP;CPP_MOCKS")
+  ffig_add_library(NAME Shape INPUTS input/Shape.h PYTHON CPP_MOCKS CPP)
 endif()
-
-ffig_add_library(NAME Shape INPUTS input/Shape.h ${ffig_bindings})
-ffig_add_library(NAME Tree INPUTS input/Tree.h ${ffig_bindings})
-ffig_add_library(NAME Asset INPUTS input/Asset.h ${ffig_bindings})
+ffig_add_library(NAME Tree INPUTS input/Tree.h PYTHON CPP)
+ffig_add_library(NAME Asset INPUTS input/Asset.h PYTHON)
 
 add_subdirectory(tests/src)
 

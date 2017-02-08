@@ -16,7 +16,7 @@ const char* {{class.name}}_error()
 }
 
 namespace {
-using {{class.name}}_ptr = const std::shared_ptr<const {{class.name}}>*;
+using {{class.name}}_ptr = const std::shared_ptr<{{class.name}}>*;
 } // end anonymous namespace
 
 void {{ class.name }}_dispose(const void* my{{class.name}})
@@ -39,11 +39,12 @@ int {{class.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{ar
   return {{class.name}}_RC_SUCCESS;
 }
 {% endfor %} {% endif %} {% for method in class.methods %}
-int {{ class.name }}_{{method.name}}(const void* my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}, {{method.return_type|to_c}}* rv)
+int {{ class.name }}_{{method.name}}(const void* my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}{% if not method.returns_void %}, {{method.return_type|to_c}}* rv{% endif %})
 {
   try
   {
-    {% if not method.returns_sub_object %}*rv = (*reinterpret_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
+    {% if method.returns_void %} (*reinterpret_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
+    {% elif not method.returns_sub_object %}*rv = (*reinterpret_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
     {% else %}auto p = reinterpret_cast<const {{class.name}}_ptr>(my{{class.name}});
     auto subobj = (*p)->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
     {% if method.returns_nullable %}if (!subobj)

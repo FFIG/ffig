@@ -39,3 +39,7 @@ def test_subtree_handle_keeps_tree_alive():
     del t
     assert(st.data()==x)
 
+def test_tree_set_data():
+    t = Tree(0)
+    t.set_data(77)
+    assert t.data() == 77
