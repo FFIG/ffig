@@ -23,7 +23,7 @@
 #
 # Optional bindings can be created by passing in any of the optional arguments:
 # * RUBY - creates myModuleName.rb
-# * RUBY - creates myModuleName.py
+# * PYTHON - creates myModuleName.py
 # * CPP - creates myModuleName_cpp.h
 # * CPP_MOCKS - creates myModuleName_mocks.h
 
