@@ -28,7 +28,7 @@
 # * CPP_MOCKS - creates myModuleName_mocks.h
 
 function(ffig_add_library)
-  set(options RUBY PYTHON CPP CPP_MOCKS)
+  set(options RUBY PYTHON CPP CPP_MOCKS GO)
   set(oneValueArgs NAME INPUTS)
   cmake_parse_arguments(ffig_add_library "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -55,11 +55,25 @@ function(ffig_add_library)
     set(ffig_invocation "${ffig_invocation};_cpp.h.tmpl")
     set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/${module}_cpp.h")
   endif()
+  if(ffig_add_library_GO)
+    set(ffig_invocation "${ffig_invocation};go.tmpl")
+    set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/src/${module}/${module}.go")
+  endif()
 
-  add_custom_command(OUTPUT ${ffig_outputs}
-    COMMAND ${PYTHON_EXECUTABLE} ffig/FFIG.py ${ffig_invocation}
-    DEPENDS ${input}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+  if(ffig_add_library_GO)
+    add_custom_command(OUTPUT ${ffig_outputs}
+      COMMAND ${PYTHON_EXECUTABLE} ffig/FFIG.py ${ffig_invocation}
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${ffig_output_dir}/src/${module}
+      COMMAND ${CMAKE_COMMAND} -E rename ${ffig_output_dir}/${module}.go ${ffig_output_dir}/src/${module}/${module}.go
+      DEPENDS ${input}
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+  else()
+    add_custom_command(OUTPUT ${ffig_outputs}
+      COMMAND ${PYTHON_EXECUTABLE} ffig/FFIG.py ${ffig_invocation}
+      DEPENDS ${input}
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+  endif()
+
 
   # FIXME: This is a bit ugly. The header is copied next to the generated bindings.
   file(COPY ${input} DESTINATION ${ffig_output_dir}/)

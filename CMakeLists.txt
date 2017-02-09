@@ -36,14 +36,15 @@ else()
 endif()
 
 if(Ruby_FOUND)
-  ffig_add_library(NAME Shape INPUTS input/Shape.h PYTHON CPP_MOCKS CPP RUBY)
+  ffig_add_library(NAME Shape INPUTS input/Shape.h PYTHON CPP_MOCKS CPP GO RUBY)
 else()
-  ffig_add_library(NAME Shape INPUTS input/Shape.h PYTHON CPP_MOCKS CPP)
+  ffig_add_library(NAME Shape INPUTS input/Shape.h PYTHON CPP_MOCKS CPP GO)
 endif()
 ffig_add_library(NAME Tree INPUTS input/Tree.h PYTHON CPP)
 ffig_add_library(NAME Asset INPUTS input/Asset.h PYTHON)
 
 add_subdirectory(tests/src)
+add_subdirectory(tests/go)
 
 enable_testing()
 
@@ -80,3 +81,7 @@ add_test(
   COMMAND ${CMAKE_BINARY_DIR}/tests/src/TestCppTree
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
 
+add_test(
+    NAME test_Shape
+    COMMAND ${CMAKE_BINARY_DIR}/tests/go/test_Shape
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
