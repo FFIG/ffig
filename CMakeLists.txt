@@ -35,16 +35,34 @@ else()
   endif()
 endif()
 
-if(Ruby_FOUND)
-  ffig_add_library(NAME Shape INPUTS input/Shape.h PYTHON CPP_MOCKS CPP GO RUBY)
+# Look for Go
+execute_process(COMMAND go version RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
+if(result)
+  set(Go_FOUND FALSE)
 else()
-  ffig_add_library(NAME Shape INPUTS input/Shape.h PYTHON CPP_MOCKS CPP GO)
+  set(Go_FOUND True)
 endif()
+
+# Look for Ruby
+find_package(Ruby)
+
+set(all_ffig_bindings "PYTHON;CPP;CPP_MOCKS")
+if(Ruby_FOUND)
+  list(APPEND all_ffig_bindings "RUBY")
+endif()
+
+if(Go_FOUND)
+  list(APPEND all_ffig_bindings "GO")
+endif()
+
+ffig_add_library(NAME Shape INPUTS input/Shape.h ${all_ffig_bindings})
 ffig_add_library(NAME Tree INPUTS input/Tree.h PYTHON CPP)
 ffig_add_library(NAME Asset INPUTS input/Asset.h PYTHON)
-
+    
 add_subdirectory(tests/src)
-add_subdirectory(tests/go)
+if(Go_FOUND)
+  add_subdirectory(tests/go)
+endif()
 
 enable_testing()
 
@@ -58,18 +76,10 @@ add_test(
   COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_SOURCE_DIR}/tests
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
 
-if(Ruby_FOUND)
-  add_test(
-    NAME test_ruby_bindings
-    COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/TestShape.rb ${CMAKE_SOURCE_DIR}/tests/TestShape.rb
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
-endif()
-
 add_test(
   NAME test_cpp_mocks
   COMMAND ${CMAKE_BINARY_DIR}/tests/src/TestShapeMocks
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
-
 
 add_test(
   NAME test_cpp_circle
@@ -81,7 +91,16 @@ add_test(
   COMMAND ${CMAKE_BINARY_DIR}/tests/src/TestCppTree
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
 
-add_test(
+if(Ruby_FOUND)
+  add_test(
+    NAME test_ruby_bindings
+    COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/TestShape.rb ${CMAKE_SOURCE_DIR}/tests/TestShape.rb
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+endif()
+
+if(Go_FOUND)
+  add_test(
     NAME test_Shape
     COMMAND ${CMAKE_BINARY_DIR}/tests/go/test_Shape
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+endif()
