@@ -14,9 +14,6 @@ env:
    
 services:
   - docker
-  
-before_install:
-  - if [ -f ${DOCKER_CACHE_FILE} ]; then gunzip -c ${DOCKER_CACHE_FILE} | docker load || true; fi
 
 install:
   - docker build -t ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} .
@@ -24,7 +21,6 @@ install:
 script:
   - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -t"
   - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -t --python-path python3"
-  - mkdir -p $(dirname ${DOCKER_CACHE_FILE}) ; docker save $(docker history -q ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} | grep -v '<missing>') | gzip > ${DOCKER_CACHE_FILE};
 
 notifications:
   slack:
