@@ -6,17 +6,10 @@ install:
   - git submodule update --init
   - C:\Python36-x64\python -m pip install jinja2 nose
 
-# scripts to run before build
+# scripts to run before build (We use this to build and run tests)
 before_build:
   - cd c:\projects\ffig
-  - echo Running cmake...
-  - cmake . -G "Visual Studio 14 2015 Win64" -DPYTHON_EXECUTABLE="C:\\Python36-x64\\python"
-
-configuration: Debug
-
-build:
-  project: test_ffig.sln
-
-after_build:
-  - ctest . -C Debug --output-on-failure
+  
+build_script:
+  - python scripts\build.py -t --python-path "C:\\Python36-x64\\python"
 
