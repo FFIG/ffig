@@ -8,10 +8,13 @@ import argparse
 import clang
 import inspect
 import jinja2
+import logging
 import os
 import os.path
 import re
 import sys
+
+logging.basicConfig(level=logging.WARNING)
 
 import cppmodel
 import filters.capi_filter

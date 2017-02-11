@@ -3,9 +3,7 @@ import os
 import os.path
 import re
 
-logging.basicConfig()
 log = logging.getLogger(__name__)
-log.setLevel(logging.WARNING)
 
 def render_api_and_obj_classes(api_classes, template):
     '''Render a template.'''
@@ -41,12 +39,14 @@ def default_generator(binding, api_classes, env, args, output_dir):
      - args: ffig arguments.
      - output_dir: The base directory for generator output.
     '''
+    template = env.get_template(binding)
+    output_string = render_api_and_obj_classes(api_classes, template)
+
     output_file_name = os.path.join(output_dir,
             get_template_output(args.module_name, get_template_name(binding)))
     with open(output_file_name, 'w') as output_file:
-        template = env.get_template(binding)
-        output_string = render_api_and_obj_classes(api_classes, template)
         output_file.write(output_string)
+
     return output_file_name
 
 class GeneratorContext(object):

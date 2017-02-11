@@ -60,19 +60,10 @@ function(ffig_add_library)
     set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/src/${module}/${module}.go")
   endif()
 
-  if(ffig_add_library_GO)
-    add_custom_command(OUTPUT ${ffig_outputs}
-      COMMAND ${PYTHON_EXECUTABLE} ffig/FFIG.py ${ffig_invocation}
-      COMMAND ${CMAKE_COMMAND} -E make_directory ${ffig_output_dir}/src/${module}
-      COMMAND ${CMAKE_COMMAND} -E rename ${ffig_output_dir}/${module}.go ${ffig_output_dir}/src/${module}/${module}.go
-      DEPENDS ${input}
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-  else()
-    add_custom_command(OUTPUT ${ffig_outputs}
-      COMMAND ${PYTHON_EXECUTABLE} ffig/FFIG.py ${ffig_invocation}
-      DEPENDS ${input}
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-  endif()
+  add_custom_command(OUTPUT ${ffig_outputs}
+    COMMAND ${PYTHON_EXECUTABLE} ffig/FFIG.py ${ffig_invocation}
+    DEPENDS ${input}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 
   # FIXME: This is a bit ugly. The header is copied next to the generated bindings.
