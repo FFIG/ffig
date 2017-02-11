@@ -15,6 +15,7 @@ import sys
 
 import cppmodel
 import filters.capi_filter
+import generators
 
 if sys.platform == 'darwin':
     # OS X doesn't use DYLD_LIBRARY_PATH if System Integrity Protection is
@@ -44,25 +45,9 @@ def collect_api_and_obj_classes(classes, api_annotation):
 
     return [c for k, c in api_classes.items()]
 
-def render_api_and_obj_classes(api_classes, template):
-    s = ""
-    for c in api_classes:
-        s += str(template.render({"class": c.api_class, "impl_classes": c.impls}))
-    return s
-
 def get_class_name(header_path):
     header_name = os.path.basename(header_path)
     return re.sub(".h$", "", header_name)
-
-def get_template_name(template_path):
-    template_name = os.path.basename(template_path)
-    return re.sub(".tmpl$", "", template_name)
-
-def get_template_output(class_name, template_name):
-    split_name = template_name.split('.')
-    suffix_name = '.'.join(split_name[:-1])
-    extension = split_name[-1]
-    return "{}{}.{}".format(class_name, suffix_name, extension)
 
 def write_bindings_to_disk(api_classes, env, args, output_dir):
     """ 
@@ -74,10 +59,7 @@ def write_bindings_to_disk(api_classes, env, args, output_dir):
     - output_dir where to write to
     """
     for binding in args.bindings:
-        with open(os.path.join(output_dir, get_template_output(args.module_name, get_template_name(binding))), "w") as output_file:
-            template = env.get_template(binding)
-            output_string = render_api_and_obj_classes(api_classes, template)
-            output_file.write(output_string)
+        generators.generate(binding, api_classes, env, args, output_dir)
 
 def build_model_from_source(path_to_source, module_name):
     """
