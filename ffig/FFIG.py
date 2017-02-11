@@ -52,7 +52,7 @@ def get_class_name(header_path):
     header_name = os.path.basename(header_path)
     return re.sub(".h$", "", header_name)
 
-def write_bindings_to_disk(api_classes, env, args, output_dir):
+def write_bindings_to_disk(module_name, api_classes, env, output_dir):
     """ 
     Write the bindings to disk, return Nothing
     Input:
@@ -62,7 +62,7 @@ def write_bindings_to_disk(api_classes, env, args, output_dir):
     - output_dir where to write to
     """
     for binding in args.bindings:
-        generators.generate(binding, api_classes, env, args, output_dir)
+        generators.generate(module_name, binding, api_classes, env, output_dir)
 
 def build_model_from_source(path_to_source, module_name):
     """
@@ -103,7 +103,7 @@ def main(args):
     #for f in ['to_output_ctype', 'to_ctype']:
         env.filters[f] = getattr(filters.capi_filter, f)
 
-    write_bindings_to_disk(api_classes, env, args, output_dir)
+    write_bindings_to_disk(args.module_name, api_classes, env, output_dir)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

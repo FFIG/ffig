@@ -1,0 +1,7 @@
+import sys
+if sys.version_info[0] == 2:
+    from .interop_py2 import *
+elif sys.version_info[0] == 3:
+    from .interop_py3 import *
+else:
+    raise Exception('Unsupported Python version {0}'.format(sys.version_info[0]))
