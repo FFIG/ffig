@@ -64,9 +64,6 @@ def get_template_output(class_name, template_name):
     extension = split_name[-1]
     return "{}{}.{}".format(class_name, suffix_name, extension)
 
-# -- END Old code --
-
-
 def write_bindings_to_disk(api_classes, env, args, output_dir):
     """ 
     Write the bindings to disk, return Nothing
@@ -81,7 +78,6 @@ def write_bindings_to_disk(api_classes, env, args, output_dir):
             template = env.get_template(binding)
             output_string = render_api_and_obj_classes(api_classes, template)
             output_file.write(output_string)
-
 
 def build_model_from_source(path_to_source, module_name):
     """
@@ -99,7 +95,6 @@ def build_model_from_source(path_to_source, module_name):
 
     return model
 
-
 def main(args):
     cwd = os.getcwd()
 
@@ -111,7 +106,6 @@ def main(args):
     # input files.
     input_file = os.path.join(cwd, args.inputs[0])
     m = build_model_from_source(input_file, args.module_name)
-    # -- BEGIN Old approach
     classes = m.classes
     api_classes = collect_api_and_obj_classes(classes, 'GENERATE_C_API')
 
@@ -125,8 +119,6 @@ def main(args):
         env.filters[f] = getattr(filters.capi_filter, f)
 
     write_bindings_to_disk(api_classes, env, args, output_dir)
-
-    # -- END Old approach
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
