@@ -129,9 +129,6 @@ def main(args):
     # -- END Old approach
 
 if __name__ == '__main__':
-
-    ffig_dir = os.path.abspath(os.path.dirname(__file__))
-
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
