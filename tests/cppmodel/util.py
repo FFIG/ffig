@@ -11,6 +11,7 @@ if sys.platform == 'darwin':
     Config.set_library_path(
         '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib')
 
+
 def get_tu(source, lang='c', all_warnings=False, flags=[]):
     """Obtain a translation unit from source and language.
 
@@ -35,7 +36,9 @@ def get_tu(source, lang='c', all_warnings=False, flags=[]):
     if all_warnings:
         args += ['-Wall', '-Wextra']
 
-    return TranslationUnit.from_source(name, args, unsaved_files=[(name, source)])
+    return TranslationUnit.from_source(
+        name, args, unsaved_files=[(name, source)])
+
 
 def get_named_tu(source, name, all_warnings=False, flags=[]):
     """Obtain a translation unit from source and filename.
@@ -52,7 +55,8 @@ def get_named_tu(source, name, all_warnings=False, flags=[]):
     if all_warnings:
         args += ['-Wall', '-Wextra']
 
-    return TranslationUnit.from_source(name, args, unsaved_files=[(name, source)])
+    return TranslationUnit.from_source(
+        name, args, unsaved_files=[(name, source)])
 
 
 def get_cursor(source, spelling):
@@ -72,6 +76,7 @@ def get_cursor(source, spelling):
             return cursor
 
     return None
+
 
 def get_cursors(source, spelling):
     """Obtain all cursors from a source object with a specific spelling.

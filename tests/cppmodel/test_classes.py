@@ -2,6 +2,7 @@ from util import get_tu
 import cppmodel
 from clang.cindex import TypeKind
 
+
 def test_class_name():
     source = 'class A{};'
     tu = get_tu(source, 'cpp')
@@ -9,8 +10,9 @@ def test_class_name():
     model = cppmodel.Model(tu)
     classes = model.classes
 
-    assert len(classes)==1
+    assert len(classes) == 1
     assert classes[0].name == 'A'
+
 
 def test_class_methods():
     source = """
@@ -27,6 +29,7 @@ def test_class_methods():
     assert len(classes[0].methods) == 0
     assert len(classes[1].methods) == 2
 
+
 def test_class_method_return_types():
     source = """
     class B{
@@ -40,6 +43,7 @@ def test_class_method_return_types():
 
     assert classes[0].methods[0].return_type.kind == TypeKind.VOID
     assert classes[0].methods[1].return_type.kind == TypeKind.INT
+
 
 def test_class_method_argument_types():
     source = """
@@ -57,6 +61,7 @@ def test_class_method_argument_types():
     assert args[1].type.kind == TypeKind.POINTER
     assert args[1].name == "p"
 
+
 def test_class_method_const_qualifiers():
     source = """
     class A {
@@ -71,6 +76,7 @@ def test_class_method_const_qualifiers():
 
     assert methods[0].is_const
     assert not methods[1].is_const
+
 
 def test_class_methods_are_virtual():
     source = """
@@ -89,6 +95,7 @@ def test_class_methods_are_virtual():
     assert not methods[0].is_pure_virtual
     assert not methods[1].is_virtual
     assert methods[2].is_pure_virtual
+
 
 def test_namespaces():
     source = """
@@ -112,6 +119,7 @@ def test_namespaces():
     assert classes[3].namespace == "outer"
     assert classes[4].namespace == ""
 
+
 def test_access_specifiers():
     source = """
     class A { int foo(); };
@@ -126,6 +134,7 @@ def test_access_specifiers():
     assert not classes[0].methods[0].is_public
     assert classes[1].methods[0].is_public
     assert classes[2].methods[0].is_public
+
 
 def test_class_member_data():
     source = """
@@ -149,6 +158,7 @@ def test_class_member_data():
     assert c.members[1].type.name == "B"
     assert c.members[1].name == "b_"
 
+
 def test_string_representation():
     source = """
     class A {
@@ -167,4 +177,3 @@ def test_string_representation():
     assert str(methods[1]) == 'int bar()'
     assert str(methods[2]) == 'virtual int foobar() = 0'
     assert str(methods[3]) == 'virtual int cfoobar(int x) const = 0'
-

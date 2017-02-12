@@ -9,7 +9,10 @@ def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--clean', help='remove build directory before build', action='store_true', dest='clean')
+        '--clean',
+        help='remove build directory before build',
+        action='store_true',
+        dest='clean')
     parser.add_argument(
         '-t', help='run tests', action='store_true', dest='run_tests')
     parser.add_argument(
@@ -44,7 +47,7 @@ def main():
     if args.clean:
         subprocess.check_call('rm -rf {}'.format(args.out_dir).split())
 
-    cmake_invocation = ['cmake', '.','-B{}'.format(args.out_dir)]
+    cmake_invocation = ['cmake', '.', '-B{}'.format(args.out_dir)]
     if args.platform == 'Windows':
         if args.win32:
             cmake_invocation.extend(['-G', 'Visual Studio 14 2015'])
@@ -56,7 +59,8 @@ def main():
     if args.verbose:
         cmake_invocation.append('-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON')
     if args.python_path:
-        cmake_invocation.append('-DPYTHON_EXECUTABLE={}'.format(args.python_path))
+        cmake_invocation.append(
+            '-DPYTHON_EXECUTABLE={}'.format(args.python_path))
 
     subprocess.check_call(cmake_invocation, cwd=src_dir)
     subprocess.check_call(

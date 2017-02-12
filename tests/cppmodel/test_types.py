@@ -2,6 +2,7 @@ from util import get_tu
 import cppmodel
 from clang.cindex import TypeKind
 
+
 def test_pointer_type():
     source = "double* pd();"
 
@@ -67,6 +68,7 @@ def test_pointer_to_record_type():
     assert f.return_type.is_pointer
     assert f.return_type.pointee.kind == TypeKind.RECORD
 
+
 def test_reference_to_record_type():
     source = "class A{}; A& pA();"
 
@@ -79,14 +81,12 @@ def test_reference_to_record_type():
     assert f.return_type.is_reference
     assert f.return_type.pointee.kind == TypeKind.RECORD
 
+
 def test_string_representation():
     source = "class A{};"
-    
+
     tu = get_tu(source, 'cpp')
     model = cppmodel.Model(tu)
     c = model.classes[0]
 
     assert str(c) == "class A"
-
-
-

@@ -2,9 +2,11 @@ import math
 import nose
 import Shape
 
+
 def test_Shape_Circle_is_called_Circle():
     c = Shape.Circle(3)
     assert c.name() == "Circle"
+
 
 def test_Shape_Circle_has_expected_area():
     r = 2.0
@@ -36,6 +38,7 @@ def test_Shape_Circle_is_not_equal_to_circle_with_different_radius():
     c2 = Shape.Circle(3)
     assert not c1.is_equal(c2)
 
+
 def test_Shape_Circle_is_not_equal_to_square():
     c = Shape.Circle(2)
     s = Shape.Square(2)
@@ -45,4 +48,3 @@ def test_Shape_Circle_is_not_equal_to_square():
 @nose.tools.raises(Exception)
 def test_exception_on_negative_radius():
     Shape.Circle(-1)
-

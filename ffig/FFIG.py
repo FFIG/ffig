@@ -25,8 +25,9 @@ if sys.platform == 'darwin':
     # enabled. Set the library path for libclang manually.
     clang.cindex.Config.set_library_path(
         '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib')
-    
+
 ffig_dir = os.path.abspath(os.path.dirname(__file__))
+
 
 def collect_api_and_obj_classes(classes, api_annotation):
     class APIClass:
@@ -39,7 +40,8 @@ def collect_api_and_obj_classes(classes, api_annotation):
             # if all([not m.is_pure_virtual for m in model_class.methods]):
             #    self.impls.append(model_class)
 
-    api_classes = {c.name: APIClass(c) for c in classes if api_annotation in c.annotations}
+    api_classes = {c.name: APIClass(c)
+                   for c in classes if api_annotation in c.annotations}
 
     for c in classes:
         for base in c.base_classes:
@@ -48,21 +50,24 @@ def collect_api_and_obj_classes(classes, api_annotation):
 
     return [c for k, c in api_classes.items()]
 
+
 def get_class_name(header_path):
     header_name = os.path.basename(header_path)
     return re.sub(".h$", "", header_name)
 
+
 def write_bindings_to_disk(module_name, api_classes, env, output_dir):
-    """ 
+    """
     Write the bindings to disk, return Nothing
     Input:
     - api_classes
-    - environment to get templates from 
+    - environment to get templates from
     - args
     - output_dir where to write to
     """
     for binding in args.bindings:
         generators.generate(module_name, binding, api_classes, env, output_dir)
+
 
 def build_model_from_source(path_to_source, module_name):
     """
@@ -79,6 +84,7 @@ def build_model_from_source(path_to_source, module_name):
     model.module_name = module_name
 
     return model
+
 
 def main(args):
     cwd = os.getcwd()
@@ -99,8 +105,8 @@ def main(args):
         os.makedirs(output_dir)
 
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(args.template_dir))
-    for f,_ in inspect.getmembers(filters.capi_filter):
-    #for f in ['to_output_ctype', 'to_ctype']:
+    for f, _ in inspect.getmembers(filters.capi_filter):
+        # for f in ['to_output_ctype', 'to_ctype']:
         env.filters[f] = getattr(filters.capi_filter, f)
 
     write_bindings_to_disk(args.module_name, api_classes, env, output_dir)

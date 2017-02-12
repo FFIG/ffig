@@ -10,13 +10,19 @@ def generator(module_name, binding, api_classes, env, output_dir):
         os.makedirs(module_dir)
 
     o = os.path.join(module_dir, '__init__.py')
-    generators.generate_single_output_file(module_name, '__init__.py.tmpl', api_classes, env, o)
+    generators.generate_single_output_file(
+        module_name, '__init__.py.tmpl', api_classes, env, o)
 
-    for o in [os.path.join(module_dir, x) for x in ['interop_py2.py', 'interop_py3.py']]:
+    for o in [os.path.join(module_dir, x)
+              for x in ['interop_py2.py', 'interop_py3.py']]:
         generators.generate_single_output_file(
             module_name, 'py.tmpl', api_classes, env, o)
 
-    return [os.path.join(module_dir, x) for x in ['__init__.py', 'interop_py2.py', 'interop_py3.py']]
+    return [
+        os.path.join(module_dir, x) for x in [
+            '__init__.py',
+            'interop_py2.py',
+            'interop_py3.py']]
 
 
 def setup_plugin(context):

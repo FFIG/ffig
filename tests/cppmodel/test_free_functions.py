@@ -2,6 +2,7 @@ from util import get_tu
 import cppmodel
 from clang.cindex import TypeKind
 
+
 def test_function_name():
     source = """
     void foo();
@@ -22,12 +23,12 @@ def test_function_return_type():
     int foo();
     double* bar();
     """
-    
+
     tu = get_tu(source, 'cpp')
 
     model = cppmodel.Model(tu)
     functions = model.functions
-    
+
     assert functions[0].return_type.kind == TypeKind.INT
     assert functions[1].return_type.kind == TypeKind.POINTER
     assert functions[1].return_type.is_pointer
@@ -40,12 +41,12 @@ def test_function_arguments():
     int foo();
     double bar(int x, char y);
     """
-    
+
     tu = get_tu(source, 'cpp')
 
     model = cppmodel.Model(tu)
     functions = model.functions
-    
+
     assert len(functions[0].arguments) == 0
     assert len(functions[1].arguments) == 2
     assert functions[1].arguments[0].type.kind == TypeKind.INT
@@ -53,13 +54,14 @@ def test_function_arguments():
     assert functions[1].arguments[1].type.kind == TypeKind.CHAR_S
     assert functions[1].arguments[1].name == 'y'
 
+
 def test_function_equality():
     source = """
     int foo();
     int foo(int);
     int foo(double);
     int foo(int,int);
-    namespace x { 
+    namespace x {
     int foo();
     }
     """
@@ -67,25 +69,25 @@ def test_function_equality():
     tu = get_tu(source, 'cpp')
 
     model = cppmodel.Model(tu)
-    
-    for i,f in enumerate(model.functions):
-        for j,g in enumerate(model.functions):
-            if i==j:
-                assert f==g
+
+    for i, f in enumerate(model.functions):
+        for j, g in enumerate(model.functions):
+            if i == j:
+                assert f == g
             else:
-                assert not f==g
+                assert not f == g
+
 
 def test_string_representation():
     source = """
     double foo(int, char);
     double bar(int x, char y);
     """
-    
+
     tu = get_tu(source, 'cpp')
 
     model = cppmodel.Model(tu)
     functions = model.functions
-    
+
     assert str(functions[0]) == 'double foo(int, char)'
     assert str(functions[1]) == 'double bar(int x, char y)'
-
