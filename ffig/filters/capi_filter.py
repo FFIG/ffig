@@ -19,7 +19,7 @@ def restore_cpp_type(t, n):
         if t.pointee.kind == TypeKind.RECORD:
             # This is a hack until we can get an unqualified type from libclang
             type_name = t.pointee.name.replace('const ', '')
-            return '&(**reinterpret_cast<{}_ptr>({}))'.format(type_name, n)
+            return '&(**static_cast<{}_ptr>({}))'.format(type_name, n)
     raise Exception(
         'Type {} has no defined C++ type restoration (adding one for primitives is trivial)'.format(t.name))
 

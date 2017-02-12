@@ -21,7 +21,7 @@ using {{class.name}}_ptr = const std::shared_ptr<{{class.name}}>*;
 
 void {{ class.name }}_dispose(const void* my{{class.name}})
 {
-  delete reinterpret_cast<{{class.name}}_ptr>(my{{class.name}});
+  delete static_cast<{{class.name}}_ptr>(my{{class.name}});
 }
 {% if not class.is_abstract %}{% for method in class.constructors %}
 int {{class.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}},{% endfor %} const void** rv)
@@ -43,9 +43,9 @@ int {{ class.name }}_{{method.name}}(const void* my{{class.name}}{% for arg in m
 {
   try
   {
-    {% if method.returns_void %} (*reinterpret_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
-    {% elif not method.returns_sub_object %}*rv = (*reinterpret_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
-    {% else %}auto p = reinterpret_cast<const {{class.name}}_ptr>(my{{class.name}});
+    {% if method.returns_void %} (*static_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
+    {% elif not method.returns_sub_object %}*rv = (*static_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
+    {% else %}auto p = static_cast<const {{class.name}}_ptr>(my{{class.name}});
     auto subobj = (*p)->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
     {% if method.returns_nullable %}if (!subobj)
     {
