@@ -20,11 +20,21 @@ import cppmodel
 import filters.capi_filter
 import generators
 
+
+def find_clang_library_path():
+    paths = [
+        '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib',
+        '/Library/Developer/CommandLineTools/usr/lib',
+    ]
+    for path in paths:
+        if os.path.isfile(os.path.join(path, 'libclang.dylib')):
+            return path
+    raise Exception('Unable to find libclang.dylib')
+
 if sys.platform == 'darwin':
     # OS X doesn't use DYLD_LIBRARY_PATH if System Integrity Protection is
     # enabled. Set the library path for libclang manually.
-    clang.cindex.Config.set_library_path(
-        '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib')
+    clang.cindex.Config.set_library_path(find_clang_library_path())
 
 ffig_dir = os.path.abspath(os.path.dirname(__file__))
 
