@@ -60,9 +60,6 @@ ffig_add_library(NAME Tree INPUTS input/Tree.h PYTHON CPP)
 ffig_add_library(NAME Asset INPUTS input/Asset.h PYTHON)
     
 add_subdirectory(tests/src)
-if(Go_FOUND)
-  add_subdirectory(tests/go)
-endif()
 
 enable_testing()
 
@@ -98,9 +95,6 @@ if(Ruby_FOUND)
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
 endif()
 
-if(Go_FOUND)
-  add_test(
-    NAME test_Shape
-    COMMAND ${CMAKE_BINARY_DIR}/tests/go/test_Shape
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+if(Go_FOUND AND NOT WIN32)
+  add_subdirectory(tests/go)
 endif()

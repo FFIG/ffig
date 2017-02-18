@@ -42,7 +42,34 @@ def to_c(t):
     raise Exception('Type {} has no known c equivalent'.format(t.name))
 
 
+def to_go(t):
+    if t.kind == TypeKind.INT:
+        return 'int'
+    if t.kind == TypeKind.DOUBLE:
+        return 'float64'
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return 'string'
+        if t.pointee.kind == TypeKind.RECORD:
+            return 'unsafe.Pointer'
+    raise Exception('Type {} has no known Go equivalent'.format(t.name))
+
+
+def to_go_convert(t):
+    if t.kind == TypeKind.INT:
+        return 'int'
+    if t.kind == TypeKind.DOUBLE:
+        return 'float64'
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return 'C.GoString'
+        if t.pointee.kind == TypeKind.RECORD:
+            return 'unsafe.Pointer'
+    raise Exception('Type {} has no known Go equivalent'.format(t.name))
+
 # C++ header filter to extract C type from C++ type
+
+
 def c_object(v, t):
     if t.kind == TypeKind.VOID:
         return v

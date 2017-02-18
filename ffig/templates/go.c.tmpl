@@ -1,0 +1,88 @@
+#include <dlfcn.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define STR(x) #x
+#define RSTR(x) STR(x)
+
+// Function pointers for each of the exposed functions.
+// These will be set to the dlsym() results on initialisation.
+{% for impl in impl_classes %}{% for method in impl.constructors %}
+typedef int (*{{class.name}}_{{impl.name}}_create_Ptr)({% for arg in method.arguments %}{{arg.type|to_c}}, {% endfor %}const void**);
+static {{class.name}}_{{impl.name}}_create_Ptr {{class.name}}_{{impl.name}}_create_ptr = NULL;
+{% endfor %}{% endfor %}
+
+{% for method in class.methods %}
+typedef int (*{{class.name}}_{{method.name}}_Ptr)(const void*{% for arg in method.arguments %}, {{arg.type|to_c}}{% endfor %}{% if not method.returns_void %}, {{method.return_type|to_c}}* rv{% endif %});
+static {{class.name}}_{{method.name}}_Ptr {{class.name}}_{{method.name}}_ptr;
+{% endfor %} 
+
+
+int init() {
+    {% if dso_extension is equalto 'dll' %}
+    const char* library_file = RSTR(SOURCE_PATH) "\\..\\..\\lib{{class.name}}_c.{{dso_extension}}";
+    {% else %}
+    const char* library_file = RSTR(SOURCE_PATH) "/../../lib{{class.name}}_c.{{dso_extension}}";
+    {% endif %}
+    // Load the module's dynamic library
+    char* path = realpath(library_file, NULL);
+    void* dynamic_library = dlopen(path, RTLD_LOCAL | RTLD_LAZY);
+    if (!dynamic_library) {
+        return 1;
+    }
+
+    // Resolve the function pointers
+    void* symbol = NULL;
+    int status = 1;
+
+    {% for impl in impl_classes %}{% for method in impl.constructors %}
+    ++status;
+    symbol = dlsym(dynamic_library, "{{class.name}}_{{impl.name}}_create");
+    if (!symbol) {
+        return status;
+    }
+    {{class.name}}_{{impl.name}}_create_ptr = ({{class.name}}_{{impl.name}}_create_Ptr)symbol;
+    {% endfor %}{% endfor %}
+
+    {% for method in class.methods %}
+    ++status;
+    symbol = dlsym(dynamic_library, "{{class.name}}_{{method.name}}");
+    if (!symbol) {
+        return status;
+    }
+    {{class.name}}_{{method.name}}_ptr = ({{class.name}}_{{method.name}}_Ptr)symbol;
+    {% endfor %}  
+
+    free(path);
+
+    return 0;
+}
+
+
+{% for impl in impl_classes %}{% for method in impl.constructors %}
+typedef struct {{class.name}}_{{impl.name}}_create_return_type {
+    const void* ptr;
+    int status;
+} RT_{{class.name}}_{{impl.name}}_create;
+
+RT_{{class.name}}_{{impl.name}}_create CGo_{{class.name}}_{{impl.name}}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}} {% if not loop.last %},{% endif %}{% endfor %}) {
+    RT_{{class.name}}_{{impl.name}}_create rv;
+    rv.status = {{class.name}}_{{impl.name}}_create_ptr({% for arg in method.arguments %}{{arg.name}}, {% endfor %}&rv.ptr);
+    return rv;
+}
+{% endfor %}{% endfor %}
+
+{% for method in class.methods %}
+typedef struct {{class.name}}_{{method.name}}_return_type {
+    {% if not method.returns_void %}
+    {{method.return_type|to_c}} value;
+    {% endif %}
+    int status;
+} RT_{{class.name}}_{{method.name}};
+
+RT_{{class.name}}_{{method.name}} CGo_{{class.name}}_{{method.name}}(const void* my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}) {
+    RT_{{class.name}}_{{method.name}} rv;
+    rv.status = {{class.name}}_{{method.name}}_ptr(my{{class.name}}{% for arg in method.arguments %}, {{arg.name}}{% endfor %}{% if not method.returns_void %}, &rv.value{% endif %});
+    return rv;
+}
+{% endfor %}  

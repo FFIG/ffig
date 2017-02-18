@@ -66,7 +66,12 @@ def get_class_name(header_path):
     return re.sub(".h$", "", header_name)
 
 
-def write_bindings_to_disk(module_name, bindings, api_classes, env, output_dir):
+def write_bindings_to_disk(
+        module_name,
+        bindings,
+        api_classes,
+        env,
+        output_dir):
     """
     Write the bindings to disk, return Nothing
     Input:
@@ -120,7 +125,13 @@ def main(args):
         # for f in ['to_output_ctype', 'to_ctype']:
         env.filters[f] = getattr(filters.capi_filter, f)
 
-    write_bindings_to_disk(args.module_name, list(args.bindings), api_classes, env, output_dir)
+    write_bindings_to_disk(
+        args.module_name,
+        list(
+            args.bindings),
+        api_classes,
+        env,
+        output_dir)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

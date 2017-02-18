@@ -2,8 +2,20 @@ import logging
 import os
 import os.path
 import re
+import sys
 
 log = logging.getLogger(__name__)
+
+
+def dso_extension():
+    extensions = {
+        'darwin': 'dylib',
+        'win32': 'dll',
+        'cygwin': 'dll',
+        'linux2': 'so',
+        'linux': 'so',
+    }
+    return extensions[sys.platform]
 
 
 def render_api_and_obj_classes(api_classes, template):
@@ -11,7 +23,8 @@ def render_api_and_obj_classes(api_classes, template):
     s = ""
     for c in api_classes:
         s += str(template.render({"class": c.api_class,
-                                  "impl_classes": c.impls}))
+                                  "impl_classes": c.impls,
+                                  "dso_extension": dso_extension()}))
     return s
 
 
