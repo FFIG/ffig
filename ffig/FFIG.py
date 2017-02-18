@@ -96,10 +96,38 @@ def build_model_from_source(path_to_source, module_name):
     """
     tu = clang.cindex.TranslationUnit.from_source(
         path_to_source, '-x c++ -std=c++14 -stdlib=libc++'.split())
+
     model = cppmodel.Model(tu)
     model.module_name = module_name
 
     return model
+
+
+def make_output_dir(cwd, o_dir_path):
+    """
+    Function that creates the output_dir under the given path in cwd,
+    if no such dir exists yet. Returns nothing.
+    Input:
+    - current working directory
+    - output_dir path
+    """
+    output_dir = os.path.abspath(os.path.join(cwd, o_dir_path))
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+
+def set_template_env(template_dir):
+    """
+    Function that sets the Jinja2 template environment from a given dir.
+    Returns nothing.
+    Input:
+    - template_dir path
+    """
+    env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir))
+    for f, _ in inspect.getmembers(filters.capi_filter):
+        # for f in ['to_output_ctype', 'to_ctype']:
+        env.filters[f] = getattr(filters.capi_filter, f)
+    return env
 
 
 def main(args):
@@ -116,22 +144,14 @@ def main(args):
     classes = m.classes
     api_classes = collect_api_and_obj_classes(classes, 'GENERATE_C_API')
 
-    output_dir = os.path.abspath(os.path.join(cwd, args.output_dir))
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader(args.template_dir))
-    for f, _ in inspect.getmembers(filters.capi_filter):
-        # for f in ['to_output_ctype', 'to_ctype']:
-        env.filters[f] = getattr(filters.capi_filter, f)
-
+    make_output_dir(cwd, args.output_dir)
+    env = set_template_env(args.template_dir)
     write_bindings_to_disk(
         args.module_name,
-        list(
-            args.bindings),
+        list(args.bindings),
         api_classes,
         env,
-        output_dir)
+        args.output_dir)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
