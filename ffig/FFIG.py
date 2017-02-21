@@ -61,11 +61,6 @@ def collect_api_and_obj_classes(classes, api_annotation):
     return [c for k, c in api_classes.items()]
 
 
-def get_class_name(header_path):
-    header_name = os.path.basename(header_path)
-    return re.sub(".h$", "", header_name)
-
-
 def write_bindings_to_disk(
         module_name,
         bindings,
