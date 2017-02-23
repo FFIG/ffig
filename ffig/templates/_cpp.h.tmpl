@@ -28,6 +28,7 @@ public:
 
   {{class.name}}& operator = ({{class.name}}&& c)
   {
+    if(object_) {{class.name}}_dispose(object_);
     object_ = c.object_;
     c.object_ = nullptr;
     return *this;

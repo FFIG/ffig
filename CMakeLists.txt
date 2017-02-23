@@ -11,6 +11,13 @@ else()
   add_compile_options("-std=c++14")
 endif()
 
+if(NOT WIN32)
+  set(CMAKE_CXX_FLAGS_ASAN "-g -fno-omit-frame-pointer -O0 -fsanitize=address")
+  set(CMAKE_C_FLAGS_ASAN "-g -fno-omit-frame-pointer -O0 -fsanitize=address")
+  set(CMAKE_EXE_LINKER_FLAGS_ASAN "-fsanitize=address")
+  set(CMAKE_SHARED_LINKER_FLAGS_ASAN "-fsanitize=address")
+endif()
+
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 include(ffig)
 
@@ -72,27 +79,32 @@ add_test(
   NAME test_python_bindings
   COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_SOURCE_DIR}/tests
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+set_property(TEST test_python_bindings PROPERTY LABELS PYTHON)
 
 add_test(
   NAME test_cpp_mocks
   COMMAND ${CMAKE_BINARY_DIR}/tests/src/TestShapeMocks
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+set_property(TEST test_cpp_mocks PROPERTY LABELS MOCKS)
 
 add_test(
   NAME test_cpp_circle
   COMMAND ${CMAKE_BINARY_DIR}/tests/src/TestCppCircle
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+set_property(TEST test_cpp_circle PROPERTY LABELS CPP)
 
 add_test(
   NAME test_cpp_tree
   COMMAND ${CMAKE_BINARY_DIR}/tests/src/TestCppTree
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+set_property(TEST test_cpp_tree PROPERTY LABELS CPP)
 
 if(Ruby_FOUND)
   add_test(
     NAME test_ruby_bindings
     COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/TestShape.rb ${CMAKE_SOURCE_DIR}/tests/TestShape.rb
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+  set_property(TEST test_ruby_bindings PROPERTY LABELS RUBY)
 endif()
 
 if(Go_FOUND AND NOT WIN32)
