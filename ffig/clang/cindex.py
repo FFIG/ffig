@@ -85,10 +85,15 @@ if sys.version_info[0] == 3:
 
         @classmethod
         def from_param(cls, param):
-            return cls(param)
+            if isinstance(param, str):
+                return cls(param)
+            if isinstance(param, bytes):
+                return cls(param)
+            raise TypeError("Cannot convert '{}' to '{}'".format(type(param).__name__, cls.__name__))
 
-    def _utf8_to_python_string(x, *args):
-        return x.decode("utf8")
+        @staticmethod
+        def to_python_string(x, *args):
+            return x.value
 
     def b(x):
         if isinstance(x, bytes):
@@ -100,8 +105,10 @@ elif sys.version_info[0] == 2:
     # C-interop.
     c_interop_string = c_char_p
 
-    def _utf8_to_python_string(x, *args):
+    def _to_python_string(x, *args):
         return x
+
+    c_interop_string.to_python_string = staticmethod(_to_python_string)
 
     def b(x):
         return x
@@ -3383,8 +3390,8 @@ functionList = [
 
     ("clang_getCString",
         [_CXString],
-        c_char_p,
-        _utf8_to_python_string),
+        c_interop_string,
+        c_interop_string.to_python_string),
 
     ("clang_getCursor",
         [TranslationUnit, SourceLocation],
@@ -3661,7 +3668,7 @@ functionList = [
     ("clang_getTUResourceUsageName",
         [c_uint],
         c_interop_string,
-        _utf8_to_python_string),
+        c_interop_string.to_python_string),
 
     ("clang_getTypeDeclaration",
         [Type],
