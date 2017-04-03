@@ -62,9 +62,9 @@ if(Go_FOUND)
   list(APPEND all_ffig_bindings "GO")
 endif()
 
-ffig_add_library(NAME Shape INPUTS input/Shape.h ${all_ffig_bindings})
-ffig_add_library(NAME Tree INPUTS input/Tree.h PYTHON CPP)
-ffig_add_library(NAME Asset INPUTS input/Asset.h PYTHON)
+ffig_add_library(NAME Shape INPUTS tests/input/Shape.h ${all_ffig_bindings})
+ffig_add_library(NAME Tree INPUTS tests/input/Tree.h PYTHON CPP)
+ffig_add_library(NAME Asset INPUTS tests/input/Asset.h PYTHON)
     
 add_subdirectory(tests/src)
 
