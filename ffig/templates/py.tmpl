@@ -24,10 +24,10 @@ else:
     c_string_p = c_char_p
 
 
-class {{class.name}}_error(Exception):
+class {{module.name}}_error(Exception):
     def __init__(self):
-        self.value = conf.lib.{{class.name}}_error()
-        conf.lib.{{class.name}}_clear_error()
+        self.value = conf.lib.{{module.name}}_error()
+        conf.lib.{{module.name}}_clear_error()
 
     def __str__(self):
         return self.value
@@ -41,23 +41,23 @@ class {{class.name}}:
       self.ptr = c_object_p()
       rc = conf.lib.{{class.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.name}},{% endfor %} byref(self.ptr))
       if rc != 0:
-        raise {{class.name}}_error()
+        raise {{module.name}}_error()
   {% endfor %} {% endif %} {% for method in class.methods %}
   def {{method.name}}(self{% for arg in method.arguments %}, {{arg.name}} {% endfor %}): {% if method.returns_void %}
     rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}{% if not loop.last %}, {% endif %}{% endfor %})
     if rc != 0:
-      raise {{class.name}}_error() {% elif not method.returns_sub_object %}
+      raise {{module.name}}_error() {% elif not method.returns_sub_object %}
     rv = {{method.return_type|to_output_ctype}}()
     rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
     if rc == 0:
       return rv.value
-    raise {{class.name}}_error() {% else %}
+    raise {{module.name}}_error() {% else %}
     rv = c_object_p()
     rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
     if rc == 0:
       {% if method.returns_nullable %}if not bool(rv): return None{% endif %}
       return {{method.return_type|to_ctype}}(_p=rv)
-    raise {{class.name}}_error() {% endif %}
+    raise {{module.name}}_error() {% endif %}
   {% endfor %}
   def from_param(self):
     return self.ptr
@@ -73,17 +73,17 @@ class {{class.name}}:
       self.ptr = c_object_p()
       rc = conf.lib.{{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.name}},{% endfor %} byref(self.ptr))
       if rc != 0:
-        raise {{class.name}}_error()
+        raise {{module.name}}_error()
 {% endfor %}
 {% endfor %}
 
 methodList = [
 
-  ("{{class.name}}_error",
+  ("{{module.name}}_error",
   [],
   c_char_p),
 
-  ("{{class.name}}_clear_error",
+  ("{{module.name}}_clear_error",
   [],
   None),
 
@@ -154,11 +154,11 @@ class Config:
         name = platform.system()
 
         if name == 'Darwin':
-            file = 'lib{{class.name}}_c.dylib'
+            file = 'lib{{module.name}}_c.dylib'
         elif name == 'Windows':
-            file = '{{class.name}}_c.dll'
+            file = '{{module.name}}_c.dll'
         else:
-            file = 'lib{{class.name}}_c.so'
+            file = 'lib{{module.name}}_c.so'
         return file
 
     def _get_filepath(self):

@@ -1,7 +1,7 @@
 #pragma once
 
-#define {{class.name}}_RC_SUCCESS 0
-#define {{class.name}}_RC_FAIL 1
+#define {{module.name}}_RC_SUCCESS 0
+#define {{module.name}}_RC_FAIL 1
 
 // FIXME: Use something nicer than _MBCS to see if we are on VS
 #ifdef _MBCS
@@ -18,9 +18,9 @@
 extern "C"
 {
 #endif
-EXPORT void {{class.name}}_clear_error();
-EXPORT const char* {{class.name}}_error();
-EXPORT void {{ class.name }}_dispose(const void* my{{class.name}});
+EXPORT void {{module.name}}_clear_error();
+EXPORT const char* {{module.name}}_error();
+EXPORT void {{class.name}}_dispose(const void* my{{class.name}});
 {% if not class.is_abstract %}{% for method in class.constructors %}
 EXPORT int {{class.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}},{% endfor %} const void** rv); {% endfor %}{% endif %}
 {% for method in class.methods %}

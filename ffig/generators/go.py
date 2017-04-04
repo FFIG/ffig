@@ -31,7 +31,7 @@ def go_generator(module_name, binding, api_classes, env, output_dir):
     # Generate the C file
     template = env.get_template('go.c.tmpl')
     generated_code = generators.render_api_and_obj_classes(
-        api_classes, template)
+        module_name, api_classes, template)
     output_file_name = os.path.join(
         module_directory, generators.get_template_output(
             module_name, generators.get_template_name(binding))) + '.h'
@@ -43,7 +43,7 @@ def go_generator(module_name, binding, api_classes, env, output_dir):
     # Generate the Go file
     template = env.get_template(binding)
     generated_code = generators.render_api_and_obj_classes(
-        api_classes, template)
+        module_name, api_classes, template)
     output_file_name = os.path.join(
         module_directory, generators.get_template_output(
             module_name, generators.get_template_name(binding)))

@@ -1,8 +1,8 @@
-package {{class.name}}
+package {{module.name}}
 
 // #cgo CFLAGS: -std=c11 -I${SRCDIR} -DSOURCE_PATH=${SRCDIR}
 // #cgo LDFLAGS: -ldl
-// #include "{{class.name}}.go.h"
+// #include "{{module.name}}.go.h"
 import "C"
 
 import (

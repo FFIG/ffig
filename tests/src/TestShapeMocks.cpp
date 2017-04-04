@@ -5,33 +5,33 @@
 #include <type_traits>
 #include "Shape_mocks.h"
 
-TEST_CASE("MockShape", "[mocks::MockShape]")
+TEST_CASE("MockAbstractShape", "[mocks::MockAbstractShape]")
 {
-  static_assert(std::is_base_of<Shape,mocks::MockShape>::value,"");
+  static_assert(std::is_base_of<AbstractShape,mocks::MockAbstractShape>::value,"");
 
   GIVEN("A mock shape with no expected values set")
   {
-    mocks::MockShape shape;
+    mocks::MockAbstractShape shape;
 
     THEN("All method invocations lead to exceptions")
     {
       REQUIRE_THROWS_AS(shape.name(),
-                        mocks::MockShape::MockMethodResultNotSpecified);
+                        mocks::MockAbstractShape::MockMethodResultNotSpecified);
 
       REQUIRE_THROWS_AS(shape.area(),
-                        mocks::MockShape::MockMethodResultNotSpecified);
+                        mocks::MockAbstractShape::MockMethodResultNotSpecified);
 
       REQUIRE_THROWS_AS(shape.perimeter(),
-                        mocks::MockShape::MockMethodResultNotSpecified);
+                        mocks::MockAbstractShape::MockMethodResultNotSpecified);
 
       //REQUIRE_THROWS_AS(shape.is_equal(&shape),
-      //                  mocks::MockShape::MockMethodResultNotSpecified);
+      //                  mocks::MockAbstractShape::MockMethodResultNotSpecified);
     }
   }
 
   GIVEN("A mock shape with expected values set")
   {
-    mocks::MockShape shape;
+    mocks::MockAbstractShape shape;
     shape.area_ = 10;
     shape.perimeter_ = 25;
     shape.name_ = "Mock";
@@ -48,7 +48,7 @@ TEST_CASE("MockShape", "[mocks::MockShape]")
   
   GIVEN("A mock shape with function objects returning values")
   {
-    mocks::MockShape shape;
+    mocks::MockAbstractShape shape;
     int area_f_count = 0;
     shape.area_ = [&area_f_count]{ ++area_f_count; return 0.0;};
 

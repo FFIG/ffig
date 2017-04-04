@@ -20,9 +20,9 @@ static {{class.name}}_{{method.name}}_Ptr {{class.name}}_{{method.name}}_ptr;
 
 int init() {
     {% if dso_extension is equalto 'dll' %}
-    const char* library_file = RSTR(SOURCE_PATH) "\\..\\..\\lib{{class.name}}_c.{{dso_extension}}";
+    const char* library_file = RSTR(SOURCE_PATH) "\\..\\..\\lib{{module.name}}_c.{{dso_extension}}";
     {% else %}
-    const char* library_file = RSTR(SOURCE_PATH) "/../../lib{{class.name}}_c.{{dso_extension}}";
+    const char* library_file = RSTR(SOURCE_PATH) "/../../lib{{module.name}}_c.{{dso_extension}}";
     {% endif %}
     // Load the module's dynamic library
     char* path = realpath(library_file, NULL);

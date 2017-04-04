@@ -9,20 +9,20 @@
 #define C_API
 #endif
 
-struct Shape
+struct AbstractShape
 {
-  virtual ~Shape()
+  virtual ~AbstractShape()
   {
   }
   virtual double area() const = 0;
   virtual double perimeter() const = 0;
   virtual const char* name() const = 0;
-  virtual int is_equal(const Shape* s) const = 0;
+  virtual int is_equal(const AbstractShape* s) const = 0;
 } C_API;
 
 static const double pi = 3.14159265359;
 
-class Circle : public Shape
+class Circle : public AbstractShape
 {
   const double radius_;
 
@@ -42,7 +42,7 @@ public:
     return "Circle";
   }
 
-  int is_equal(const Shape* s) const override
+  int is_equal(const AbstractShape* s) const override
   {
     if ( auto c = dynamic_cast<const Circle*>(s) )
       return c->radius_ == radius_;
@@ -59,7 +59,7 @@ public:
   }
 };
 
-class Square : public Shape
+class Square : public AbstractShape
 {
   const double side_;
 
@@ -79,7 +79,7 @@ public:
     return "Square";
   }
 
-  int is_equal(const Shape* s) const override
+  int is_equal(const AbstractShape* s) const override
   {
     if ( auto sq = dynamic_cast<const Square*>(s) )
       return sq->side_ == side_;
@@ -96,7 +96,7 @@ public:
   }
 };
 
-class Pentagon : public Shape
+class Pentagon : public AbstractShape
 {
   const double side_;
 
@@ -116,7 +116,7 @@ public:
     return "Pentagon";
   }
 
-  int is_equal(const Shape* s) const override
+  int is_equal(const AbstractShape* s) const override
   {
     if ( auto p = dynamic_cast<const Pentagon*>(s) )
       return p->side_ == side_;

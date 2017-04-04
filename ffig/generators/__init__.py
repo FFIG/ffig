@@ -18,11 +18,12 @@ def dso_extension():
     return extensions[sys.platform]
 
 
-def render_api_and_obj_classes(api_classes, template):
+def render_api_and_obj_classes(module_name, api_classes, template):
     '''Render a template.'''
     s = ""
     for c in api_classes:
-        s += str(template.render({"class": c.api_class,
+        s += str(template.render({"module": {"name": module_name},
+                                  "class": c.api_class,
                                   "impl_classes": c.impls,
                                   "dso_extension": dso_extension()}))
     return s
@@ -51,7 +52,8 @@ def generate_single_output_file(
     '''Generate a single named output file. Used by the default generator.'''
     with open(output_file_name, 'w') as output_file:
         template = env.get_template(binding)
-        output_string = render_api_and_obj_classes(api_classes, template)
+        output_string = render_api_and_obj_classes(
+            module_name, api_classes, template)
         output_file.write(output_string)
 
 
@@ -71,7 +73,8 @@ def default_generator(module_name, binding, api_classes, env, output_dir):
      - output_dir: The base directory for generator output.
     '''
     template = env.get_template(binding)
-    output_string = render_api_and_obj_classes(api_classes, template)
+    output_string = render_api_and_obj_classes(
+        module_name, api_classes, template)
 
     output_file_name = os.path.join(
         output_dir, get_template_output(
