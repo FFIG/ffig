@@ -5,6 +5,7 @@ import collections
 import logging
 import subprocess
 import sys
+import os
 
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 log = logging.getLogger('codechecks')
@@ -66,6 +67,11 @@ def main():
 
     # Get a list of all the files in this repository:
     files = subprocess.check_output(['git', 'ls-files']).split('\n')
+
+    # Ignore files taken and modified from llvm/clang as reformatting makes
+    # upstreaming changes hard.
+    ignored_directories = [os.path.join('ffig', 'clang')]
+    files = [f for f in files if os.path.dirname(f) not in ignored_directories]
 
     # Collect the result of each stage.
     results = []
