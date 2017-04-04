@@ -3852,7 +3852,7 @@ def register_functions(lib, ignore_errors):
 class Config:
     library_path = None
     library_file = None
-    compatibility_check = False
+    compatibility_check = True
     loaded = False
 
     @staticmethod

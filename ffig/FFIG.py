@@ -20,6 +20,8 @@ import cppmodel
 import filters.capi_filter
 import generators
 
+clang.cindex.Config.set_compatibility_check(False)
+
 
 def find_clang_library_path():
     paths = [

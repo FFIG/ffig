@@ -7,6 +7,8 @@ from clang.cindex import Config
 import os.path
 import sys
 
+Config.set_compatibility_check(False)
+
 
 def find_clang_library_path():
     paths = [
