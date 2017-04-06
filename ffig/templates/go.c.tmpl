@@ -1,6 +1,7 @@
 #include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 #define STR(x) #x
 #define RSTR(x) STR(x)
@@ -19,36 +20,54 @@ static {{class.name}}_{{method.name}}_Ptr {{class.name}}_{{method.name}}_ptr;
 
 
 int init() {
+    // The progress code is incremented prior to each step below.  If a step
+    // fails, this code is returned and used as the exit code from the Go
+    // layer. This allows us to inspect the generated C source and determine at
+    // which point the process of loading the library and resolving the symbols
+    // failed. If everything succeeds, this function explicitly returns 0.
+    int progress_code = 0;
+
+    // Assume the DSO is two levels up from the Go module:
     {% if dso_extension is equalto 'dll' %}
     const char* library_file = RSTR(SOURCE_PATH) "\\..\\..\\lib{{module.name}}_c.{{dso_extension}}";
     {% else %}
     const char* library_file = RSTR(SOURCE_PATH) "/../../lib{{module.name}}_c.{{dso_extension}}";
     {% endif %}
-    // Load the module's dynamic library
+
+    // Form the canonical path to the DSO and check that it points to a valid file.
+    // This should permit early termination in the event that the DSO file is missing.
+    ++progress_code;
     char* path = realpath(library_file, NULL);
+    struct stat st;
+    if (stat(path, &st) != 0) {
+        // The file doesn't exist, or cannot be accessed.
+        return progress_code;
+    }
+
+    // Load the module's dynamic library
+    ++progress_code;
     void* dynamic_library = dlopen(path, RTLD_LOCAL | RTLD_LAZY);
     if (!dynamic_library) {
-        return 1;
+        return progress_code;
     }
 
     // Resolve the function pointers
     void* symbol = NULL;
-    int status = 1;
 
     {% for impl in impl_classes %}{% for method in impl.constructors %}
-    ++status;
+    ++progress_code;
     symbol = dlsym(dynamic_library, "{{class.name}}_{{impl.name}}_create");
     if (!symbol) {
-        return status;
+        return progress_code;
     }
     {{class.name}}_{{impl.name}}_create_ptr = ({{class.name}}_{{impl.name}}_create_Ptr)symbol;
     {% endfor %}{% endfor %}
 
     {% for method in class.methods %}
-    ++status;
+    ++progress_code;
     symbol = dlsym(dynamic_library, "{{class.name}}_{{method.name}}");
     if (!symbol) {
-        return status;
+        return progress_code;
     }
     {{class.name}}_{{method.name}}_ptr = ({{class.name}}_{{method.name}}_Ptr)symbol;
     {% endfor %}  
