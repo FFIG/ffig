@@ -2,26 +2,35 @@ import os
 from ctypes import *
 c_object_p = POINTER(c_void_p)
 
-# Python 3 strings are unicode, translate them to/from utf8 for C-interop
-if type(u"") == str:
-    class c_string_p(c_char_p):
-        def __init__(self, p=None):
-            if p is None:
-                p = ""
-            if type(p) == str:
-                p = p.encode("utf8")
-            super(c_char_p, self).__init__(p)
+class c_interop_string(c_char_p):
 
-        @property
-        def value(self):
-            return super(c_char_p, self).value.decode("utf8")
+  def __init__(self, p=None):
+    if p is None:
+      p = ""
+    if isinstance(p, str):
+      p = p.encode("utf8")
+    super(c_char_p, self).__init__(p)
 
-        @classmethod
-        def from_param(cls, param):
-                return cls(param)
+  def __str__(self):
+    return self.value
 
-else:
-    c_string_p = c_char_p
+  @property
+  def value(self):
+    if super(c_char_p, self).value is None:
+      return None
+    return super(c_char_p, self).value.decode("utf8")
+
+  @classmethod
+  def from_param(cls, param):
+    if isinstance(param, str):
+      return cls(param)
+    if isinstance(param, bytes):
+      return cls(param)
+    raise TypeError("Cannot convert '{}' to '{}'".format(type(param).__name__, cls.__name__))
+
+  @staticmethod
+  def to_python_string(x, *args):
+    return x.value
 
 
 class {{module.name}}_error(Exception):
@@ -47,7 +56,7 @@ class {{class.name}}:
     rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}{% if not loop.last %}, {% endif %}{% endfor %})
     if rc != 0:
       raise {{module.name}}_error() {% elif not method.returns_sub_object %}
-    rv = {{method.return_type|to_output_ctype}}()
+    rv = {{method.return_type|to_output_py3_ctype}}()
     rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
     if rc == 0:
       return rv.value
@@ -56,7 +65,7 @@ class {{class.name}}:
     rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
     if rc == 0:
       {% if method.returns_nullable %}if not bool(rv): return None{% endif %}
-      return {{method.return_type|to_ctype}}(_p=rv)
+      return {{method.return_type|to_py3_ctype}}(_p=rv)
     raise {{module.name}}_error() {% endif %}
   {% endfor %}
   def from_param(self):
@@ -78,25 +87,23 @@ class {{class.name}}:
 {% endfor %}
 
 methodList = [
-
   ("{{module.name}}_error",
   [],
   c_char_p),
-
   ("{{module.name}}_clear_error",
   [],
   None),
-
   ("{{class.name}}_dispose",
   [{{class.name}}],
-  None),{% for impl in impl_classes %} {% for method in impl.constructors %}
-
+  None),{% if not class.is_abstract %} {% for method in class.constructors %}
+  ("{{class.name}}_{{class.name}}_create",
+  [{% for arg in method.arguments %}{{arg.type|to_py3_ctype}}, {% endfor %}POINTER(c_object_p)],
+  c_int),{% endfor %} {% endif %} {% for impl in impl_classes %} {% for method in impl.constructors %}
   ("{{class.name}}_{{ impl.name }}_create",
-  [{% for arg in method.arguments %}{{arg.type|to_ctype}}, {% endfor %}POINTER(c_object_p)],
+  [{% for arg in method.arguments %}{{arg.type|to_py3_ctype}}, {% endfor %}POINTER(c_object_p)],
   c_int),{% endfor %}{% endfor %} {% for method in class.methods %}
-
   ("{{ class.name }}_{{method.name}}",
-  [{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_ctype}} {% endfor %}{% if not method.returns_void %}, POINTER({{method.return_type|to_output_ctype}}){% endif %}],
+  [{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_py3_ctype}}{% endfor %}{% if not method.returns_void %}, POINTER({{method.return_type|to_output_py3_ctype}}){% endif %}],
   c_int){% if not loop.last %},{% endif %}{% endfor %}
 ]
 

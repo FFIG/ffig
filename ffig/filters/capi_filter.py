@@ -90,7 +90,7 @@ def c_object(v, t):
 
 
 # Python filter to translate C-type to Python ctype type
-def to_ctype(t):
+def to_py3_ctype(t):
     if t.kind == TypeKind.VOID:
         return None
     if t.kind == TypeKind.INT:
@@ -101,7 +101,7 @@ def to_ctype(t):
         return 'bool'
     if t.kind == TypeKind.POINTER:
         if t.pointee.kind == TypeKind.CHAR_S:
-            return 'c_string_p'
+            return 'c_interop_string'
         if t.pointee.kind == TypeKind.RECORD:
             # This is a hack until we can get an unqualified type from libclang
             return t.pointee.name.replace('const ', '')
@@ -110,7 +110,7 @@ def to_ctype(t):
             t.name))
 
 
-def to_output_ctype(t):
+def to_output_py3_ctype(t):
     if t.kind == TypeKind.VOID:
         return None
     if t.kind == TypeKind.INT:
@@ -121,7 +121,46 @@ def to_output_ctype(t):
         return 'bool'
     if t.kind == TypeKind.POINTER:
         if t.pointee.kind == TypeKind.CHAR_S:
-            return 'c_string_p'
+            return 'c_interop_string'
+        if t.pointee.kind == TypeKind.RECORD:
+            return 'c_object_p'
+    raise Exception(
+        'No ctypes equivalent is defined for type {}'.format(
+            t.name))
+
+
+def to_py2_ctype(t):
+    if t.kind == TypeKind.VOID:
+        return None
+    if t.kind == TypeKind.INT:
+        return 'c_int'
+    if t.kind == TypeKind.DOUBLE:
+        return 'c_double'
+    if t.kind == TypeKind.BOOL:
+        return 'bool'
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return 'c_char_p'
+        if t.pointee.kind == TypeKind.RECORD:
+            # This is a hack until we can get an unqualified type from libclang
+            return t.pointee.name.replace('const ', '')
+    raise Exception(
+        'No ctypes equivalent is defined for type {}'.format(
+            t.name))
+
+
+def to_output_py2_ctype(t):
+    if t.kind == TypeKind.VOID:
+        return None
+    if t.kind == TypeKind.INT:
+        return 'c_int'
+    if t.kind == TypeKind.DOUBLE:
+        return 'c_double'
+    if t.kind == TypeKind.BOOL:
+        return 'bool'
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return 'c_char_p'
         if t.pointee.kind == TypeKind.RECORD:
             return 'c_object_p'
     raise Exception(

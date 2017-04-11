@@ -1,0 +1,167 @@
+import os
+from ctypes import *
+c_object_p = POINTER(c_void_p)
+
+class {{module.name}}_error(Exception):
+    def __init__(self):
+        self.value = conf.lib.{{module.name}}_error()
+        conf.lib.{{module.name}}_clear_error()
+
+    def __str__(self):
+        return self.value
+
+class {{class.name}}:
+  {% if not class.is_abstract %} {% for method in class.constructors %}
+  def __init__(self, {% for arg in method.arguments %} {{arg.name}}=None,{% endfor %} _p=None):
+    if _p:
+      self.ptr = _p
+    else:
+      self.ptr = c_object_p()
+      rc = conf.lib.{{class.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.name}},{% endfor %} byref(self.ptr))
+      if rc != 0:
+        raise {{module.name}}_error()
+  {% endfor %} {% endif %} {% for method in class.methods %}
+  def {{method.name}}(self{% for arg in method.arguments %}, {{arg.name}} {% endfor %}): {% if method.returns_void %}
+    rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}{% if not loop.last %}, {% endif %}{% endfor %})
+    if rc != 0:
+      raise {{module.name}}_error() {% elif not method.returns_sub_object %}
+    rv = {{method.return_type|to_output_py2_ctype}}()
+    rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
+    if rc == 0:
+      return rv.value
+    raise {{module.name}}_error() {% else %}
+    rv = c_object_p()
+    rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
+    if rc == 0:
+      {% if method.returns_nullable %}if not bool(rv): return None{% endif %}
+      return {{method.return_type|to_py2_ctype}}(_p=rv)
+    raise {{module.name}}_error() {% endif %}
+  {% endfor %}
+  def from_param(self):
+    return self.ptr
+
+  def __del__(self):
+    conf.lib.{{class.name}}_dispose(self)
+
+{% for impl in impl_classes %}class {{impl.name}}({{class.name}}): {% for method in impl.constructors %}
+  def __init__(self, {% for arg in method.arguments %} {{arg.name}}=None,{% endfor %} _p=None):
+    if _p:
+      self.ptr = _p
+    else:
+      self.ptr = c_object_p()
+      rc = conf.lib.{{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.name}},{% endfor %} byref(self.ptr))
+      if rc != 0:
+        raise {{module.name}}_error()
+{% endfor %}
+{% endfor %}
+
+methodList = [
+  ("{{module.name}}_error",
+  [],
+  c_char_p),
+  ("{{module.name}}_clear_error",
+  [],
+  None),
+  ("{{class.name}}_dispose",
+  [{{class.name}}],
+  None),{% if not class.is_abstract %} {% for method in class.constructors %}
+  ("{{class.name}}_{{class.name}}_create",
+  [{% for arg in method.arguments %}{{arg.type|to_py2_ctype}}, {% endfor %}POINTER(c_object_p)],
+  c_int),{% endfor %} {% endif %} {% for impl in impl_classes %} {% for method in impl.constructors %}
+  ("{{class.name}}_{{ impl.name }}_create",
+  [{% for arg in method.arguments %}{{arg.type|to_py2_ctype}}, {% endfor %}POINTER(c_object_p)],
+  c_int),{% endfor %}{% endfor %} {% for method in class.methods %}
+
+  ("{{ class.name }}_{{method.name}}",
+  [{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_py2_ctype}}{% endfor %}{% if not method.returns_void %}, POINTER({{method.return_type|to_output_py2_ctype}}){% endif %}],
+  c_int){% if not loop.last %},{% endif %}{% endfor %}
+]
+
+# library loading and method registrations
+# based on clang python bindings approach
+
+def register_method(lib, item):
+  func = getattr(lib, item[0])
+
+  if len(item) >= 2:
+    func.argtypes = item[1]
+
+  if len(item) >= 3:
+    func.restype = item[2]
+
+
+class CachedProperty(object):
+
+    def __init__(self, wrapped):
+        self.wrapped = wrapped
+        try:
+            self.__doc__ = wrapped.__doc__
+        except:
+            pass
+
+    def __get__(self, instance, instance_type=None):
+        if instance is None:
+            return self
+
+        value = self.wrapped(instance)
+        setattr(instance, self.wrapped.__name__, value)
+
+        return value
+
+class Config:
+    library_path = None
+    loaded = False
+
+    @staticmethod
+    def set_library_path(path):
+        if Config.loaded:
+            raise Exception("library path is already set.")
+        Config.library_path = path
+
+    @CachedProperty
+    def lib(self):
+        lib = self._get_library()
+        for m in methodList:
+          register_method(lib,m)
+        Config.loaded = True
+        return lib
+
+    def _get_filename(self):
+        import platform
+        name = platform.system()
+
+        if name == 'Darwin':
+            file = 'lib{{module.name}}_c.dylib'
+        elif name == 'Windows':
+            file = '{{module.name}}_c.dll'
+        else:
+            file = 'lib{{module.name}}_c.so'
+        return file
+
+    def _get_filepath(self):
+        filename = self._get_filename()
+        if not Config.library_path:
+            return filename
+        return os.path.join(Config.library_path, filename)
+
+    def _get_library(self):
+        try:
+            # Use user-specified library path.
+            if Config.library_path:
+                library = cdll.LoadLibrary(self._get_filepath())
+            else:
+                # Use local file
+                try:
+                    this_file_dir = os.path.abspath(os.path.dirname(__file__))
+                    library = cdll.LoadLibrary(os.path.join(this_file_dir, self._get_filename()))
+                except:
+                    # Use system library path (last).
+                    library = cdll.LoadLibrary(self._get_filename())
+        except OSError as e:
+            msg = str(e) + ". To provide a path to {{class.name}} dylib use Config.set_library_path()"
+            raise Exception(msg)
+
+        return library
+
+conf = Config()
+
