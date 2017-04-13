@@ -41,9 +41,9 @@ func {{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{ar
 {% endfor %}
 
 {% for method in class.methods %}
-func {{class.name}}_{{method.name}}(my{{class.name}} {{class.name}}{% for arg in method.arguments %}, {{arg.name}} {{arg.type|to_go}}{% endfor %}) {% if not method.returns_void %}({{method.return_type|to_go}}, bool){% else %}bool{% endif %} {
+func (obj {{class.name}}) {{method.name|to_go_method_name}}({% for arg in method.arguments %}{{arg.name}} {{arg.type|to_go}}{% if not loop.last %},{% endif %}{% endfor %}) {% if not method.returns_void %}({{method.return_type|to_go}}, bool){% else %}bool{% endif %} {
     var rv C.RT_{{class.name}}_{{method.name}}
-    rv = C.CGo_{{class.name}}_{{method.name}}(my{{class.name}}.ptr{% for arg in method.arguments %}, {{arg.name}}{% endfor %})
+    rv = C.CGo_{{class.name}}_{{method.name}}(obj.ptr{% for arg in method.arguments %}, {{arg.name|go_object(arg.type)}}{% endfor %})
     
     if rv.status == 0 {
         {% if not method.returns_void %}

@@ -51,7 +51,7 @@ def to_go(t):
         if t.pointee.kind == TypeKind.CHAR_S:
             return 'string'
         if t.pointee.kind == TypeKind.RECORD:
-            return 'unsafe.Pointer'
+            return t.pointee.name.replace('const', '')
     raise Exception('Type {} has no known Go equivalent'.format(t.name))
 
 
@@ -66,6 +66,27 @@ def to_go_convert(t):
         if t.pointee.kind == TypeKind.RECORD:
             return 'unsafe.Pointer'
     raise Exception('Type {} has no known Go equivalent'.format(t.name))
+
+
+def to_go_method_name(m):
+    '''
+    Returns the method name with the first character uppercased.
+
+    In Go, only entities with an uppercase first character are exposed in the
+    module interface.
+    '''
+    return m.capitalize()
+
+
+def go_object(v, t):
+    '''
+    In analogy to the `c_object` filter below, this returns `v.ptr` for objects
+    of class type, and `v` for everything else.
+    '''
+    if t.kind == TypeKind.POINTER and t.pointee.kind == TypeKind.RECORD:
+        return '{}.ptr'.format(v)
+    else:
+        return v
 
 # C++ header filter to extract C type from C++ type
 
