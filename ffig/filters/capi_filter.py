@@ -51,7 +51,7 @@ def to_go(t):
         if t.pointee.kind == TypeKind.CHAR_S:
             return 'string'
         if t.pointee.kind == TypeKind.RECORD:
-            return t.pointee.name.replace('const', '')
+            return t.pointee.name.replace('const ', '')
     raise Exception('Type {} has no known Go equivalent'.format(t.name))
 
 
