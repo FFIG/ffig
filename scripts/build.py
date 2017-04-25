@@ -2,6 +2,7 @@
 import sys
 import os
 import platform
+import shutil
 import subprocess
 
 
@@ -49,8 +50,8 @@ def main():
 
     src_dir = os.path.realpath(os.path.dirname(os.path.dirname(__file__)))
 
-    if args.clean:
-        subprocess.check_call('rm -rf {}'.format(args.out_dir).split())
+    if args.clean and os.path.exists(args.out_dir):
+        shutil.rmtree(args.out_dir)
 
     cmake_invocation = ['cmake', '.', '-B{}'.format(args.out_dir)]
     if args.platform == 'Windows':
