@@ -22,12 +22,12 @@ namespace {
 using {{class.name}}_ptr = const std::shared_ptr<{{class.name}}>*;
 } // end anonymous namespace
 
-void {{ class.name }}_dispose(const void* my{{class.name}})
+void {{module.name}}_{{ class.name }}_dispose(const void* my{{class.name}})
 {
   delete static_cast<{{class.name}}_ptr>(my{{class.name}});
 }
 {% if not class.is_abstract %}{% for method in class.constructors %}
-int {{class.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}},{% endfor %} const void** rv)
+int {{module.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}},{% endfor %} const void** rv)
 {
   try
   {
@@ -42,7 +42,7 @@ int {{class.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{ar
   return {{module.name}}_RC_SUCCESS;
 }
 {% endfor %} {% endif %} {% for method in class.methods %}
-int {{ class.name }}_{{method.name}}(const void* my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}{% if not method.returns_void %}, {{method.return_type|to_c}}* rv{% endif %})
+int {{module.name}}_{{ class.name }}_{{method.name}}(const void* my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}{% if not method.returns_void %}, {{method.return_type|to_c}}* rv{% endif %})
 {
   try
   {
@@ -65,7 +65,7 @@ int {{ class.name }}_{{method.name}}(const void* my{{class.name}}{% for arg in m
   return {{module.name}}_RC_SUCCESS;
 }
 {% endfor %} {% for impl in impl_classes %} {% for method in impl.constructors %}
-int {{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}},{% endfor %} const void** rv)
+int {{module.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}},{% endfor %} const void** rv)
 {
   try
   {

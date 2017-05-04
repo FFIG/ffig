@@ -8,13 +8,13 @@ module {{module.name}}_c
   ffi_lib ['{{module.name}}_c',
            File.dirname(__FILE__) + '/lib{{module.name}}_c.so',
            File.dirname(__FILE__) + '/lib{{module.name}}_c.dylib' ]
-  attach_function :{{class.name}}_dispose, [:pointer], :void
+  attach_function :{{module.name}}_{{class.name}}_dispose, [:pointer], :void
   attach_function :{{module.name}}_error, [], :string
   attach_function :{{module.name}}_clear_error, [], :void 
   {% for method in class.methods %}
-  attach_function :{{class.name}}_{{method.name}}, [:pointer{% for arg in method.arguments %}, :{{arg.type|to_ruby_type}}{% endfor %}, :pointer], :int{% endfor %}
+  attach_function :{{module.name}}_{{class.name}}_{{method.name}}, [:pointer{% for arg in method.arguments %}, :{{arg.type|to_ruby_type}}{% endfor %}, :pointer], :int{% endfor %}
   {% for impl in impl_classes %}{% for method in impl.constructors %}
-  attach_function :{{class.name}}_{{impl.name}}_create, [{% for arg in method.arguments %}:{{arg.type|to_ruby_type}},{% endfor %} :pointer], :int{% endfor %}{% endfor %}
+  attach_function :{{module.name}}_{{impl.name}}_create, [{% for arg in method.arguments %}:{{arg.type|to_ruby_type}},{% endfor %} :pointer], :int{% endfor %}{% endfor %}
 end
 
 class {{module.name}}Error < Exception
@@ -32,12 +32,12 @@ class {{class.name}}
   end
 
   def self.finalize(ptr)
-    proc { {{module.name}}_c.{{class.name}}_dispose(ptr) }
+    proc { {{module.name}}_c.{{module.name}}_{{class.name}}_dispose(ptr) }
   end
   {% for method in class.methods %}
   def {{method.name}}()
     dptr = {{method.return_type|to_ruby_output_type}}
-    rc = {{module.name}}_c.{{class.name}}_{{method.name}}(@ptr, dptr)
+    rc = {{module.name}}_c.{{module.name}}_{{class.name}}_{{method.name}}(@ptr, dptr)
     if rc != 0
       raise {{module.name}}Error
     end
@@ -49,7 +49,7 @@ class {{class.name}}
 class {{impl.name}} < {{class.name}}
   def initialize({% for arg in method.arguments %}{{arg.name}}{% if not loop.last %},{% endif %}{% endfor %})
     objptr = FFI::MemoryPointer.new :pointer
-    rc = {{module.name}}_c.{{class.name}}_{{impl.name}}_create({% for arg in method.arguments %}{{arg.name}}, {% endfor %}objptr)
+    rc = {{module.name}}_c.{{module.name}}_{{impl.name}}_create({% for arg in method.arguments %}{{arg.name}}, {% endfor %}objptr)
     if rc != 0
       raise {{module.name}}Error
     end

@@ -26,9 +26,9 @@ type {{class.name}} struct {
 {% for impl in impl_classes %}
 {% for method in impl.constructors %}
 
-func {{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.name}} {{arg.type|to_go}}{% if not loop.last %},{% endif %}{% endfor %}) ({{class.name}}, bool) {
-    var pv C.RT_{{class.name}}_{{impl.name}}_create
-    pv = C.CGo_{{class.name}}_{{impl.name}}_create({% for arg in method.arguments %}C.{{arg.type|to_c}}({{arg.name}}) {%if not loop.last %},{% endif %} {% endfor %})
+func {{ impl.name }}_create({% for arg in method.arguments %}{{arg.name}} {{arg.type|to_go}}{% if not loop.last %},{% endif %}{% endfor %}) ({{class.name}}, bool) {
+    var pv C.RT_{{module.name}}_{{impl.name}}_create
+    pv = C.CGo_{{module.name}}_{{impl.name}}_create({% for arg in method.arguments %}C.{{arg.type|to_c}}({{arg.name}}) {%if not loop.last %},{% endif %} {% endfor %})
 
     var obj {{class.name}}
 
@@ -45,8 +45,8 @@ func {{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{ar
 
 {% for method in class.methods %}
 func (obj {{class.name}}) {{method.name|to_go_method_name}}({% for arg in method.arguments %}{{arg.name}} {{arg.type|to_go}}{% if not loop.last %},{% endif %}{% endfor %}) {% if not method.returns_void %}({{method.return_type|to_go}}, bool){% else %}bool{% endif %} {
-    var rv C.RT_{{class.name}}_{{method.name}}
-    rv = C.CGo_{{class.name}}_{{method.name}}(obj.ptr{% for arg in method.arguments %}, {{arg.name|go_object(arg.type)}}{% endfor %})
+    var rv C.RT_{{module.name}}_{{class.name}}_{{method.name}}
+    rv = C.CGo_{{module.name}}_{{class.name}}_{{method.name}}(obj.ptr{% for arg in method.arguments %}, {{arg.name|go_object(arg.type)}}{% endfor %})
     
     if rv.status == 0 {
         {% if not method.returns_void %}

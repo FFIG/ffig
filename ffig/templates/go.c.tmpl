@@ -12,13 +12,13 @@
 // Function pointers for each of the exposed functions.
 // These will be set to the dlsym() results on initialisation.
 {% for impl in impl_classes %}{% for method in impl.constructors %}
-typedef int (*{{class.name}}_{{impl.name}}_create_Ptr)({% for arg in method.arguments %}{{arg.type|to_c}}, {% endfor %}const void**);
-static {{class.name}}_{{impl.name}}_create_Ptr {{class.name}}_{{impl.name}}_create_ptr = NULL;
+typedef int (*{{module.name}}_{{impl.name}}_create_Ptr)({% for arg in method.arguments %}{{arg.type|to_c}}, {% endfor %}const void**);
+static {{module.name}}_{{impl.name}}_create_Ptr {{module.name}}_{{impl.name}}_create_ptr = NULL;
 {% endfor %}{% endfor %}
 
 {% for method in class.methods %}
-typedef int (*{{class.name}}_{{method.name}}_Ptr)(const void*{% for arg in method.arguments %}, {{arg.type|to_c}}{% endfor %}{% if not method.returns_void %}, {{method.return_type|to_c}}* rv{% endif %});
-static {{class.name}}_{{method.name}}_Ptr {{class.name}}_{{method.name}}_ptr;
+typedef int (*{{module.name}}_{{class.name}}_{{method.name}}_Ptr)(const void*{% for arg in method.arguments %}, {{arg.type|to_c}}{% endfor %}{% if not method.returns_void %}, {{method.return_type|to_c}}* rv{% endif %});
+static {{module.name}}_{{class.name}}_{{method.name}}_Ptr {{module.name}}_{{class.name}}_{{method.name}}_ptr;
 {% endfor %} 
 
 
@@ -59,20 +59,20 @@ int init() {
 
     {% for impl in impl_classes %}{% for method in impl.constructors %}
     ++progress_code;
-    symbol = dlsym(dynamic_library, "{{class.name}}_{{impl.name}}_create");
+    symbol = dlsym(dynamic_library, "{{module.name}}_{{impl.name}}_create");
     if (!symbol) {
         return progress_code;
     }
-    {{class.name}}_{{impl.name}}_create_ptr = ({{class.name}}_{{impl.name}}_create_Ptr)symbol;
+    {{module.name}}_{{impl.name}}_create_ptr = ({{module.name}}_{{impl.name}}_create_Ptr)symbol;
     {% endfor %}{% endfor %}
 
     {% for method in class.methods %}
     ++progress_code;
-    symbol = dlsym(dynamic_library, "{{class.name}}_{{method.name}}");
+    symbol = dlsym(dynamic_library, "{{module.name}}_{{class.name}}_{{method.name}}");
     if (!symbol) {
         return progress_code;
     }
-    {{class.name}}_{{method.name}}_ptr = ({{class.name}}_{{method.name}}_Ptr)symbol;
+    {{module.name}}_{{class.name}}_{{method.name}}_ptr = ({{module.name}}_{{class.name}}_{{method.name}}_Ptr)symbol;
     {% endfor %}  
 
     free(path);
@@ -82,29 +82,29 @@ int init() {
 
 
 {% for impl in impl_classes %}{% for method in impl.constructors %}
-typedef struct {{class.name}}_{{impl.name}}_create_return_type {
+typedef struct {{module.name}}_{{impl.name}}_create_return_type {
     const void* ptr;
     int status;
-} RT_{{class.name}}_{{impl.name}}_create;
+} RT_{{module.name}}_{{impl.name}}_create;
 
-RT_{{class.name}}_{{impl.name}}_create CGo_{{class.name}}_{{impl.name}}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}} {% if not loop.last %},{% endif %}{% endfor %}) {
-    RT_{{class.name}}_{{impl.name}}_create rv;
-    rv.status = {{class.name}}_{{impl.name}}_create_ptr({% for arg in method.arguments %}{{arg.name}}, {% endfor %}&rv.ptr);
+RT_{{module.name}}_{{impl.name}}_create CGo_{{module.name}}_{{impl.name}}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}} {% if not loop.last %},{% endif %}{% endfor %}) {
+    RT_{{module.name}}_{{impl.name}}_create rv;
+    rv.status = {{module.name}}_{{impl.name}}_create_ptr({% for arg in method.arguments %}{{arg.name}}, {% endfor %}&rv.ptr);
     return rv;
 }
 {% endfor %}{% endfor %}
 
 {% for method in class.methods %}
-typedef struct {{class.name}}_{{method.name}}_return_type {
+typedef struct {{module.name}}_{{class.name}}_{{method.name}}_return_type {
     {% if not method.returns_void %}
     {{method.return_type|to_c}} value;
     {% endif %}
     int status;
-} RT_{{class.name}}_{{method.name}};
+} RT_{{module.name}}_{{class.name}}_{{method.name}};
 
-RT_{{class.name}}_{{method.name}} CGo_{{class.name}}_{{method.name}}(const void* my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}) {
-    RT_{{class.name}}_{{method.name}} rv;
-    rv.status = {{class.name}}_{{method.name}}_ptr(my{{class.name}}{% for arg in method.arguments %}, {{arg.name}}{% endfor %}{% if not method.returns_void %}, &rv.value{% endif %});
+RT_{{module.name}}_{{class.name}}_{{method.name}} CGo_{{module.name}}_{{class.name}}_{{method.name}}(const void* my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}) {
+    RT_{{module.name}}_{{class.name}}_{{method.name}} rv;
+    rv.status = {{module.name}}_{{class.name}}_{{method.name}}_ptr(my{{class.name}}{% for arg in method.arguments %}, {{arg.name}}{% endfor %}{% if not method.returns_void %}, &rv.value{% endif %});
     return rv;
 }
 {% endfor %}  

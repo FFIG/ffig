@@ -10,7 +10,7 @@ const tolerance = 1e-11
 
 func Test_Circle_Area(t *testing.T) {
     r := 5.0
-    s, err := Shape.AbstractShape_Circle_create(r)
+    s, err := Shape.Circle_create(r)
     if (err) {
         t.Error(`Failed to create a Circle`)
     }
@@ -26,7 +26,7 @@ func Test_Circle_Area(t *testing.T) {
 
 func Test_Circle_Perimeter(t *testing.T) {
     r := 5.0
-    s, err := Shape.AbstractShape_Circle_create(r)
+    s, err := Shape.Circle_create(r)
     if (err) {
         t.Error(`Failed to create a Circle`)
     }
@@ -42,12 +42,12 @@ func Test_Circle_Perimeter(t *testing.T) {
 
 func Test_Circle_Is_equal(t *testing.T) {
     r := 5.0
-    s, err := Shape.AbstractShape_Circle_create(r)
+    s, err := Shape.Circle_create(r)
     if (err) {
         t.Error(`Failed to create a Circle`)
     }
 
-    s2, err := Shape.AbstractShape_Circle_create(r)
+    s2, err := Shape.Circle_create(r)
     if (err) {
         t.Error(`Failed to create a Circle`)
     }
@@ -60,7 +60,7 @@ func Test_Circle_Is_equal(t *testing.T) {
         t.Error(`Circle.Is_equal() does not match expectation (expected non-zero)`)
     }
 
-    s3, err := Shape.AbstractShape_Circle_create(2.0 * r)
+    s3, err := Shape.Circle_create(2.0 * r)
     if err {
         t.Error(`Failed to create a Circle`)
     }

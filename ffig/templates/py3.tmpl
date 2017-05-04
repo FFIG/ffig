@@ -51,21 +51,21 @@ class {{class.name}}:
       self.ptr = _p
     else:
       self.ptr = c_object_p()
-      rc = conf.lib.{{class.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.name}},{% endfor %} byref(self.ptr))
+      rc = conf.lib.{{module.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.name}},{% endfor %} byref(self.ptr))
       if rc != 0:
         raise {{module.name}}_error()
   {% endfor %} {% endif %} {% for method in class.methods %}
   def {{method.name}}(self{% for arg in method.arguments %}, {{arg.name}} {% endfor %}): {% if method.returns_void %}
-    rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}{% if not loop.last %}, {% endif %}{% endfor %})
+    rc = conf.lib.{{module.name}}_{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}{% if not loop.last %}, {% endif %}{% endfor %})
     if rc != 0:
       raise {{module.name}}_error() {% elif not method.returns_sub_object %}
     rv = {{method.return_type|to_output_py3_ctype}}()
-    rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
+    rc = conf.lib.{{module.name}}_{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
     if rc == 0:
       return rv.value
     raise {{module.name}}_error() {% else %}
     rv = c_object_p()
-    rc = conf.lib.{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
+    rc = conf.lib.{{module.name}}_{{class.name}}_{{method.name}}(self, {% for arg in method.arguments %}{{arg.name}}, {% endfor %}byref(rv))
     if rc == 0:
       {% if method.returns_nullable %}if not bool(rv): return None{% endif %}
       return {{method.return_type|to_py3_ctype}}(_p=rv)
@@ -75,7 +75,7 @@ class {{class.name}}:
     return self.ptr
 
   def __del__(self):
-    conf.lib.{{class.name}}_dispose(self)
+    conf.lib.{{module.name}}_{{class.name}}_dispose(self)
 
 {% for impl in impl_classes %}class {{impl.name}}({{class.name}}): {% for method in impl.constructors %}
   def __init__(self, {% for arg in method.arguments %} {{arg.name}}=None,{% endfor %} _p=None):
@@ -83,7 +83,7 @@ class {{class.name}}:
       self.ptr = _p
     else:
       self.ptr = c_object_p()
-      rc = conf.lib.{{class.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.name}},{% endfor %} byref(self.ptr))
+      rc = conf.lib.{{module.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.name}},{% endfor %} byref(self.ptr))
       if rc != 0:
         raise {{module.name}}_error()
 {% endfor %}
@@ -96,16 +96,16 @@ methodList = [
   ("{{module.name}}_clear_error",
   [],
   None),
-  ("{{class.name}}_dispose",
+  ("{{module.name}}_{{class.name}}_dispose",
   [{{class.name}}],
   None),{% if not class.is_abstract %} {% for method in class.constructors %}
-  ("{{class.name}}_{{class.name}}_create",
+  ("{{module.name}}_{{class.name}}_create",
   [{% for arg in method.arguments %}{{arg.type|to_py3_ctype}}, {% endfor %}POINTER(c_object_p)],
   c_int),{% endfor %} {% endif %} {% for impl in impl_classes %} {% for method in impl.constructors %}
-  ("{{class.name}}_{{ impl.name }}_create",
+  ("{{module.name}}_{{ impl.name }}_create",
   [{% for arg in method.arguments %}{{arg.type|to_py3_ctype}}, {% endfor %}POINTER(c_object_p)],
   c_int),{% endfor %}{% endfor %} {% for method in class.methods %}
-  ("{{ class.name }}_{{method.name}}",
+  ("{{module.name}}_{{ class.name }}_{{method.name}}",
   [{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_py3_ctype}}{% endfor %}{% if not method.returns_void %}, POINTER({{method.return_type|to_output_py3_ctype}}){% endif %}],
   c_int){% if not loop.last %},{% endif %}{% endfor %}
 ]
