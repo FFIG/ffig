@@ -177,3 +177,18 @@ def test_string_representation():
     assert str(methods[1]) == 'int bar()'
     assert str(methods[2]) == 'virtual int foobar() = 0'
     assert str(methods[3]) == 'virtual int cfoobar(int x) const = 0'
+
+
+def test_noexcept():
+    source = """
+    class A {
+        virtual int foo();
+    };"""
+    tu = get_tu(source, 'cpp')
+
+    model = cppmodel.Model(tu, force_noexcept=True)
+    classes = model.classes
+    methods = classes[0].methods
+
+    assert str(methods[0]) == 'virtual int foo() noexcept'
+    assert methods[0].is_noexcept

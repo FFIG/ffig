@@ -82,7 +82,7 @@ def write_bindings_to_disk(
         generators.generate(module_name, binding, api_classes, env, output_dir)
 
 
-def build_model_from_source(path_to_source, module_name):
+def build_model_from_source(path_to_source, module_name, treat_methods_as_noexcept):
     """
     Input:
     - full path to source file
@@ -94,7 +94,7 @@ def build_model_from_source(path_to_source, module_name):
     tu = clang.cindex.TranslationUnit.from_source(
         path_to_source, '-x c++ -std=c++14 -stdlib=libc++'.split())
 
-    model = cppmodel.Model(tu)
+    model = cppmodel.Model(tu, treat_methods_as_noexcept)
     model.module_name = module_name
 
     return model
@@ -137,7 +137,7 @@ def main(args):
     # FIXME: Loop over files and extend the model once we can handle multiple
     # input files.
     input_file = os.path.join(cwd, args.inputs[0])
-    m = build_model_from_source(input_file, args.module_name)
+    m = build_model_from_source(input_file, args.module_name, args.noexcept)
     classes = m.classes
     api_classes = collect_api_and_obj_classes(classes, 'GENERATE_C_API')
 
@@ -184,6 +184,11 @@ if __name__ == '__main__':
         help='module name for generated files',
         dest='module_name',
         required=True)
+    parser.add_argument(
+        '--noexcept',
+        help='treat all methods as if they were marked noexcept',
+        dest='noexcept',
+        action='store_true')
 
     args = parser.parse_args()
 
