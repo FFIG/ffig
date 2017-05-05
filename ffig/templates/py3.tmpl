@@ -92,7 +92,8 @@ class {{class.name}}:
 methodList = [
   ("{{module.name}}_error",
   [],
-  c_char_p),
+  c_interop_string,
+  c_interop_string.to_python_string),
   ("{{module.name}}_clear_error",
   [],
   None),
@@ -122,6 +123,8 @@ def register_method(lib, item):
   if len(item) >= 3:
     func.restype = item[2]
 
+  if len(item) == 4:
+    func.errcheck = item[3]
 
 class CachedProperty(object):
 

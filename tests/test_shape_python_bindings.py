@@ -48,3 +48,10 @@ def test_Shape_Circle_is_not_equal_to_square():
 @nose.tools.raises(Exception)
 def test_exception_on_negative_radius():
     Shape.Circle(-1)
+
+
+def test_exception_text_is_a_string():
+    try:
+        Shape.Circle(-1)
+    except Shape.Shape_error as e:
+        assert isinstance(str(e), str)
