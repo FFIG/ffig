@@ -19,6 +19,7 @@ before_install:
     - pip install pep8
 
 install:
+  - docker pull ffig/ffig-base
   - docker build -t ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} .
 
 script:
