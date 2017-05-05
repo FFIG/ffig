@@ -131,6 +131,27 @@ def to_py3_ctype(t):
             t.name))
 
 
+def to_hint_type(t):
+    if t.kind == TypeKind.VOID:
+        return None
+    if t.kind == TypeKind.INT:
+        return 'int'
+    if t.kind == TypeKind.DOUBLE:
+        return 'float'
+    if t.kind == TypeKind.BOOL:
+        return 'bool'
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return 'str'
+        if t.pointee.kind == TypeKind.RECORD:
+            # This is encoding the assumption that the name of a binding class
+            # is the same as the name of the underlying C++ class.
+            return to_cpp_type(t)
+    raise Exception(
+        'No ctypes equivalent is defined for type {}'.format(
+            t.name))
+
+
 def to_output_py3_ctype(t):
     if t.kind == TypeKind.VOID:
         return None

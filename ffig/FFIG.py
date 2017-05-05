@@ -82,7 +82,10 @@ def write_bindings_to_disk(
         generators.generate(module_name, binding, api_classes, env, output_dir)
 
 
-def build_model_from_source(path_to_source, module_name, treat_methods_as_noexcept):
+def build_model_from_source(
+        path_to_source,
+        module_name,
+        treat_methods_as_noexcept):
     """
     Input:
     - full path to source file
