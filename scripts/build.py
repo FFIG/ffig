@@ -60,7 +60,7 @@ def main():
         else:
             cmake_invocation.extend(['-G', 'Visual Studio 14 2015 Win64'])
     else:
-        cmake_invocation.append('-DCMAKE_BUILD_TYPE={}'.format(args.config))
+        cmake_invocation.extend(['-GNinja', '-DCMAKE_BUILD_TYPE={}'.format(args.config)])
 
     if args.verbose:
         cmake_invocation.append('-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON')
