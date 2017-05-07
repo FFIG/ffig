@@ -13,6 +13,7 @@ demos/CMakeFiles/
 demos/CMakeLists.txt
 demos/LLVM-Cauldron.slides.html
 demos/Makefile
+demos/Shape
 demos/Shape.h
 demos/Shape.json
 demos/Shape.py
