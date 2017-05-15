@@ -10,7 +10,6 @@ import "C"
 
 import (
     "os"
-    "unsafe"
 )
 
 func init() {
@@ -20,7 +19,7 @@ func init() {
 }
 
 type {{class.name}} struct {
-    ptr unsafe.Pointer
+    ptr C.{{module.name}}_{{class.name}}
 }
 
 {% for impl in impl_classes %}
@@ -28,7 +27,7 @@ type {{class.name}} struct {
 
 func {{ impl.name }}_create({% for arg in method.arguments %}{{arg.name}} {{arg.type|to_go}}{% if not loop.last %},{% endif %}{% endfor %}) ({{class.name}}, bool) {
     var pv C.RT_{{module.name}}_{{impl.name}}_create
-    pv = C.CGo_{{module.name}}_{{impl.name}}_create({% for arg in method.arguments %}C.{{arg.type|to_c}}({{arg.name}}) {%if not loop.last %},{% endif %} {% endfor %})
+    pv = C.CGo_{{module.name}}_{{impl.name}}_create({% for arg in method.arguments %}C.{{arg.type|to_c(module.name)}}({{arg.name}}) {%if not loop.last %},{% endif %} {% endfor %})
 
     var obj {{class.name}}
 
@@ -46,7 +45,7 @@ func {{ impl.name }}_create({% for arg in method.arguments %}{{arg.name}} {{arg.
 {% for method in class.methods %}
 func (obj {{class.name}}) {{method.name|to_go_method_name}}({% for arg in method.arguments %}{{arg.name}} {{arg.type|to_go}}{% if not loop.last %},{% endif %}{% endfor %}) {% if not method.returns_void %}({{method.return_type|to_go}}, bool){% else %}bool{% endif %} {
     var rv C.RT_{{module.name}}_{{class.name}}_{{method.name}}
-    rv = C.CGo_{{module.name}}_{{class.name}}_{{method.name}}(obj.ptr{% for arg in method.arguments %}, {{arg.name|go_object(arg.type)}}{% endfor %})
+    rv = C.CGo_{{module.name}}_{{class.name}}_{{method.name}}(obj.ptr{% for arg in method.arguments %}, {{arg|go_object}}{% endfor %})
     
     if rv.status == 0 {
         {% if not method.returns_void %}

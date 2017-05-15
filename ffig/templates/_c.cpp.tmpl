@@ -27,11 +27,11 @@ void {{module.name}}_{{ class.name }}_dispose({{module.name}}_{{class.name}} my{
   delete static_cast<{{class.name}}_ptr>(my{{class.name}});
 }
 {% if not class.is_abstract %}{% for method in class.constructors %}
-int {{module.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}},{% endfor %} {{module.name}}_{{class.name}}* rv)
+int {{module.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.type|to_c(module.name)}} {{arg.name}},{% endfor %} {{module.name}}_{{class.name}}* rv)
 {
   try
   {
-    auto p = std::make_unique<const {{class.name}}>({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
+    auto p = std::make_unique<const {{class.name}}>({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg|restore_cpp_type}}{% endfor %});
     *rv = new std::shared_ptr<const {{class.name}}>(p.release());
   }
   catch(const std::exception& e)
@@ -42,12 +42,12 @@ int {{module.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{a
   return {{module.name}}_RC_SUCCESS;
 }
 {% endfor %} {% endif %} {% for method in class.methods %}
-int {{module.name}}_{{ class.name }}_{{method.name}}({{module.name}}_{{class.name}} my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}{% if not method.returns_void %}, {{method.return_type|to_c}}* rv{% endif %})
+int {{module.name}}_{{ class.name }}_{{method.name}}({{module.name}}_{{class.name}} my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c(module.name)}} {{arg.name}}{% endfor %}{% if not method.returns_void %}, {{method.return_type|to_c(module.name)}}* rv{% endif %})
 {
   try
   {
-    {% if method.returns_void %} (*static_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
-    {% elif not method.returns_sub_object %}*rv = (*static_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
+    {% if method.returns_void %} (*static_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg|restore_cpp_type}}{% endfor %});
+    {% elif not method.returns_sub_object %}*rv = (*static_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg|restore_cpp_type}}{% endfor %});
     {% else %}auto p = static_cast<const {{class.name}}_ptr>(my{{class.name}});
     auto subobj = (*p)->{{method.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
     {% if method.returns_nullable %}if (!subobj)
@@ -65,11 +65,11 @@ int {{module.name}}_{{ class.name }}_{{method.name}}({{module.name}}_{{class.nam
   return {{module.name}}_RC_SUCCESS;
 }
 {% endfor %} {% for impl in impl_classes %} {% for method in impl.constructors %}
-int {{module.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}},{% endfor %} {{module.name}}_{{class.name}}* rv)
+int {{module.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.type|to_c(module.name)}} {{arg.name}},{% endfor %} {{module.name}}_{{class.name}}* rv)
 {
   try
   {
-    auto p = std::make_unique<const {{impl.name}}>({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type|restore_cpp_type(arg.name)}}{% endfor %});
+    auto p = std::make_unique<const {{impl.name}}>({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg|restore_cpp_type}}{% endfor %});
     *rv = new std::shared_ptr<const {{class.name}}>(p.release());
   }
   catch(const std::exception& e)

@@ -25,13 +25,13 @@ extern "C"
 #endif
 EXPORT void {{module.name}}_clear_error();
 EXPORT const char* {{module.name}}_error();
-EXPORT void {{module.name}}_{{class.name}}_dispose(const void* my{{class.name}});
+EXPORT void {{module.name}}_{{class.name}}_dispose({{module.name}}_{{class.name}} my{{class.name}});
 {% if not class.is_abstract %}{% for method in class.constructors %}
-EXPORT int {{module.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}},{% endfor %} {{module.name}}_{{class.name}}* rv); {% endfor %}{% endif %}
+EXPORT int {{module.name}}_{{ class.name }}_create({% for arg in method.arguments %}{{arg.type|to_c(module.name)}} {{arg.name}},{% endfor %} {{module.name}}_{{class.name}}* rv); {% endfor %}{% endif %}
 {% for method in class.methods %}
-EXPORT int {{module.name}}_{{ class.name }}_{{method.name}}({{module.name}}_{{class.name}} my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}{% if not method.returns_void %}, {{method.return_type|to_c}}* rv{% endif %});
+EXPORT int {{module.name}}_{{ class.name }}_{{method.name}}({{module.name}}_{{class.name}} my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c(module.name)}} {{arg.name}}{% endfor %}{% if not method.returns_void %}, {{method.return_type|to_c(module.name)}}* rv{% endif %});
 {% endfor %} {% for impl in impl_classes %} {% for method in impl.constructors %}
-EXPORT int {{module.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}},{% endfor %} {{module.name}}_{{class.name}}* rv);
+EXPORT int {{module.name}}_{{ impl.name }}_create({% for arg in method.arguments %}{{arg.type|to_c(module.name)}} {{arg.name}},{% endfor %} {{module.name}}_{{class.name}}* rv);
 {% endfor %} {% endfor %}
 #ifdef __cplusplus
 }

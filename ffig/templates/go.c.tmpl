@@ -9,15 +9,19 @@
 #define STR(x) #x
 #define RSTR(x) STR(x)
 
+// Simple typedef for a void* which we know is a c-api object.
+typedef const void* {{module.name}}_{{class.name}};
+
+
 // Function pointers for each of the exposed functions.
 // These will be set to the dlsym() results on initialisation.
 {% for impl in impl_classes %}{% for method in impl.constructors %}
-typedef int (*{{module.name}}_{{impl.name}}_create_Ptr)({% for arg in method.arguments %}{{arg.type|to_c}}, {% endfor %}const void**);
+typedef int (*{{module.name}}_{{impl.name}}_create_Ptr)({% for arg in method.arguments %}{{arg.type|to_c(module.name)}}, {% endfor %}{{module.name}}_{{class.name}}*);
 static {{module.name}}_{{impl.name}}_create_Ptr {{module.name}}_{{impl.name}}_create_ptr = NULL;
 {% endfor %}{% endfor %}
 
 {% for method in class.methods %}
-typedef int (*{{module.name}}_{{class.name}}_{{method.name}}_Ptr)(const void*{% for arg in method.arguments %}, {{arg.type|to_c}}{% endfor %}{% if not method.returns_void %}, {{method.return_type|to_c}}* rv{% endif %});
+typedef int (*{{module.name}}_{{class.name}}_{{method.name}}_Ptr)(const void*{% for arg in method.arguments %}, {{arg.type|to_c(module.name)}}{% endfor %}{% if not method.returns_void %}, {{method.return_type|to_c(module.name)}}* rv{% endif %});
 static {{module.name}}_{{class.name}}_{{method.name}}_Ptr {{module.name}}_{{class.name}}_{{method.name}}_ptr;
 {% endfor %} 
 
@@ -83,11 +87,11 @@ int init() {
 
 {% for impl in impl_classes %}{% for method in impl.constructors %}
 typedef struct {{module.name}}_{{impl.name}}_create_return_type {
-    const void* ptr;
+    {{module.name}}_{{class.name}} ptr;
     int status;
 } RT_{{module.name}}_{{impl.name}}_create;
 
-RT_{{module.name}}_{{impl.name}}_create CGo_{{module.name}}_{{impl.name}}_create({% for arg in method.arguments %}{{arg.type|to_c}} {{arg.name}} {% if not loop.last %},{% endif %}{% endfor %}) {
+RT_{{module.name}}_{{impl.name}}_create CGo_{{module.name}}_{{impl.name}}_create({% for arg in method.arguments %}{{arg.type|to_c(module.name)}} {{arg.name}} {% if not loop.last %},{% endif %}{% endfor %}) {
     RT_{{module.name}}_{{impl.name}}_create rv;
     rv.status = {{module.name}}_{{impl.name}}_create_ptr({% for arg in method.arguments %}{{arg.name}}, {% endfor %}&rv.ptr);
     return rv;
@@ -97,12 +101,12 @@ RT_{{module.name}}_{{impl.name}}_create CGo_{{module.name}}_{{impl.name}}_create
 {% for method in class.methods %}
 typedef struct {{module.name}}_{{class.name}}_{{method.name}}_return_type {
     {% if not method.returns_void %}
-    {{method.return_type|to_c}} value;
+    {{method.return_type|to_c(module.name)}} value;
     {% endif %}
     int status;
 } RT_{{module.name}}_{{class.name}}_{{method.name}};
 
-RT_{{module.name}}_{{class.name}}_{{method.name}} CGo_{{module.name}}_{{class.name}}_{{method.name}}(const void* my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c}} {{arg.name}}{% endfor %}) {
+RT_{{module.name}}_{{class.name}}_{{method.name}} CGo_{{module.name}}_{{class.name}}_{{method.name}}({{module.name}}_{{class.name}} my{{class.name}}{% for arg in method.arguments %}, {{arg.type|to_c(module.name)}} {{arg.name}}{% endfor %}) {
     RT_{{module.name}}_{{class.name}}_{{method.name}} rv;
     rv.status = {{module.name}}_{{class.name}}_{{method.name}}_ptr(my{{class.name}}{% for arg in method.arguments %}, {{arg.name}}{% endfor %}{% if not method.returns_void %}, &rv.value{% endif %});
     return rv;

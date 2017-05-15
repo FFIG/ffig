@@ -4,7 +4,9 @@ from cppmodel import TypeKind
 # CPP filter to cast type if required
 
 
-def restore_cpp_type(t, n):
+def restore_cpp_type(a):
+    t = a.type
+    n = a.name
     if t.kind == TypeKind.VOID:
         return n
     if t.kind == TypeKind.INT:
@@ -25,7 +27,7 @@ def restore_cpp_type(t, n):
 
 
 # C filter to convert C++ type to C equivalent
-def to_c(t):
+def to_c(t, m):
     if t.kind == TypeKind.VOID:
         return 'void'
     if t.kind == TypeKind.INT:
@@ -38,7 +40,7 @@ def to_c(t):
         if t.pointee.kind == TypeKind.CHAR_S:
             return 'const char*'
         if t.pointee.kind == TypeKind.RECORD:
-            return 'const void*'
+            return '{}_{}'.format(m, t.pointee.name.replace('const ', ''))
     raise Exception('Type {} has no known c equivalent'.format(t.name))
 
 
@@ -78,33 +80,37 @@ def to_go_method_name(m):
     return m.capitalize()
 
 
-def go_object(v, t):
+def go_object(a):
     '''
-    In analogy to the `c_object` filter below, this returns `v.ptr` for objects
-    of class type, and `v` for everything else.
+    In analogy to the `c_object` filter below, this returns `a.name.ptr` for objects
+    of class type, and `a.name` for everything else.
     '''
+    t = a.type
+    n = a.name
     if t.kind == TypeKind.POINTER and t.pointee.kind == TypeKind.RECORD:
-        return '{}.ptr'.format(v)
+        return '{}.ptr'.format(n)
     else:
-        return v
+        return n
 
 # C++ header filter to extract C type from C++ type
 
 
-def c_object(v, t):
+def c_object(a):
+    t = a.type
+    n = a.name
     if t.kind == TypeKind.VOID:
-        return v
+        return n
     if t.kind == TypeKind.INT:
-        return v
+        return n
     if t.kind == TypeKind.DOUBLE:
-        return v
+        return n
     if t.kind == TypeKind.BOOL:
-        return v
+        return n
     if t.kind == TypeKind.POINTER:
         if t.pointee.kind == TypeKind.CHAR_S:
-            return v
+            return n
         if t.pointee.kind == TypeKind.RECORD:
-            return '{}->object_'.format(v)
+            return '{}->object_'.format(n)
     raise Exception(
         'No object extraction is defined for type {}'.format(
             t.name))

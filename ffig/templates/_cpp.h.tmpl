@@ -17,7 +17,7 @@ public:
   {% if not class.is_abstract %}{% for method in class.constructors %}
   {{class.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type}} {{arg.name}}{% endfor %})
   {
-    int rc = {{module.name}}_{{class.name}}_create({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.name|c_object(arg.type)}}{% endfor %}, &object_);
+    int rc = {{module.name}}_{{class.name}}_create({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg|c_object}}{% endfor %}, &object_);
     if ( rc == {{module.name}}_RC_SUCCESS ) return;
     throw exception();
   }{% endfor %}{% endif %}
@@ -53,10 +53,10 @@ public:
 {% for method in class.methods %}
   {{method.return_type|to_cpp_type}} {{method.name}}({% for arg in method.arguments %}{%if not loop.first %}, {% endif %}{{arg.type}} {{arg.name}}{% endfor %}) const
   {
-    {% if method.returns_void %} int rc = {{module.name}}_{{class.name}}_{{method.name}}(object_{% for arg in method.arguments %}, {{arg.name|c_object(arg.type)}}{% endfor %});
+    {% if method.returns_void %} int rc = {{module.name}}_{{class.name}}_{{method.name}}(object_{% for arg in method.arguments %}, {{arg|c_object}}{% endfor %});
     {% else %}{{method.return_type|to_cpp_type}} rv;
-    {% if not method.returns_sub_object %}int rc = {{module.name}}_{{class.name}}_{{method.name}}(object_{% for arg in method.arguments %}, {{arg.name|c_object(arg.type)}}{% endfor %}, &rv);
-    {% else %}int rc = {{module.name}}_{{class.name}}_{{method.name}}(object_{% for arg in method.arguments %}, {{arg.name|c_object(arg.type)}}{% endfor %}, &rv.object_);{% endif %}
+    {% if not method.returns_sub_object %}int rc = {{module.name}}_{{class.name}}_{{method.name}}(object_{% for arg in method.arguments %}, {{arg|c_object}}{% endfor %}, &rv);
+    {% else %}int rc = {{module.name}}_{{class.name}}_{{method.name}}(object_{% for arg in method.arguments %}, {{arg|c_object}}{% endfor %}, &rv.object_);{% endif %}
     {% endif %}if (rc == {{module.name}}_RC_SUCCESS) return{% if not method.returns_void %} rv{% endif %};
     throw exception();
   }
@@ -68,7 +68,7 @@ class {{impl.name}} : public {{class.name}}
 public:
   {% for method in impl.constructors %}{{impl.name}}({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.type}} {{arg.name}}{% endfor %})
   {
-    int rc = {{module.name}}_{{impl.name}}_create({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg.name|c_object(arg.type)}}{% endfor %}, &object_);
+    int rc = {{module.name}}_{{impl.name}}_create({% for arg in method.arguments %}{% if not loop.first %}, {% endif %}{{arg|c_object}}{% endfor %}, &object_);
     if ( rc == {{module.name}}_RC_SUCCESS ) return;
     throw exception();
   }{% endfor %}
