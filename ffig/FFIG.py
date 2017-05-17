@@ -130,11 +130,11 @@ def set_template_env(template_dir):
     return env
 
 
-def main(args):
+def run(args):
     cwd = os.getcwd()
 
     # FIXME: Remove the need for this constraint.
-    if len(args.inputs) != 1:
+    if len(args.inputs) > 1:
         raise Exception("Multiple input files are currently not supported.")
 
     # FIXME: Loop over files and extend the model once we can handle multiple
@@ -153,7 +153,8 @@ def main(args):
         env,
         args.output_dir)
 
-if __name__ == '__main__':
+
+def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -165,7 +166,9 @@ if __name__ == '__main__':
         '-i', '--input',
         nargs='+',
         help='header files for input',
-        dest='inputs')
+        default=[],
+        dest='inputs',
+        required=True)
     parser.add_argument(
         '--libclang',
         help='path to libclang',
@@ -195,4 +198,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    main(args)
+    run(args)
