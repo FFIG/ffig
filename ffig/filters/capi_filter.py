@@ -1,5 +1,4 @@
-import cppmodel
-from cppmodel import TypeKind
+from ffig.cppmodel import TypeKind
 
 # CPP filter to cast type if required
 

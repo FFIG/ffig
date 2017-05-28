@@ -5,7 +5,7 @@
 # generate a c-api and language bindings.
 
 import argparse
-import clang
+import ffig.clang as clang
 import inspect
 import jinja2
 import logging
@@ -16,9 +16,9 @@ import sys
 
 logging.basicConfig(level=logging.WARNING)
 
-import cppmodel
-import filters.capi_filter
-import generators
+import ffig.cppmodel
+import ffig.filters.capi_filter
+import ffig.generators
 
 clang.cindex.Config.set_compatibility_check(False)
 
@@ -45,7 +45,7 @@ def collect_api_and_obj_classes(classes, api_annotation):
     class APIClass:
 
         def __init__(self, model_class):
-            self.api_class = cppmodel.apply_class_annotations(model_class)
+            self.api_class = ffig.cppmodel.apply_class_annotations(model_class)
             self.impls = []
             # If a class has no pure virtual methods it can be considered as an
             # implementation class
@@ -79,7 +79,7 @@ def write_bindings_to_disk(
     - output_dir where to write to
     """
     for binding in bindings:
-        generators.generate(module_name, binding, api_classes, env, output_dir)
+        ffig.generators.generate(module_name, binding, api_classes, env, output_dir)
 
 
 def build_model_from_source(
@@ -97,7 +97,7 @@ def build_model_from_source(
     tu = clang.cindex.TranslationUnit.from_source(
         path_to_source, '-x c++ -std=c++14 -stdlib=libc++'.split())
 
-    model = cppmodel.Model(tu, treat_methods_as_noexcept)
+    model = ffig.cppmodel.Model(tu, treat_methods_as_noexcept)
     model.module_name = module_name
 
     return model
@@ -124,9 +124,9 @@ def set_template_env(template_dir):
     - template_dir path
     """
     env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir))
-    for f, _ in inspect.getmembers(filters.capi_filter):
+    for f, _ in inspect.getmembers(ffig.filters.capi_filter):
         # for f in ['to_output_ctype', 'to_ctype']:
-        env.filters[f] = getattr(filters.capi_filter, f)
+        env.filters[f] = getattr(ffig.filters.capi_filter, f)
     return env
 
 

@@ -1,6 +1,6 @@
 from util import get_tu
-import cppmodel
-from clang.cindex import TypeKind
+import ffig.cppmodel
+from ffig.clang.cindex import TypeKind
 
 
 def test_function_name():
@@ -10,7 +10,7 @@ def test_function_name():
     """
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
     functions = model.functions
 
     assert len(functions) == 2
@@ -26,7 +26,7 @@ def test_function_return_type():
 
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
     functions = model.functions
 
     assert functions[0].return_type.kind == TypeKind.INT
@@ -44,7 +44,7 @@ def test_function_arguments():
 
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
     functions = model.functions
 
     assert len(functions[0].arguments) == 0
@@ -68,7 +68,7 @@ def test_function_equality():
 
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
 
     for i, f in enumerate(model.functions):
         for j, g in enumerate(model.functions):
@@ -86,7 +86,7 @@ def test_string_representation():
 
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
     functions = model.functions
 
     assert str(functions[0]) == 'double foo(int, char)'
@@ -100,7 +100,7 @@ def test_force_noexcept():
 
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu, force_noexcept=True)
+    model = ffig.cppmodel.Model(tu, force_noexcept=True)
     functions = model.functions
 
     assert str(functions[0]) == 'double foo(int, char) noexcept'

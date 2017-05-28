@@ -1,6 +1,6 @@
 # Generator module for Python 2 and 3.
 
-import generators
+import ffig.generators
 import os
 
 
@@ -10,15 +10,15 @@ def generator(module_name, binding, api_classes, env, output_dir):
         os.makedirs(module_dir)
 
     o = os.path.join(module_dir, '__init__.py')
-    generators.generate_single_output_file(
+    ffig.generators.generate_single_output_file(
         module_name, '__init__.py.tmpl', api_classes, env, o)
 
     o = os.path.join(module_dir, '_py2.py')
-    generators.generate_single_output_file(
+    ffig.generators.generate_single_output_file(
         module_name, 'py2.tmpl', api_classes, env, o)
 
     o = os.path.join(module_dir, '_py3.py')
-    generators.generate_single_output_file(
+    ffig.generators.generate_single_output_file(
         module_name, 'py3.tmpl', api_classes, env, o)
 
     return [

@@ -1,13 +1,13 @@
 from util import get_tu
-import cppmodel
-from clang.cindex import TypeKind
+import ffig.cppmodel
+from ffig.clang.cindex import TypeKind
 
 
 def test_class_name():
     source = 'class A{};'
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
     classes = model.classes
 
     assert len(classes) == 1
@@ -23,7 +23,7 @@ def test_class_methods():
     };"""
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
     classes = model.classes
 
     assert len(classes[0].methods) == 0
@@ -38,7 +38,7 @@ def test_class_method_return_types():
     };"""
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
     classes = model.classes
 
     assert classes[0].methods[0].return_type.kind == TypeKind.VOID
@@ -52,7 +52,7 @@ def test_class_method_argument_types():
     };"""
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
     classes = model.classes
     args = classes[0].methods[0].arguments
 
@@ -70,7 +70,7 @@ def test_class_method_const_qualifiers():
     };"""
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
     classes = model.classes
     methods = classes[0].methods
 
@@ -87,7 +87,7 @@ def test_class_methods_are_virtual():
     };"""
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
     classes = model.classes
     methods = classes[0].methods
 
@@ -110,7 +110,7 @@ def test_namespaces():
     class E{};"""
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
     classes = model.classes
 
     assert classes[0].namespace == ""
@@ -128,7 +128,7 @@ def test_access_specifiers():
     """
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
     classes = model.classes
 
     assert not classes[0].methods[0].is_public
@@ -147,7 +147,7 @@ def test_class_member_data():
 
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
     c = model.classes[1]
 
     assert c.members[0].type.kind == TypeKind.INT
@@ -169,7 +169,7 @@ def test_string_representation():
     };"""
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu)
+    model = ffig.cppmodel.Model(tu)
     classes = model.classes
     methods = classes[0].methods
 
@@ -186,7 +186,7 @@ def test_noexcept():
     };"""
     tu = get_tu(source, 'cpp')
 
-    model = cppmodel.Model(tu, force_noexcept=True)
+    model = ffig.cppmodel.Model(tu, force_noexcept=True)
     classes = model.classes
     methods = classes[0].methods
 

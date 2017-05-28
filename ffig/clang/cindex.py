@@ -65,7 +65,7 @@ call is efficient.
 from ctypes import *
 import collections
 
-import clang.enumerations
+import ffig.clang.enumerations
 
 import sys
 if sys.version_info[0] == 3:
@@ -3943,7 +3943,7 @@ class Config:
         return True
 
 def register_enumerations():
-    for name, value in clang.enumerations.TokenKinds:
+    for name, value in ffig.clang.enumerations.TokenKinds:
         TokenKind.register(value, name)
 
 conf = Config()

@@ -1,7 +1,6 @@
 import os
 import sys
-import clang.cindex
-from clang.cindex import AccessSpecifier, CursorKind, TypeKind
+from ffig.clang.cindex import AccessSpecifier, CursorKind, TypeKind
 
 
 def _get_annotations(node):

@@ -66,7 +66,7 @@ function(ffig_add_library)
   endif()
 
   add_custom_command(OUTPUT ${ffig_outputs}
-    COMMAND ${PYTHON_EXECUTABLE} ffig ${ffig_invocation}
+    COMMAND ${PYTHON_EXECUTABLE} -m ffig ${ffig_invocation}
     DEPENDS ${input}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 

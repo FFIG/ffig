@@ -1,8 +1,6 @@
 # This file provides common utility functions for the test suite.
 
-from clang.cindex import Cursor
-from clang.cindex import TranslationUnit
-from clang.cindex import Config
+from ffig.clang.cindex import Cursor, TranslationUnit, Config
 
 import os.path
 import sys

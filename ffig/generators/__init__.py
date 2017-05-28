@@ -141,7 +141,7 @@ def _activate_plugin(module_name):
     '''Internal function used to activate a plugin that has been found.'''
     log.info('Importing {}'.format(module_name))
     module = __import__(
-        'generators.{0}'.format(module_name),
+        'ffig.generators.{0}'.format(module_name),
         fromlist=['setup_plugin'])
     module.setup_plugin(generator_context)
 
