@@ -3,31 +3,39 @@ sudo: required
 
 language: python
 
-cache:
-  directories:
-    - /home/travis/docker/
+matrix:
+  include:
+    - os: linux
+      sudo: required
+      env:
+        global:
+          - DOCKER_REPOSITORY=jbcoe/ffig
+          - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar.gz
+      services:
+        - docker
+      install:
+        - docker pull ffig/ffig-base
+        - docker build -t ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} .
+      before_install:
+        - pip install pep8
+      script:
+        - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN"
+        - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python3"
+        - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -t"
+        - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -t --python-path python3"
+        - ./scripts/codechecks.py
 
-env:
-  global:
-    - DOCKER_REPOSITORY=jbcoe/ffig
-    - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar.gz
-   
-services:
-  - docker
-
-before_install:
-    - pip install pep8
-
-install:
-  - docker pull ffig/ffig-base
-  - docker build -t ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} .
-
-script:
-  - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN"
-  - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python3"
-  - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -t"
-  - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -t --python-path python3"
-  - ./scripts/codechecks.py
+    - os: osx
+      language: generic
+      osx_image: xcode8
+      install:
+        - brew install ninja python3
+        - sudo pip2 install --upgrade pip && sudo pip2 install jinja2 nose backports.typing
+        - sudo pip3 install --upgrade pip && sudo pip3 install jinja2 nose
+        - gem install ffi
+      script:
+        - ./scripts/build.py -t
+        - ./scripts/build.py -t --python-path python3
 
 notifications:
   slack:
