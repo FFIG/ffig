@@ -1,0 +1,26 @@
+{#
+ # comma_separated_list:
+ #   Format a list of items separated by commas. Each item is formatted
+ #   according to the callback body. Leading and trailing commas can be
+ #   added by setting leading_comma or trailing_comma to True.
+ #
+ # Usage example: The example below generates Python code to join a list of
+ #                items that are converted to strings. The text to output for
+ #                each item is the body of the {% call %} block.
+ #   ''.join(
+ #       {%- call(item) comma_separated_list(items) -%}
+ #          str({{item}})
+ #       {%- endcall -%}
+ #   )
+ #}
+{%- macro comma_separated_list(items, leading_comma=False, trailing_comma=False) -%}
+    {%- for item in items -%}
+        {%- if leading_comma and loop.first -%}
+            ,
+        {%- endif -%}
+        {{ caller(item) }}
+        {%- if trailing_comma or not loop.last -%}
+            ,
+        {%- endif -%}
+    {%- endfor -%}
+{%- endmacro -%}

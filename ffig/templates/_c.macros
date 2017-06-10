@@ -1,3 +1,5 @@
+{%- import 'ffig.macros' as ffig_macros -%}
+
 {#
  # method_parameters:
  #   Format a parameter list with types converted to C types. This is suitable
@@ -6,15 +8,9 @@
  #   or end of the list by setting leading_comma or trailing_comma to True.
  #}
 {%- macro method_parameters(module, method, leading_comma=False, trailing_comma=False) -%}
-    {%- for arg in method.arguments -%}
-        {%- if leading_comma and loop.first -%}
-            ,
-        {%- endif -%}
+    {%- call(arg) ffig_macros.comma_separated_list(method.arguments, leading_comma, trailing_comma) -%}
         {{arg.type | to_c(module.name)}} {{arg.name}}
-        {%- if trailing_comma or not loop.last -%}
-            ,
-        {%- endif -%}
-    {%- endfor -%}
+    {%- endcall -%}
 {%- endmacro -%}
 
 {#
@@ -25,14 +21,8 @@
  #   or end of the list by setting leading_comma or trailing_comma to True.
  #}
 {%- macro method_arguments(method, leading_comma=False, trailing_comma=False) -%}
-    {%- for arg in method.arguments -%}
-        {%- if leading_comma and loop.first -%}
-            ,
-        {%- endif -%}
+    {%- call(arg) ffig_macros.comma_separated_list(method.arguments, leading_comma, trailing_comma) -%}
         {{arg | restore_cpp_type}}
-        {%- if trailing_comma or not loop.last -%}
-            ,
-        {%- endif -%}
-    {%- endfor -%}
+    {%- endcall -%}
 {%- endmacro -%}
 
