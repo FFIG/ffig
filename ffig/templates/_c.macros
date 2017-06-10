@@ -1,0 +1,38 @@
+{#
+ # method_parameters:
+ #   Format a parameter list with types converted to C types. This is suitable
+ #   for function parameter lists in declarations or definitions.
+ #   Commas are inserted between each parameter, and can be added to the start
+ #   or end of the list by setting leading_comma or trailing_comma to True.
+ #}
+{%- macro method_parameters(module, method, leading_comma=False, trailing_comma=False) -%}
+    {%- for arg in method.arguments -%}
+        {%- if leading_comma and loop.first -%}
+            ,
+        {%- endif -%}
+        {{arg.type | to_c(module.name)}} {{arg.name}}
+        {%- if trailing_comma or not loop.last -%}
+            ,
+        {%- endif -%}
+    {%- endfor -%}
+{%- endmacro -%}
+
+{#
+ # method_arguments:
+ #   Format an argument list with appropriate casts to restore the C++ type.
+ #   This is suitable for argument lists when calling a function.
+ #   Commas are inserted between each argument, and can be added to the start
+ #   or end of the list by setting leading_comma or trailing_comma to True.
+ #}
+{%- macro method_arguments(method, leading_comma=False, trailing_comma=False) -%}
+    {%- for arg in method.arguments -%}
+        {%- if leading_comma and loop.first -%}
+            ,
+        {%- endif -%}
+        {{arg | restore_cpp_type}}
+        {%- if trailing_comma or not loop.last -%}
+            ,
+        {%- endif -%}
+    {%- endfor -%}
+{%- endmacro -%}
+
