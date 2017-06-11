@@ -1,0 +1,54 @@
+{%- import 'ffig.macros' as ffig_macros -%}
+{%- import '_c.macros' as c_macros -%}
+
+{#
+ # c_method_parameters:
+ #   Forwards directly to c_macros.method_parameters.
+ #   The indirection permits future divergence from the C implementation
+ #   without having to replace every instance in the CGo template.
+ #}
+{%- macro c_method_parameters(module, method, leading_comma=False, trailing_comma=False) -%}
+    {{c_macros.method_parameters(module, method, leading_comma, trailing_comma)}}
+{%- endmacro -%}
+
+{#
+ # c_method_arguments:
+ #   Simply use the argument name, no conversion needed as this is
+ #   handled by the C bindings.
+ #}
+{%- macro c_method_arguments(method, leading_comma=False, trailing_comma=False) -%}
+    {%- call(arg) ffig_macros.comma_separated_list(method.arguments, leading_comma, trailing_comma) -%}
+        {{arg.name}}
+    {%- endcall -%}
+{%- endmacro -%}
+
+{#
+ # go_method_parameters:
+ #   List of parameter names and types converted to Go types.
+ #}
+{%- macro go_method_parameters(method, leading_comma=False, trailing_comma=False) -%}
+    {%- call(arg) ffig_macros.comma_separated_list(method.arguments, leading_comma, trailing_comma) -%}
+        {{arg.name}} {{arg.type | to_go}}
+    {%- endcall -%}
+{%- endmacro -%}
+
+{#
+ # go_arguments_to_c_arguments:
+ #   List of arguments with conversion to C types.
+ #}
+{%- macro go_arguments_to_c_arguments(module, method, leading_comma=False, trailing_comma=False) -%}
+    {%- call(arg) ffig_macros.comma_separated_list(method.arguments, leading_comma, trailing_comma) -%}
+        C.{{arg.type | to_c(module.name)}}({{arg.name}})
+    {%- endcall -%}
+{%- endmacro -%}
+
+{#
+ # go_arguments_to_c_arguments_extract_go_object:
+ #   As go_arguments_to_c_arguments but extract objects from the Go wrapper.
+ #}
+{%- macro go_arguments_to_c_arguments_extract_go_object(method, leading_comma=False, trailing_comma=False) -%}
+    {%- call(arg) ffig_macros.comma_separated_list(method.arguments, leading_comma, trailing_comma) -%}
+        {{arg | go_object}}
+    {%- endcall -%}
+{%- endmacro -%}
+
