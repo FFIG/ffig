@@ -88,6 +88,9 @@ class {{class.name}}:
   {% endfor -%}
 {%- endif -%}
 {%- for method in class.methods %}
+  {%- if method.is_property -%}
+  @property
+  {% endif -%}
   def {{method.name}}(self{{method_parameters(method, leading_comma=True)}}):
   {%- if method.returns_void %}
     rc = conf.lib.{{module.name}}_{{class.name}}_{{method.name}}(self {{method_arguments(method, leading_comma=True)}})

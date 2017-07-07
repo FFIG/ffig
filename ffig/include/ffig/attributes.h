@@ -4,9 +4,11 @@
 #define FFIG_ATTRIBUTES_H
 
 #ifdef __clang__
-#define FFIG_EXPORT __attribute__((annotate("GENERATE_C_API")))
+#define FFIG_EXPORT __attribute__((annotate("FFIG:EXPORT")))
+#define FFIG_PROPERTY __attribute__((annotate("FFIG:PROPERTY")))
 #else
 #define FFIG_EXPORT
+#define FFIG_PROPERTY
 #endif
 
 #endif // FFIG_ATTRIBUTES_H

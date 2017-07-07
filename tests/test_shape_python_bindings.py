@@ -5,21 +5,21 @@ import Shape
 
 def test_Shape_Circle_is_called_Circle():
     c = Shape.Circle(3)
-    assert c.name() == "Circle"
+    assert c.name == "Circle"
 
 
 def test_Shape_Circle_has_expected_area():
     r = 2.0
     c = Shape.Circle(r)
     a = math.pi * r * r
-    nose.tools.assert_almost_equal(c.area(), a)
+    nose.tools.assert_almost_equal(c.area, a)
 
 
 def test_Shape_Circle_has_expected_perimeter():
     r = 2.0
     c = Shape.Circle(r)
     p = 2.0 * math.pi * r
-    nose.tools.assert_almost_equal(c.perimeter(), p)
+    nose.tools.assert_almost_equal(c.perimeter, p)
 
 
 def test_Shape_Circle_is_equal_to_itself():

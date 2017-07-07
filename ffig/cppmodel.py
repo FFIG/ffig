@@ -197,8 +197,11 @@ class Model(object):
 
 def apply_class_annotations(model_class):
     for m in model_class.methods:
+        if "FFIG:PROPERTY" in m.annotations:
+            m.is_property = True
         if m.is_pure_virtual:
             model_class.is_abstract = True
+
         if m.return_type.kind == TypeKind.VOID:
             m.returns_void = True
         elif m.return_type.kind in [TypeKind.INT, TypeKind.BOOL, TypeKind.DOUBLE]:

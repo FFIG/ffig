@@ -7,9 +7,9 @@ struct FFIG_EXPORT AbstractShape
   virtual ~AbstractShape()
   {
   }
-  virtual double area() const = 0;
-  virtual double perimeter() const = 0;
-  virtual const char* name() const = 0;
+  virtual FFIG_PROPERTY double area() const = 0;
+  virtual FFIG_PROPERTY double perimeter() const = 0;
+  virtual FFIG_PROPERTY const char* name() const = 0;
   virtual int is_equal(const AbstractShape* s) const = 0;
 };
 
