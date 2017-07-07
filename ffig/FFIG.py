@@ -79,7 +79,8 @@ def write_bindings_to_disk(
     - output_dir where to write to
     """
     for binding in bindings:
-        ffig.generators.generate(module_name, binding, api_classes, env, output_dir)
+        ffig.generators.generate(module_name, binding,
+                                 api_classes, env, output_dir)
 
 
 def build_model_from_source(
@@ -94,8 +95,9 @@ def build_model_from_source(
     Returns:
     - model built from a clang.cindex TranslationUnit with a name from args
     """
+    ffig_include_dir = os.path.join(os.path.dirname(__file__), 'include')
     tu = clang.cindex.TranslationUnit.from_source(
-        path_to_source, '-x c++ -std=c++14 -stdlib=libc++'.split())
+        path_to_source, '-x c++ -std=c++14 -stdlib=libc++ -I{}'.format(ffig_include_dir).split())
 
     model = ffig.cppmodel.Model(tu, treat_methods_as_noexcept)
     model.module_name = module_name

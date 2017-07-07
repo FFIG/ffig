@@ -23,6 +23,8 @@ include(ffig)
 
 include_directories(externals/catch/include)
 include_directories(externals/variant/include)
+# FIXME: Use FFIG to get this path.
+include_directories(ffig/include)
 
 # Check that the found version of Python==3 on Windows.
 # Trust the user if they have supplied their own.

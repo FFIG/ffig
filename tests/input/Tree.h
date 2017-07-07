@@ -1,17 +1,12 @@
+#include "ffig/attributes.h"
 #include <memory>
 #include <random>
-
-#ifdef __clang__
-#define C_API __attribute__((annotate("GENERATE_C_API")))
-#else
-#define C_API
-#endif
 
 static std::mt19937 mt;
 static std::uniform_int_distribution<int> d(1,10);
 static auto gen = []{return d(mt);};
 
-class Tree
+class FFIG_EXPORT Tree
 {
   int data_;
   std::shared_ptr<Tree> left_;
@@ -47,5 +42,5 @@ class Tree
     data_ = x;
   }
 
-} C_API;
+};
 

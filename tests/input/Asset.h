@@ -1,15 +1,11 @@
-#ifdef __clang__
-#define C_API __attribute__((annotate("GENERATE_C_API")))
-#else
-#define C_API
-#endif
+#include "ffig/attributes.h"
 
-struct Asset
+struct FFIG_EXPORT Asset
 {
   virtual double PV() const = 0;
   virtual const char* name() const = 0;
   virtual ~Asset() = default;
-} C_API;
+};
 
 struct CDO : Asset
 {

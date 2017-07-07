@@ -1,15 +1,8 @@
+#include "ffig/attributes.h"
 #include <cmath>
+#include <string>
 
-// Any class annotated with this macro will be exposed and have all functions
-// exposed.
-// Any class deriving from an exposed class will have its constructors exposed.
-#ifdef __clang__
-#define C_API __attribute__((annotate("GENERATE_C_API")))
-#else
-#define C_API
-#endif
-
-struct AbstractShape
+struct FFIG_EXPORT AbstractShape
 {
   virtual ~AbstractShape()
   {
@@ -18,7 +11,7 @@ struct AbstractShape
   virtual double perimeter() const = 0;
   virtual const char* name() const = 0;
   virtual int is_equal(const AbstractShape* s) const = 0;
-} C_API;
+};
 
 static const double pi = 3.14159265359;
 
