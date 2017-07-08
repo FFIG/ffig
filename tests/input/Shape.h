@@ -1,5 +1,6 @@
 #include "ffig/attributes.h"
 #include <cmath>
+#include <stdexcept>
 #include <string>
 
 struct FFIG_EXPORT AbstractShape

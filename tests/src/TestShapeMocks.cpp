@@ -1,9 +1,10 @@
 #define CATCH_CONFIG_MAIN // This tells Catch to provide a main() - only do this
                           // in one cpp file
+#include "Shape_mocks.h"
+
 #include <catch.hpp>
 #include <string>
 #include <type_traits>
-#include "Shape_mocks.h"
 
 TEST_CASE("MockAbstractShape", "[mocks::MockAbstractShape]")
 {
