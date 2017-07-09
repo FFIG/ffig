@@ -63,14 +63,14 @@ int {{module.name}}_{{class.name}}_{{method.name}}(
     try
     {
         {% if method.returns_void -%}
-        (*static_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}(
+        (*static_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.impl_name}}(
             {{c_macros.method_arguments(method)}});
         {%- elif not method.returns_sub_object -%}
-        *rv = (*static_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.name}}(
+        *rv = (*static_cast<{{class.name}}_ptr>(my{{class.name}}))->{{method.impl_name}}(
             {{c_macros.method_arguments(method)}});
         {%- else -%}
         auto p = static_cast<const {{class.name}}_ptr>(my{{class.name}});
-        auto subobj = (*p)->{{method.name}}(
+        auto subobj = (*p)->{{method.impl_name}}(
             {{c_macros.method_arguments(method)}});
         {% if method.returns_nullable -%}
         if (!subobj)

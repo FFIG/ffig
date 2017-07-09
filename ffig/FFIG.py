@@ -97,7 +97,8 @@ def build_model_from_source(
     """
     ffig_include_dir = os.path.join(os.path.dirname(__file__), 'include')
     tu = clang.cindex.TranslationUnit.from_source(
-        path_to_source, '-x c++ -std=c++14 -stdlib=libc++ -I{}'.format(ffig_include_dir).split())
+        path_to_source,
+        '-x c++ -std=c++14 -stdlib=libc++ -I{}'.format(ffig_include_dir).split())
 
     model = ffig.cppmodel.Model(tu, treat_methods_as_noexcept)
     model.module_name = module_name

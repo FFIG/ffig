@@ -2,8 +2,8 @@
 
 struct FFIG_EXPORT Asset
 {
-  virtual double PV() const = 0;
-  virtual const char* name() const = 0;
+  virtual FFIG_EXPORT_NAME(value) double PV() const = 0;
+  virtual FFIG_EXPORT_NAME(name) const char* id() const = 0;
   virtual ~Asset() = default;
 };
 
@@ -12,6 +12,6 @@ struct CDO : Asset
   CDO() {}
 
   double PV() const override { return 0.0; }
-  const char* name() const override { return "CDO"; }
+  const char* id() const override { return "CDO"; }
 };
 

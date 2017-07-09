@@ -197,6 +197,13 @@ class Model(object):
 
 def apply_class_annotations(model_class):
     for m in model_class.methods:
+        # FIXME: Split this up into smaller functions.
+
+        m.impl_name = m.name
+        names = [a for a in m.annotations if a.startswith("FFIG:NAME:")]
+        if names:
+            m.name = names[-1].replace("FFIG:NAME:", "")
+
         if "FFIG:PROPERTY" in m.annotations:
             m.is_property = True
         if m.is_pure_virtual:
