@@ -20,7 +20,7 @@ const char* {{module.name}}_error()
 }
 
 namespace {
-    using {{class.name}}_ptr = const std::shared_ptr<{{class.name}}>*;
+    using {{class.name}}_ptr = const std::shared_ptr<{{class.impl_name}}>*;
 } // end anonymous namespace
 
 void {{module.name}}_{{ class.name }}_dispose({{module.name}}_{{class.name}} my{{class.name}})
@@ -36,8 +36,9 @@ int {{module.name}}_{{class.name}}_create(
 {
     try
     {
-        auto p = std::make_unique<const {{class.name}}>({{c_macros.method_arguments(method)}});
-        *rv = new std::shared_ptr<const {{class.name}}>(p.release());
+        auto p = std::make_unique<const {{class.impl_name}}>({{c_macros.method_arguments(method)}});
+        *rv = new std::shared_ptr<const {{class.impl_name}}>(p.get());
+        p.release();
     }
     catch (const std::exception& e)
     {
@@ -99,8 +100,8 @@ int {{module.name}}_{{impl.name}}_create(
 {
     try
     {
-        auto p = std::make_unique<const {{impl.name}}>({{c_macros.method_arguments(method)}});
-        *rv = new std::shared_ptr<const {{class.name}}>(p.release());
+        auto p = std::make_unique<const {{impl.impl_name}}>({{c_macros.method_arguments(method)}});
+        *rv = new std::shared_ptr<const {{class.impl_name}}>(p.release());
     }
     catch (const std::exception& e)
     {

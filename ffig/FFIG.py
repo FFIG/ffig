@@ -47,10 +47,6 @@ def collect_api_and_obj_classes(classes, api_annotation):
         def __init__(self, model_class):
             self.api_class = ffig.cppmodel.apply_class_annotations(model_class)
             self.impls = []
-            # If a class has no pure virtual methods it can be considered as an
-            # implementation class
-            # if all([not m.is_pure_virtual for m in model_class.methods]):
-            #    self.impls.append(model_class)
 
     api_classes = {c.name: APIClass(c)
                    for c in classes if api_annotation in c.annotations}
@@ -58,6 +54,7 @@ def collect_api_and_obj_classes(classes, api_annotation):
     for c in classes:
         for base in c.base_classes:
             if base in api_classes:
+                ffig.cppmodel.apply_class_annotations(c)
                 api_classes[base].impls.append(c)
 
     return [c for k, c in api_classes.items()]

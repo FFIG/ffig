@@ -7,9 +7,9 @@ struct FFIG_EXPORT Asset
   virtual ~Asset() = default;
 };
 
-struct CDO : Asset
+struct FFIG_NAME(CDO) CollateralisedDebtObligation : Asset
 {
-  CDO() {}
+  CollateralisedDebtObligation() {}
 
   double PV() const override { return 0.0; }
   const char* id() const override { return "CDO"; }

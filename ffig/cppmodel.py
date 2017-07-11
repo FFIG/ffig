@@ -195,14 +195,18 @@ class Model(object):
                 self.add_child_nodes(c, child_namespaces)
 
 
-def apply_class_annotations(model_class):
-    for m in model_class.methods:
-        # FIXME: Split this up into smaller functions.
+def _set_impl_name(o):
+    o.impl_name = o.name
+    names = [a for a in o.annotations if a.startswith("FFIG:NAME:")]
+    if names:
+        o.name = names[-1].replace("FFIG:NAME:", "")
 
-        m.impl_name = m.name
-        names = [a for a in m.annotations if a.startswith("FFIG:NAME:")]
-        if names:
-            m.name = names[-1].replace("FFIG:NAME:", "")
+
+def apply_class_annotations(model_class):
+    _set_impl_name(model_class)
+
+    for m in model_class.methods:
+        _set_impl_name(m)
 
         if "FFIG:PROPERTY" in m.annotations:
             m.is_property = True
