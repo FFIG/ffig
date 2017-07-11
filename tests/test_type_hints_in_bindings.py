@@ -40,11 +40,11 @@ def test_type_hints_for_initialisor_of_impl_class():
 
 @python3only
 def test_type_hints_for_class_method_with_zero_arguments():
-    cdo = CDO()
-    hs = get_type_hints(cdo.name)
+    t = Tree(1)
+    hs = get_type_hints(t.data)
 
     assert len(hs) == 1
-    assert hs["return"] == str
+    assert hs["return"] == int
 
 
 @python3only

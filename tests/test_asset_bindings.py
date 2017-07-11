@@ -6,10 +6,10 @@ def test_no_argument_constructor():
     cdo = CDO()
 
 
-def test_id_is_renamed_to_name():
+def test_id_is_renamed_to_name_and_is_a_property():
     cdo = CDO()
 
-    assert cdo.name() == "CDO"
+    assert cdo.name == "CDO"
 
 
 def test_PV_is_renamed_to_value():
