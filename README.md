@@ -6,10 +6,12 @@ This project uses libclang to read existing C++ class definitions and create
 equivalent classes in other languages (primarily Python for now) and binds them
 to the C++ implementation.
 
+## A Comparison of FFIG with SWIG
+
 While similar to SWIG, <http://www.swig.org>, FFIG does not need an interface
 generation language to be used nor do the bindings it generates depend on any
 binary details of an interpreter. FFIG Python bindings will run on PyPy,
-Python2 Python3 without requiring changes.
+Python2 and Python3 without requiring changes.
 
 FFIG is in early development. We welcome feedback from users but would
 encourage anyone looking to generate language bindings to look at SWIG.
