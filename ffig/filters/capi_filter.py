@@ -278,3 +278,13 @@ def restore_ruby_type(t):
             return 'get_pointer(0)'
     raise Exception(
         'Type {} has no defined C++ type restoration (adding one for primitives is trivial)'.format(t.name))
+
+
+def to_lua(t, v):
+    if t.kind == TypeKind.INT or t.kind == TypeKind.DOUBLE:
+        return '{}'.format(v)
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return 'ffi.string({})'.format(v)
+    raise Exception(
+        'Type {} has no defined Lua type restoration'.format(t.name))

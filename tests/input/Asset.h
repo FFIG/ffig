@@ -11,7 +11,7 @@ struct FFIG_NAME(CDO) CollateralisedDebtObligation : Asset
 {
   CollateralisedDebtObligation() {}
 
-  double PV() const override { return 0.0; }
+  double PV() const override { return 99.99; }
   const char* id() const override { return "CDO"; }
 };
 

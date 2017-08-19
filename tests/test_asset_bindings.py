@@ -15,4 +15,4 @@ def test_id_is_renamed_to_name_and_is_a_property():
 def test_PV_is_renamed_to_value():
     cdo = CDO()
 
-    assert cdo.value() == 0
+    assert cdo.value() == 99.99

@@ -23,12 +23,13 @@
 #
 # Optional bindings can be created by passing in any of the optional arguments:
 # * RUBY - creates myModuleName.rb
-# * PYTHON - creates myModuleName.py
+# * PYTHON - creates myModuleName/{_py3.py,_py2.py,__init__.py}
+# * LUA - creates myModuleName.lua (needs luajit)
 # * CPP - creates myModuleName_cpp.h
 # * CPP_MOCKS - creates myModuleName_mocks.h
 
 function(ffig_add_library)
-  set(options RUBY PYTHON CPP CPP_MOCKS GO NOEXCEPT)
+  set(options RUBY PYTHON CPP CPP_MOCKS GO LUA NOEXCEPT)
   set(oneValueArgs NAME INPUTS)
   cmake_parse_arguments(ffig_add_library "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -42,6 +43,10 @@ function(ffig_add_library)
   if(ffig_add_library_RUBY)
     set(ffig_invocation "${ffig_invocation};rb.tmpl")
     set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/${module}.rb")
+  endif()
+  if(ffig_add_library_LUA)
+    set(ffig_invocation "${ffig_invocation};lua.tmpl")
+    set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/${module}.lua")
   endif()
   if(ffig_add_library_PYTHON)
     set(ffig_invocation "${ffig_invocation};python")
