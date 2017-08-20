@@ -1,6 +1,7 @@
 from util import get_tu
 import ffig.cppmodel
 from ffig.clang.cindex import TypeKind
+from nose.tools import assert_equals
 
 
 def test_function_name():
@@ -81,7 +82,6 @@ def test_function_equality():
 def test_string_representation():
     source = """
     double foo(int, char);
-    double bar(int x, char y);
     """
 
     tu = get_tu(source, 'cpp')
@@ -89,8 +89,8 @@ def test_string_representation():
     model = ffig.cppmodel.Model(tu)
     functions = model.functions
 
-    assert str(functions[0]) == 'double foo(int, char)'
-    assert str(functions[1]) == 'double bar(int x, char y)'
+    assert_equals(str(functions[0]),
+                  '<cppmodel.Function double foo(int, char)>')
 
 
 def test_force_noexcept():
@@ -103,5 +103,6 @@ def test_force_noexcept():
     model = ffig.cppmodel.Model(tu, force_noexcept=True)
     functions = model.functions
 
-    assert str(functions[0]) == 'double foo(int, char) noexcept'
+    assert_equals(str(functions[0]),
+                  '<cppmodel.Function double foo(int, char) noexcept>')
     assert functions[0].is_noexcept

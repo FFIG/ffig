@@ -1,6 +1,7 @@
 from util import get_tu
 import ffig.cppmodel
 from ffig.clang.cindex import TypeKind
+from nose.tools import assert_equals
 
 
 def test_class_name():
@@ -173,10 +174,14 @@ def test_string_representation():
     classes = model.classes
     methods = classes[0].methods
 
-    assert str(methods[0]) == 'virtual int foo()'
-    assert str(methods[1]) == 'int bar()'
-    assert str(methods[2]) == 'virtual int foobar() = 0'
-    assert str(methods[3]) == 'virtual int cfoobar(int x) const = 0'
+    assert_equals(str(methods[0]),
+                  '<cppmodel.Method virtual int foo()>')
+    assert_equals(str(methods[1]),
+                  '<cppmodel.Method int bar()>')
+    assert_equals(str(methods[2]),
+                  '<cppmodel.Method virtual int foobar() = 0>')
+    assert_equals(str(methods[3]),
+                  '<cppmodel.Method virtual int cfoobar(int) const = 0>')
 
 
 def test_noexcept():
@@ -190,5 +195,6 @@ def test_noexcept():
     classes = model.classes
     methods = classes[0].methods
 
-    assert str(methods[0]) == 'virtual int foo() noexcept'
+    assert_equals(str(methods[0]),
+                  '<cppmodel.Method virtual int foo() noexcept>')
     assert methods[0].is_noexcept

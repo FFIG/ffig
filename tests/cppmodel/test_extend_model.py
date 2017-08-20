@@ -1,6 +1,7 @@
 from util import get_named_tu
 import ffig.cppmodel
 import nose
+from nose.tools import assert_equals
 
 
 def test_new_class_is_added():

@@ -21,6 +21,9 @@ class Type:
         else:
             self.pointee = None
 
+    def __repr__(self):
+        return "<cppmodel.Type {}>".format(self.name)
+
     def __str__(self):
         return self.name
 
@@ -36,8 +39,8 @@ class FunctionArgument:
 
     def __str__(self):
         if self.name is None:
-            return str(self.type)
-        return "{} {}".format(self.type, self.name)
+            return "<cppmodel.FunctionArgument self.type.name>"
+        return "<cppmodel.FunctionArgument {} {}>".format(self.type, self.name)
 
     def __init__(self, type, name=None):
         self.type = type
@@ -60,9 +63,9 @@ class _Function(object):
         for t, n in zip(argument_types, arguments):
             self.arguments.append(FunctionArgument(t, n))
 
-    def __str__(self):
-        r = '{} {}({})'.format(str(self.return_type), str(self.name),
-                               ', '.join([str(a) for a in self.arguments]))
+    def __repr__(self):
+        r = '{} {}({})'.format(self.return_type.name, str(self.name),
+                               ', '.join([a.type.name for a in self.arguments]))
         if self.is_noexcept:
             r = r + " noexcept"
         return r
@@ -78,6 +81,10 @@ class Function(_Function):
         else:
             self.qualified_name = self.name
 
+    def __repr__(self):
+        s = _Function.__repr__(self)
+        return "<cppmodel.Function {}>".format(s)
+
     def __eq__(self, f):
         if self.name != f.name:
             return False
@@ -92,7 +99,7 @@ class Function(_Function):
         return True
 
 
-class Method(Function):
+class Method(_Function):
 
     def __init__(self, cursor, force_noexcept=False):
         _Function.__init__(self, cursor, force_noexcept)
@@ -101,21 +108,21 @@ class Method(Function):
         self.is_pure_virtual = cursor.is_pure_virtual_method()
         self.is_public = (cursor.access_specifier == AccessSpecifier.PUBLIC)
 
-    def __str__(self):
-        s = super(Function, self).__str__()
+    def __repr__(self):
+        s = _Function.__repr__(self)
         if self.is_const:
             s = '{} const'.format(s)
         if self.is_pure_virtual:
             s = 'virtual {} = 0'.format(s)
         elif self.is_virtual:
             s = 'virtual {}'.format(s)
-        return s
+        return "<cppmodel.Method {}>".format(s)
 
 
 class Class(object):
 
-    def __str__(self):
-        return "class {}".format(self.name)
+    def __repr__(self):
+        return "<cppmodel.Class {}>".format(self.name)
 
     def __init__(self, cursor, namespaces, force_noexcept=False):
         self.name = cursor.spelling
@@ -150,11 +157,15 @@ class Class(object):
 
 class Model(object):
 
-    def __init__(self, translation_unit=None, force_noexcept=False):
+    def __init__(self, translation_unit, force_noexcept=False):
+        self.filename = translation_unit.spelling
         self.functions = []
         self.classes = []
-        if translation_unit is not None:
-            self.add_child_nodes(translation_unit.cursor, [], force_noexcept)
+        self.add_child_nodes(translation_unit.cursor, [], force_noexcept)
+
+    def __repr__(self):
+        return "<cppmodel.Model filename={}, classes={}, functions={}>".format(
+            self.filename, [c.name for c in self.classes], [f.name for f in self.functions])
 
     def extend(self, translation_unit):
         m = Model(translation_unit)

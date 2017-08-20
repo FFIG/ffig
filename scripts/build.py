@@ -88,9 +88,16 @@ def main():
             os.makedirs(os.path.join(src_dir, args.out_dir))
         python_executable = getattr(args, 'python_path', 'python')
         subprocess.check_call(
-            '{} -m virtualenv pyenv'.format(python_executable).split(), cwd=os.path.join(src_dir, args.out_dir))
-        subprocess.check_call('{}/pyenv/bin/pip install -r requirements.txt'.format(
-            os.path.join(src_dir, args.out_dir)).split(), cwd=src_dir)
+            '{} -m virtualenv pyenv'.format(python_executable).split(),
+            cwd=os.path.join(
+                src_dir,
+                args.out_dir))
+        subprocess.check_call(
+            '{}/pyenv/bin/pip install -r requirements.txt'.format(
+                os.path.join(
+                    src_dir,
+                    args.out_dir)).split(),
+            cwd=src_dir)
         args.python_path = os.path.join(
             src_dir, args.out_dir, 'pyenv', 'bin', 'python')
 

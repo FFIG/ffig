@@ -1,6 +1,7 @@
 from util import get_tu
 import ffig.cppmodel
 from ffig.clang.cindex import TypeKind
+from nose.tools import assert_equals
 
 
 def test_pointer_type():
@@ -89,4 +90,4 @@ def test_string_representation():
     model = ffig.cppmodel.Model(tu)
     c = model.classes[0]
 
-    assert str(c) == "class A"
+    assert_equals(str(c), "<cppmodel.Class A>")
