@@ -16,6 +16,7 @@ import sys
 
 logging.basicConfig(level=logging.WARNING)
 
+import ffig.annotations
 import ffig.cppmodel
 import ffig.filters.capi_filter
 import ffig.generators
@@ -45,7 +46,8 @@ def collect_api_and_obj_classes(classes, api_annotation):
     class APIClass:
 
         def __init__(self, model_class):
-            self.api_class = ffig.cppmodel.apply_class_annotations(model_class)
+            self.api_class = ffig.annotations.apply_class_annotations(
+                model_class)
             self.impls = []
 
     api_classes = {c.name: APIClass(c)
@@ -54,7 +56,7 @@ def collect_api_and_obj_classes(classes, api_annotation):
     for c in classes:
         for base in c.base_classes:
             if base in api_classes:
-                ffig.cppmodel.apply_class_annotations(c)
+                ffig.annotations.apply_class_annotations(c)
                 api_classes[base].impls.append(c)
 
     return [c for k, c in api_classes.items()]
