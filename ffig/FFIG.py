@@ -77,6 +77,10 @@ def write_bindings_to_disk(
     - environment to get templates from
     - output_dir where to write to
     """
+
+    bindings.extend("_c.cpp.tmpl _c.h.tmpl".split())
+    bindings = list(set(bindings))
+
     for binding in bindings:
         ffig.generators.generate(module_name, binding,
                                  api_classes, env, output_dir)
