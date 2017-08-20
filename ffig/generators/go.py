@@ -41,7 +41,7 @@ def go_generator(module_name, binding, api_classes, env, output_dir):
             module_name, output_file_name))
 
     # Generate the Go file
-    template = env.get_template(binding)
+    template = env.get_template('go.tmpl')
     generated_code = ffig.generators.render_api_and_obj_classes(
         module_name, api_classes, template)
     output_file_name = os.path.join(
@@ -56,4 +56,4 @@ def go_generator(module_name, binding, api_classes, env, output_dir):
 
 
 def setup_plugin(context):
-    context.register(go_generator, ['go.tmpl'])
+    context.register(go_generator, ['go'])
