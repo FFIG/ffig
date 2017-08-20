@@ -47,6 +47,11 @@ def main():
         '--python-path',
         help='path to python executable ie "/usr/local/bin/python3"',
         dest='python_path')
+    parser.add_argument(
+        '--venv',
+        help='Use a python virtualenv, installing modules from requirements.txt',
+        action="store_true",
+        dest='venv')
 
     if platform.system() == "Windows":
         parser.add_argument(
@@ -58,7 +63,7 @@ def main():
     args = parser.parse_args()
     args.platform = platform.system()
 
-    src_dir = os.path.realpath(os.path.dirname(os.path.dirname(__file__)))
+    src_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 
     if args.clean and os.path.exists(args.out_dir):
         shutil.rmtree(args.out_dir)
@@ -77,6 +82,18 @@ def main():
 
     if args.verbose:
         cmake_invocation.append('-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON')
+
+    if args.venv:
+        if not os.path.exists(os.path.join(src_dir, args.out_dir)):
+            os.makedirs(os.path.join(src_dir, args.out_dir))
+        python_executable = getattr(args, 'python_path', 'python')
+        subprocess.check_call(
+            '{} -m virtualenv pyenv'.format(python_executable).split(), cwd=os.path.join(src_dir, args.out_dir))
+        subprocess.check_call('{}/pyenv/bin/pip install -r requirements.txt'.format(
+            os.path.join(src_dir, args.out_dir)).split(), cwd=src_dir)
+        args.python_path = os.path.join(
+            src_dir, args.out_dir, 'pyenv', 'bin', 'python')
+
     if args.python_path:
         cmake_invocation.append(
             '-DPYTHON_EXECUTABLE={}'.format(args.python_path))
@@ -92,7 +109,8 @@ def main():
             cwd=os.path.join(src_dir, args.out_dir))
     elif args.labelled_tests:
         rc = subprocess.call(
-            'ctest . --output-on-failure -C {} -L {}'.format(args.config, args.labelled_tests).split(),
+            'ctest . --output-on-failure -C {} -L {}'.format(
+                args.config, args.labelled_tests).split(),
             cwd=os.path.join(src_dir, args.out_dir))
     if rc != 0:
         sys.exit(1)
