@@ -57,6 +57,8 @@ The build uses cmake driven by a simple Python script. To build and run tests, r
 
 **Build status (on Travis-CI):** [![Build Status](https://travis-ci.org/FFIG/ffig.svg?branch=master)](https://travis-ci.org/FFIG/ffig)
 
+**Build status (on AppVeyor):** [![Build Status](https://ci.appveyor.com/api/projects/status/github/ffig/ffig?branch=master)](https://ci.appveyor.com/project/jbcoe/ffig?branch=master)
+
 
 # Issues
 
