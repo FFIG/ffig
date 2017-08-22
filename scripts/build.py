@@ -86,12 +86,11 @@ def main():
     if args.venv:
         if not os.path.exists(os.path.join(src_dir, args.out_dir)):
             os.makedirs(os.path.join(src_dir, args.out_dir))
-        python_executable = getattr(args, 'python_path', 'python')
+        python_executable = args.python_path if args.python_path else 'python'
         subprocess.check_call(
             '{} -m virtualenv pyenv'.format(python_executable).split(),
-            cwd=os.path.join(
-                src_dir,
-                args.out_dir))
+            cwd=os.path.join(src_dir,
+                             args.out_dir))
         subprocess.check_call(
             '{}/pyenv/bin/pip install -r requirements.txt'.format(
                 os.path.join(
