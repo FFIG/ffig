@@ -7,6 +7,9 @@ include_directories(
 add_executable(TestCppTree TestCppTree.cpp)
 target_link_libraries(TestCppTree Tree_c)
 
+add_executable(TestTreeCAPI TestTreeCAPI.cpp)
+target_link_libraries(TestTreeCAPI Tree_c)
+
 add_executable(TestCppCircle TestCppCircle.cpp)
 target_link_libraries(TestCppCircle Shape_c)
 

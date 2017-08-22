@@ -2,7 +2,7 @@ import os
 
 root_dir = os.path.dirname(__file__)
 
-flags = "-x c++ -std=c++14 -stdlib=libc++ -Iffig/include -isystem /usr/include/c++/v1 -isystem {0}/externals/catch/include".format(
+flags = "-x c++ -std=c++14 -stdlib=libc++ -I{0}/build/generated -Iffig/include -isystem /usr/include/c++/v1 -isystem {0}/externals/catch/include".format(
     root_dir).split()
 
 

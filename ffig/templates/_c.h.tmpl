@@ -35,6 +35,11 @@ EXPORT void {{module.name}}_{{class.name}}_dispose({{module.name}}_{{class.name}
 EXPORT int {{module.name}}_{{ class.name }}_create(
     {{c_macros.method_parameters(module, method, trailing_comma=True)}}
     {{module.name}}_{{class.name}}* rv);
+{%- if method.is_noexcept %}
+
+EXPORT {{module.name}}_{{class.name}} {{module.name}}_{{ class.name }}_create_noexcept(
+    {{c_macros.method_parameters(module, method)}});
+{% endif -%}
 {% endfor %}
 {%- endif -%}
 
@@ -48,6 +53,12 @@ EXPORT int {{module.name}}_{{ class.name }}_{{method.name}}(
         {{method.return_type | to_c(module.name)}}* rv
     {%- endif -%}
     );
+{%- if method.is_noexcept %}
+
+EXPORT {{method.return_type | to_c(module.name)}} {{module.name}}_{{ class.name }}_{{method.name}}_noexcept(
+    {{module.name}}_{{class.name}} my{{class.name}} {{c_macros.method_parameters(module, method, leading_comma=True)}}
+    );
+{% endif -%}
 {% endfor %}
 
 {%- for impl in impl_classes %}
