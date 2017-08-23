@@ -204,3 +204,10 @@ class Model(object):
                 child_namespaces = list(namespaces)
                 child_namespaces.append(c.spelling)
                 self.add_child_nodes(c, child_namespaces)
+
+        # Drop functions and classes with "__" prefixes as they are standard
+        # library implementation details.
+        self.functions = [
+            f for f in self.functions if not f.name.startswith('__')]
+        self.classes = [
+            c for c in self.classes if not len(c.name) == 0 and not c.name.startswith('__')]
