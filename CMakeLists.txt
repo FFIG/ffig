@@ -112,7 +112,7 @@ add_test(
   NAME test_tree_capi
   COMMAND ${CMAKE_BINARY_DIR}/tests/src/TestTreeCAPI
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
-set_property(TEST test_tree_capi PROPERTY LABELS CPP)
+set_property(TEST test_tree_capi PROPERTY LABELS C)
 
 add_test(
   NAME test_cpp_tree
