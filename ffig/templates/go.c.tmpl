@@ -11,20 +11,25 @@
 #define RSTR(x) STR(x)
 
 // Simple typedef for a void* which we know is a c-api object.
+{% for class in classes %}
 typedef const void* {{module.name}}_{{class.name}};
+{%- endfor %}
 
 
 // Function pointers for each of the exposed functions.
 // These will be set to the dlsym() results on initialisation.
-{% for impl in impl_classes -%}
+{% for class in classes %}
+{% for impl in class.impls -%}
 {%- for method in impl.constructors -%}
 typedef int (*{{module.name}}_{{impl.name}}_create_Ptr)(
     {{go_macros.c_method_parameters(module, method, trailing_comma=True)}}
     {{module.name}}_{{class.name}}* object);
 static {{module.name}}_{{impl.name}}_create_Ptr {{module.name}}_{{impl.name}}_create_ptr = NULL;
 {%- endfor -%}
+{%- endfor -%}
 {%- endfor %}
 
+{% for class in classes %}
 {% for method in class.methods %}
 typedef int (*{{module.name}}_{{class.name}}_{{method.name}}_Ptr)(
     const void*
@@ -35,6 +40,7 @@ typedef int (*{{module.name}}_{{class.name}}_{{method.name}}_Ptr)(
     );
 static {{module.name}}_{{class.name}}_{{method.name}}_Ptr {{module.name}}_{{class.name}}_{{method.name}}_ptr;
 {% endfor %} 
+{%- endfor %} 
 
 
 int init() {
@@ -72,7 +78,8 @@ int init() {
     // Resolve the function pointers
     void* symbol = NULL;
 
-    {% for impl in impl_classes -%}
+    {% for class in classes %}
+    {% for impl in class.impls -%}
     {% for method in impl.constructors %}
     ++progress_code;
     symbol = dlsym(dynamic_library, "{{module.name}}_{{impl.name}}_create");
@@ -81,8 +88,10 @@ int init() {
     }
     {{module.name}}_{{impl.name}}_create_ptr = ({{module.name}}_{{impl.name}}_create_Ptr)symbol;
     {% endfor -%}
+    {% endfor -%}
     {% endfor %}
 
+    {%- for class in classes %}
     {%- for method in class.methods %}
     ++progress_code;
     symbol = dlsym(dynamic_library, "{{module.name}}_{{class.name}}_{{method.name}}");
@@ -91,14 +100,15 @@ int init() {
     }
     {{module.name}}_{{class.name}}_{{method.name}}_ptr = ({{module.name}}_{{class.name}}_{{method.name}}_Ptr)symbol;
     {% endfor %}  
+    {%- endfor %}  
 
     free(path);
 
     return 0;
 }
 
-
-{% for impl in impl_classes -%}
+{% for class in classes -%}
+{% for impl in class.impls -%}
 {%- for method in impl.constructors %}
 typedef struct {{module.name}}_{{impl.name}}_create_return_type {
     {{module.name}}_{{class.name}} ptr;
@@ -114,7 +124,9 @@ RT_{{module.name}}_{{impl.name}}_create CGo_{{module.name}}_{{impl.name}}_create
 }
 {% endfor -%}
 {%- endfor %}
+{%- endfor %}
 
+{% for class in classes -%}
 {% for method in class.methods %}
 typedef struct {{module.name}}_{{class.name}}_{{method.name}}_return_type {
     {% if not method.returns_void %}
@@ -135,3 +147,4 @@ RT_{{module.name}}_{{class.name}}_{{method.name}} CGo_{{module.name}}_{{class.na
     return rv;
 }
 {% endfor %}  
+{%- endfor %}  

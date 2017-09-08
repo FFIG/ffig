@@ -18,12 +18,15 @@
 -- Manual edits will be lost.
 local ffi = require("ffi")
 ffi.cdef[[
+{% for class in classes %}
 typedef const void* {{module.name}}_{{class.name}};
+{%- endfor %}
 
 void {{module.name}}_clear_error();
 
 const char* {{module.name}}_error();
 
+{% for class in classes %}
 void {{module.name}}_{{class.name}}_dispose({{module.name}}_{{class.name}} my{{class.name}});
 
 {% if not class.is_abstract -%}
@@ -46,7 +49,7 @@ int {{module.name}}_{{ class.name }}_{{method.name}}(
     );
 {% endfor %}
 
-{%- for impl in impl_classes %}
+{%- for impl in class.impls %}
 {% for method in impl.constructors %}
 int {{module.name}}_{{ impl.name }}_create(
     {{c_macros.method_parameters(module, method, trailing_comma=True)}}
@@ -82,7 +85,7 @@ end
 {%- endfor -%}
 {%- endif %}
 
-{% for impl in impl_classes %}
+{% for impl in class.impls %}
 {{impl.name}} = {}
 {% for method in impl.constructors %}
 function {{impl.name}}:new(o)
@@ -104,4 +107,5 @@ function {{class.name}}:{{method.name}}()
   return {{method.return_type|to_lua("v[0]")}}
 end
 {% endfor %}
+{%- endfor %}
 

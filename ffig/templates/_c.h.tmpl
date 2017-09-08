@@ -9,7 +9,7 @@
 
 // FIXME: Use something nicer than _MBCS to see if we are on VS
 #ifdef _MBCS
-#ifdef {{class.name}}_c_EXPORTS
+#ifdef {{module.name}}_c_EXPORTS
 #define EXPORT extern "C" __declspec(dllexport)
 #else
 #define EXPORT extern "C" __declspec(dllimport)
@@ -17,9 +17,9 @@
 #else
 #define EXPORT extern "C" __attribute__((visibility("default")))
 #endif
-
+{% for class in classes %}
 typedef const void* {{module.name}}_{{class.name}};
-
+{% endfor %}
 #ifdef __cplusplus
 extern "C"
 {
@@ -27,9 +27,8 @@ extern "C"
 EXPORT void {{module.name}}_clear_error();
 
 EXPORT const char* {{module.name}}_error();
-
+{% for class in classes %}
 EXPORT void {{module.name}}_{{class.name}}_dispose({{module.name}}_{{class.name}} my{{class.name}});
-
 {% if not class.is_abstract -%}
 {% for method in class.constructors %}
 EXPORT int {{module.name}}_{{ class.name }}_create(
@@ -61,11 +60,12 @@ EXPORT {{method.return_type | to_c(module.name)}} {{module.name}}_{{ class.name 
 {% endif -%}
 {% endfor %}
 
-{%- for impl in impl_classes %}
+{%- for impl in class.impls %}
 {% for method in impl.constructors %}
 EXPORT int {{module.name}}_{{ impl.name }}_create(
     {{c_macros.method_parameters(module, method, trailing_comma=True)}}
     {{module.name}}_{{class.name}}* rv);
+{%- endfor %}
 {%- endfor %}
 {%- endfor %}
 #ifdef __cplusplus

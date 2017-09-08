@@ -20,11 +20,14 @@ func init() {
     }
 }
 
+{% for class in classes %}
 type {{class.name}} struct {
     ptr C.{{module.name}}_{{class.name}}
 }
+{% endfor %}
 
-{% for impl in impl_classes %}
+{% for class in classes -%}
+{% for impl in class.impls %}
 {% for method in impl.constructors %}
 
 func {{ impl.name }}_create({{go_macros.go_method_parameters(method)}}) ({{class.name}}, bool) {
@@ -41,9 +44,11 @@ func {{ impl.name }}_create({{go_macros.go_method_parameters(method)}}) ({{class
     }
 }
 
-{% endfor %}
+{%- endfor %}
+{%- endfor %}
 {% endfor %}
 
+{% for class in classes -%}
 {% for method in class.methods %}
 func (obj {{class.name}}) {{method.name|to_go_method_name}}({{go_macros.go_method_parameters(method)}})
         {%- if not method.returns_void -%}
@@ -68,3 +73,4 @@ func (obj {{class.name}}) {{method.name|to_go_method_name}}({{go_macros.go_metho
     }
 }
 {% endfor %}
+{%- endfor %}

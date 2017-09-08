@@ -80,6 +80,7 @@ endif()
 ffig_add_library(NAME Shape INPUTS tests/input/Shape.h ${all_ffig_bindings})
 ffig_add_library(NAME Tree INPUTS tests/input/Tree.h NOEXCEPT PYTHON CPP)
 ffig_add_library(NAME Asset INPUTS tests/input/Asset.h PYTHON LUA)
+ffig_add_library(NAME Animal INPUTS tests/input/Animal.h PYTHON)
     
 add_subdirectory(tests/src)
 

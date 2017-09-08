@@ -73,7 +73,7 @@ class {{module.name}}_error(Exception):
 
     def __str__(self):
         return self.value
-
+{% for class in classes -%}
 class {{class.name}}:
   {% if not class.is_abstract -%}
 {%- for method in class.constructors %}
@@ -117,7 +117,7 @@ class {{class.name}}:
   def __del__(self):
     conf.lib.{{module.name}}_{{class.name}}_dispose(self)
 
-{% for impl in impl_classes %}class {{impl.name}}({{class.name}}): {% for method in impl.constructors %}
+{% for impl in class.impls %}class {{impl.name}}({{class.name}}): {% for method in impl.constructors %}
   def __init__(self, {{constructor_parameters(method, trailing_comma=True)}} _p=None):
     if _p:
       self.ptr = _p
@@ -128,6 +128,7 @@ class {{class.name}}:
         raise {{module.name}}_error()
 {% endfor %}
 {% endfor %}
+{%- endfor %}
 
 methodList = [
   ("{{module.name}}_error",
@@ -138,6 +139,7 @@ methodList = [
   [],
   None),
 
+{% for class in classes %}
   ("{{module.name}}_{{class.name}}_dispose",
   [{{class.name}}],
   None),
@@ -150,7 +152,7 @@ methodList = [
 {%- endfor -%}
 {%- endif -%}
 
-{%- for impl in impl_classes -%}
+{%- for impl in class.impls -%}
 {%- for method in impl.constructors %}
   ("{{module.name}}_{{ impl.name }}_create",
   [{{method_argument_types(method, trailing_comma=True)}} POINTER(c_object_p)],
@@ -162,7 +164,8 @@ methodList = [
   ("{{module.name}}_{{ class.name }}_{{method.name}}",
   [{{class.name}}{{method_argument_types(method, leading_comma=True)}}
 {%- if not method.returns_void %}, POINTER({{method.return_type|to_output_py2_ctype}}){% endif %}],
-  c_int){% if not loop.last %},{% endif -%}
+  c_int),
+{%- endfor %}
 {%- endfor %}
 ]
 
@@ -247,7 +250,7 @@ class Config:
                     # Use system library path (last).
                     library = cdll.LoadLibrary(self._get_filename())
         except OSError as e:
-            msg = str(e) + ". To provide a path to {{class.name}} dylib use Config.set_library_path()"
+            msg = str(e) + ". To provide a path to {} use Config.set_library_path()".format(self._get_filename())
             raise Exception(msg)
 
         return library

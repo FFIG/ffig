@@ -20,13 +20,9 @@ def dso_extension():
 
 def render_api_and_obj_classes(module_name, api_classes, template):
     '''Render a template.'''
-    s = ""
-    for c in api_classes:
-        s += str(template.render({"module": {"name": module_name},
-                                  "class": c.api_class,
-                                  "impl_classes": c.impls,
-                                  "dso_extension": dso_extension()}))
-    return s
+    return str(template.render({"module": {"name": module_name},
+                                "classes": api_classes,
+                                "dso_extension": dso_extension()}))
 
 
 def get_template_name(template_path):

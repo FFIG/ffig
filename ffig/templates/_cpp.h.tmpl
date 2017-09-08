@@ -36,7 +36,7 @@
 #include "{{module.name}}_c.h"
 namespace CPP_API {
 
-
+{% for class in classes -%}
 class {{class.name}}
 {
 protected:
@@ -120,7 +120,7 @@ public:
 
 };
 
-{% for impl in impl_classes %}
+{% for impl in class.impls %}
 class {{impl.name}} : public {{class.name}}
 {
 public:
@@ -139,4 +139,5 @@ public:
   {%- endfor %}
 };
 {% endfor %}
+{%- endfor %}
 } // end namespace CPP_API

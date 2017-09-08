@@ -209,5 +209,5 @@ class Model(object):
         # library implementation details.
         self.functions = [
             f for f in self.functions if not f.name.startswith('__')]
-        self.classes = [
-            c for c in self.classes if not len(c.name) == 0 and not c.name.startswith('__')]
+        self.classes = [c for c in self.classes if not len(
+            c.name) == 0 and not c.name.startswith('__')]

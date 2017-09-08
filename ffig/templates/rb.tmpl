@@ -8,13 +8,15 @@ module {{module.name}}_c
   ffi_lib ['{{module.name}}_c',
            File.dirname(__FILE__) + '/lib{{module.name}}_c.so',
            File.dirname(__FILE__) + '/lib{{module.name}}_c.dylib' ]
+{% for class in classes %}
   attach_function :{{module.name}}_{{class.name}}_dispose, [:pointer], :void
   attach_function :{{module.name}}_error, [], :string
   attach_function :{{module.name}}_clear_error, [], :void 
   {% for method in class.methods %}
   attach_function :{{module.name}}_{{class.name}}_{{method.name}}, [:pointer{% for arg in method.arguments %}, :{{arg.type|to_ruby_type}}{% endfor %}, :pointer], :int{% endfor %}
-  {% for impl in impl_classes %}{% for method in impl.constructors %}
+  {% for impl in class.impls %}{% for method in impl.constructors %}
   attach_function :{{module.name}}_{{impl.name}}_create, [{% for arg in method.arguments %}:{{arg.type|to_ruby_type}},{% endfor %} :pointer], :int{% endfor %}{% endfor %}
+{% endfor -%}
 end
 
 class {{module.name}}Error < Exception
@@ -25,6 +27,7 @@ class {{module.name}}Error < Exception
   end
 end
 
+{% for class in classes %}
 class {{class.name}}
   def initialize(objptr)
     @ptr = objptr.get_pointer(0)
@@ -45,7 +48,7 @@ class {{class.name}}
   end
 {% endfor %}end
 
-{% for impl in impl_classes %}{% for method in impl.constructors %}
+{% for impl in class.impls %}{% for method in impl.constructors %}
 class {{impl.name}} < {{class.name}}
   def initialize({% for arg in method.arguments %}{{arg.name}}{% if not loop.last %},{% endif %}{% endfor %})
     objptr = FFI::MemoryPointer.new :pointer
@@ -56,5 +59,7 @@ class {{impl.name}} < {{class.name}}
     super(objptr)
   end
 end
-{% endfor %}{% endfor %}
+{% endfor %}
+{%- endfor %}
+{%- endfor %}
 

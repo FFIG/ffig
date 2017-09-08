@@ -43,15 +43,12 @@ ffig_dir = os.path.abspath(os.path.dirname(__file__))
 
 
 def collect_api_and_obj_classes(classes, api_annotation):
-    class APIClass:
-
-        def __init__(self, model_class):
-            self.api_class = ffig.annotations.apply_class_annotations(
-                model_class)
-            self.impls = []
-
-    api_classes = {c.name: APIClass(c)
+    api_classes = {c.name: c
                    for c in classes if api_annotation in c.annotations}
+
+    for _, c in api_classes.items():
+        ffig.annotations.apply_class_annotations(c)
+        c. impls = []
 
     for c in classes:
         for base in c.base_classes:

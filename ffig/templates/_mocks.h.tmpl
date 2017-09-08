@@ -38,6 +38,7 @@
 #include <functional>
 namespace mocks {
 
+{% for class in classes %}
 struct Mock{{class.name}} : {{class.name}}
 {
   enum state
@@ -78,6 +79,7 @@ struct Mock{{class.name}} : {{class.name}}
     return MockMethodResult()("{{method.name}}", {{method.name}}_
             {{method_arguments(method, leading_comma=True)}});
   }
-{%endfor%}
+{% endfor %}
 };
+{% endfor %}
 } // end namespace mocks
