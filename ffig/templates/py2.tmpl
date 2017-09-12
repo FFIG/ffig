@@ -73,9 +73,16 @@ class {{module.name}}_error(Exception):
 
     def __str__(self):
         return self.value
-{% for class in classes -%}
+
+{% for class in classes %}
 class {{class.name}}:
   {% if not class.is_abstract -%}
+  @classmethod
+  def from_capi(cls, ptr):
+    assert(isinstance(ptr, c_object_p))
+    if not bool(ptr): 
+      return None
+    return cls(_p=ptr)
 {%- for method in class.constructors %}
   def __init__(self, {{constructor_parameters(method, trailing_comma=True)}} _p=None):
     if _p:
@@ -106,18 +113,26 @@ class {{class.name}}:
     rv = c_object_p()
     rc = conf.lib.{{module.name}}_{{class.name}}_{{method.name}}(self {{method_arguments(method, leading_comma=True)}}, byref(rv))
     if rc == 0:
-      {% if method.returns_nullable %}if not bool(rv): return None{% endif %}
-      return {{method.return_type|to_py2_ctype}}(_p=rv)
+      return {{method.return_type|to_py2_ctype}}.from_capi(rv)
     raise {{module.name}}_error()
   {%- endif %}
   {% endfor %}
-  def from_param(self):
-    return self.ptr
+  @classmethod
+  def from_param(k, x):
+    assert isinstance(x,k)
+    return x.ptr
 
   def __del__(self):
     conf.lib.{{module.name}}_{{class.name}}_dispose(self)
 
-{% for impl in class.impls %}class {{impl.name}}({{class.name}}): {% for method in impl.constructors %}
+{% for impl in class.impls %}class {{impl.name}}({{class.name}}):
+  @classmethod
+  def from_capi(cls, ptr):
+    assert(isinstance(ptr, c_object_p))
+    if not bool(ptr): 
+      return None
+    return cls(_p=ptr)
+{% for method in impl.constructors %}
   def __init__(self, {{constructor_parameters(method, trailing_comma=True)}} _p=None):
     if _p:
       self.ptr = _p
