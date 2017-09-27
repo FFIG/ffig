@@ -29,7 +29,7 @@
 # * CPP_MOCKS - creates myModuleName_mocks.h
 
 function(ffig_add_library)
-  set(options RUBY PYTHON CPP CPP_MOCKS GO LUA NOEXCEPT)
+    set(options RUBY PYTHON CPP CPP_MOCKS GO LUA DOTNET NOEXCEPT)
   set(oneValueArgs NAME INPUTS)
   cmake_parse_arguments(ffig_add_library "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -47,6 +47,10 @@ function(ffig_add_library)
   if(ffig_add_library_LUA)
     set(ffig_invocation "${ffig_invocation};lua")
     set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/${module}.lua")
+  endif()
+  if(ffig_add_library_DOTNET)
+    set(ffig_invocation "${ffig_invocation};dotnet")
+    set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/${module}.cs")
   endif()
   if(ffig_add_library_PYTHON)
     set(ffig_invocation "${ffig_invocation};python")

@@ -15,12 +15,8 @@
  #}
 {%- macro comma_separated_list(items, leading_comma=False, trailing_comma=False) -%}
     {%- for item in items -%}
-        {%- if leading_comma and loop.first -%}
-            ,
-        {%- endif -%}
+        {%- if leading_comma and loop.first %}, {% endif -%}
         {{ caller(item) }}
-        {%- if trailing_comma or not loop.last -%}
-            ,
-        {%- endif -%}
+        {%- if trailing_comma or not loop.last %}, {% endif -%}
     {%- endfor -%}
 {%- endmacro -%}

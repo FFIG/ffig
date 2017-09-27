@@ -68,7 +68,7 @@ else()
   set(LuaJIT_EXECUTABLE "luajit")
 endif()
 
-set(all_ffig_bindings "PYTHON;CPP;CPP_MOCKS")
+set(all_ffig_bindings "PYTHON;CPP;CPP_MOCKS;DOTNET")
 if(Ruby_FOUND)
   list(APPEND all_ffig_bindings "RUBY")
 endif()
@@ -120,6 +120,11 @@ add_test(
   COMMAND ${CMAKE_BINARY_DIR}/tests/src/TestCppTree
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
 set_property(TEST test_cpp_tree PROPERTY LABELS CPP)
+
+add_test(
+  NAME test_dotnet_shape_output
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py ${CMAKE_SOURCE_DIR}/tests/output/Shape.cs ${CMAKE_BINARY_DIR}/generated/Shape.cs)
+set_property(TEST test_cpp_tree PROPERTY LABELS DOTNET)
 
 if(LuaJIT_FOUND)
   # FIXME: The relative paths here (and in the lua test file) are very brittle.

@@ -288,3 +288,103 @@ def to_lua(t, v):
             return 'ffi.string({})'.format(v)
     raise Exception(
         'Type {} has no defined Lua type restoration'.format(t.name))
+
+
+def to_shared_lib(module):
+    return "lib{}_c.dylib".format(module.name)
+
+
+def to_dotnet_c_param(arg):
+    t = arg.type
+    if t.kind == TypeKind.INT:
+        return "{} {}".format(arg.type, arg.name)
+    if t.kind == TypeKind.DOUBLE:
+        return "{} {}".format(arg.type, arg.name)
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.RECORD:
+            return "IntPtr {}".format(arg.name)
+    raise Exception(
+        'Type {} has no defined dotnet C parameter translation (adding one may be trivial)'.format(
+            t.name))
+
+
+def to_dotnet_param(arg):
+    t = arg.type
+    if t.kind == TypeKind.INT:
+        return "{} {}".format(arg.type, arg.name)
+    if t.kind == TypeKind.DOUBLE:
+        return "{} {}".format(arg.type, arg.name)
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.RECORD:
+            return '{} {}'.format(
+                t.pointee.name.replace(
+                    'const ', ''), arg.name)
+    raise Exception(
+        'Type {} has no defined dotnet parameter translation (adding one may be trivial)'.format(
+            t.name))
+
+
+def to_dotnet_output_param(t):
+    if t.kind == TypeKind.INT:
+        return t
+    if t.kind == TypeKind.DOUBLE:
+        return t
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "IntPtr"
+    raise Exception(
+        'Type {} has no defined dotnet output parameter translation (adding one may be trivial)'.format(
+            t.name))
+
+
+def to_dotnet_output_value(t, rv):
+    if t.kind == TypeKind.INT:
+        return "{} {}".format(t, rv)
+    if t.kind == TypeKind.DOUBLE:
+        return "{} {}".format(t, rv)
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "IntPtr {} = IntPtr.Zero".format(rv)
+    raise Exception(
+        'Type {} has no defined dotnet output value translation (adding one may be trivial)'.format(
+            t.name))
+
+
+def to_dotnet_return_type(t):
+    if t.kind == TypeKind.INT:
+        return t
+    if t.kind == TypeKind.DOUBLE:
+        return t
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "string"
+    raise Exception(
+        'Type {} has no defined dotnet return type translation (adding one may be trivial)'.format(
+            t.name))
+
+
+def dotnet_to_c_arg(arg):
+    t = arg.type
+    if t.kind == TypeKind.INT:
+        return arg.name
+    if t.kind == TypeKind.DOUBLE:
+        return arg.name
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.RECORD:
+            return "{}.c_obj_".format(arg.name)
+    raise Exception(
+        'Type {} has no defined dotnet to c argument translation (adding one may be trivial)'.format(
+            t.name))
+
+
+def to_dotnet_return_value(t, rv):
+    if t.kind == TypeKind.INT:
+        return rv
+    if t.kind == TypeKind.DOUBLE:
+        return rv
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "Marshal.PtrToStringAnsi({})".format(rv)
+    raise Exception(
+        'Type {} has no defined dotnet return value translation (adding one may be trivial)'.format(
+            t.name))

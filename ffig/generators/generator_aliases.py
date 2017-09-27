@@ -4,6 +4,7 @@
 import ffig.generators
 
 aliases = {
+    'dotnet': 'cs.tmpl',
     'lua': 'lua.tmpl',
     'ruby': 'rb.tmpl',
 }
