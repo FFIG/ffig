@@ -7,22 +7,18 @@ matrix:
   include:
     - os: linux
       sudo: required
-      env:
-        global:
-          - DOCKER_REPOSITORY=jbcoe/ffig
-          - DOCKER_CACHE_FILE=/home/travis/docker/cache.tar.gz
       services:
         - docker
       install:
         - docker pull ffig/ffig-base
-        - docker build -t ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} .
+        - docker build . -t ffig-ci
       before_install:
         - pip install pep8
       script:
-        - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -t --python-path python2 --venv"
-        - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python2 --venv"
-        - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -t --python-path python3 --venv"
-        - docker run ${DOCKER_REPOSITORY}:${TRAVIS_COMMIT} /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python3 --venv"
+        - docker run ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python2 --venv"
+        - docker run ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python2 --venv"
+        - docker run ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python3 --venv"
+        - docker run ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python3 --venv"
         - ./scripts/codechecks.py
 
     - os: osx
