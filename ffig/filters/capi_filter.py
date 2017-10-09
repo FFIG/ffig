@@ -332,6 +332,8 @@ def to_dotnet_output_param(t):
     if t.kind == TypeKind.POINTER:
         if t.pointee.kind == TypeKind.CHAR_S:
             return "IntPtr"
+        if t.pointee.kind == TypeKind.RECORD:
+            return "IntPtr"
     raise Exception(
         'Type {} has no defined dotnet output parameter translation (adding one may be trivial)'.format(
             t.name))
@@ -344,6 +346,8 @@ def to_dotnet_output_value(t, rv):
         return "{} {}".format(t, rv)
     if t.kind == TypeKind.POINTER:
         if t.pointee.kind == TypeKind.CHAR_S:
+            return "IntPtr {} = IntPtr.Zero".format(rv)
+        if t.pointee.kind == TypeKind.RECORD:
             return "IntPtr {} = IntPtr.Zero".format(rv)
     raise Exception(
         'Type {} has no defined dotnet output value translation (adding one may be trivial)'.format(
@@ -358,6 +362,8 @@ def to_dotnet_return_type(t):
     if t.kind == TypeKind.POINTER:
         if t.pointee.kind == TypeKind.CHAR_S:
             return "string"
+        if t.pointee.kind == TypeKind.RECORD:
+            return t.pointee.name.replace('const ', '')
     raise Exception(
         'Type {} has no defined dotnet return type translation (adding one may be trivial)'.format(
             t.name))
@@ -385,6 +391,8 @@ def to_dotnet_return_value(t, rv):
     if t.kind == TypeKind.POINTER:
         if t.pointee.kind == TypeKind.CHAR_S:
             return "Marshal.PtrToStringAnsi({})".format(rv)
+        if t.pointee.kind == TypeKind.RECORD:
+            return 'new {}({})'.format(t.pointee.name.replace('const ', ''), rv)
     raise Exception(
         'Type {} has no defined dotnet return value translation (adding one may be trivial)'.format(
             t.name))
