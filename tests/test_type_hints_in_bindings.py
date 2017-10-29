@@ -1,11 +1,10 @@
 from Asset import *
 from Shape import *
 from Tree import *
+from nose.tools import make_decorator
 
 if sys.version_info[0] == 3:
     from typing import *
-
-from nose.tools import make_decorator
 
 
 def python3only(func):

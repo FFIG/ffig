@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "*.tmpl": "jinja"
+    },
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "build/**" : true,
+        "**/*.pyc" : true,
+        "**/__pycache__" : true,
+        ".vscode/tags" : true
+    },
+    "python.formatting.formatOnSave": true,
+    "python.autoComplete.extraPaths": [
+        "build/generated"
+    ]
+
+}

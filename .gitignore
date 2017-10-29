@@ -25,3 +25,4 @@ demos/Shape_mocks.h
 demos/cmake_install.cmake
 demos/libShape_c.dylib
 build
+.vscode/tags
