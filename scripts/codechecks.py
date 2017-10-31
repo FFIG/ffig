@@ -7,7 +7,7 @@ import subprocess
 import sys
 import os
 
-logging.basicConfig(level=logging.INFO, format='%(message)s')
+logging.basicConfig(level=logging.ERROR, format='%(message)s')
 log = logging.getLogger('codechecks')
 
 ProcessResult = collections.namedtuple('ProcessResult',
@@ -44,14 +44,13 @@ def python_checks(files, reformat=False):
     ]
 
     if reformat:
-        command = ['autopep8', '--aggressive', '--aggressive', '--in-place']
+        command = ['python', '-m', 'autopep8', '--aggressive', '--aggressive', '--in-place']
         command.extend(files)
         if not _capture_output(command):
             return False
 
-    command = ['pep8', '--ignore={0}'.format(','.join(ignored))]
-    command.extend(files)
-    return _capture_output(command)
+    command = ['python', '-m', 'autopep8', '--ignore={0}'.format(','.join(ignored))]
+    return all([_capture_output(command + [f]) for f in files])
 
 
 def main():

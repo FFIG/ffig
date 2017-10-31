@@ -392,7 +392,9 @@ def to_dotnet_return_value(t, rv):
         if t.pointee.kind == TypeKind.CHAR_S:
             return "Marshal.PtrToStringAnsi({})".format(rv)
         if t.pointee.kind == TypeKind.RECORD:
-            return 'new {}({})'.format(t.pointee.name.replace('const ', ''), rv)
+            return 'new {}({})'.format(
+                t.pointee.name.replace(
+                    'const ', ''), rv)
     raise Exception(
         'Type {} has no defined dotnet return value translation (adding one may be trivial)'.format(
             t.name))

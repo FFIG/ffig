@@ -13,7 +13,7 @@ matrix:
         - docker pull ffig/ffig-base
         - docker build . -t ffig-ci
       before_install:
-        - pip install pep8
+        - pip install autopep8
       script:
         - docker run ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python2 --venv"
         - docker run ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python2 --venv"
