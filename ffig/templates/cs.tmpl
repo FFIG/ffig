@@ -51,10 +51,10 @@ namespace {{module.name}}_c {
 
   public class Exception : System.Exception {
 
-    [DllImport("lib{{module.name}}_c.dylib")]
+    [DllImport("lib{{module.name}}_c")]
     private static extern void {{module.name}}_clear_error();
 
-    [DllImport("lib{{module.name}}_c.dylib")]
+    [DllImport("lib{{module.name}}_c")]
     private static extern IntPtr {{module.name}}_error();
 
     public Exception() : base(Marshal.PtrToStringAnsi({{module.name}}_error())) {
@@ -64,18 +64,18 @@ namespace {{module.name}}_c {
 {% for class in classes %}
   public class {{class.name}} {
 
-    [DllImport("lib{{module.name}}_c.dylib")]
+    [DllImport("lib{{module.name}}_c")]
     private static extern int {{module.name}}_{{class.name}}_dispose(IntPtr c_obj);
   {% for method in class.constructors %}
-    [DllImport("lib{{module.name}}_c.dylib")]
+    [DllImport("lib{{module.name}}_c")]
     private static extern int {{module.name}}_{{class.name}}_create({{method_c_parameters(method, trailing_comma=True)}}out IntPtr ptr);
   {% endfor %}
   {%- for method in class.methods %}
     {% if not method.returns_void -%}
-    [DllImport("lib{{module.name}}_c.dylib")]
+    [DllImport("lib{{module.name}}_c")]
     private static extern int {{module.name}}_{{class.name}}_{{method.name}}(IntPtr c_obj, {{method_c_parameters(method, trailing_comma=True)}}out {{method.return_type|to_dotnet_output_param}} rv);
     {%- else -%}
-    [DllImport("lib{{module.name}}_c.dylib")]
+    [DllImport("lib{{module.name}}_c")]
     private static extern int {{module.name}}_{{class.name}}_{{method.name}}(IntPtr c_obj, {{method_c_parameters(method)}});
     {%- endif %}
   {% endfor %}
@@ -127,7 +127,7 @@ namespace {{module.name}}_c {
   {% for impl in class.impls %}
   public class {{impl.name}} : {{module.name}}_c.{{class.name}} {
     {% for method in impl.constructors %}
-    [DllImport("lib{{module.name}}_c.dylib")]
+    [DllImport("lib{{module.name}}_c")]
     private static extern int {{module.name}}_{{impl.name}}_create({{method_c_parameters(method, trailing_comma=True)}}out IntPtr ptr);
 
     public {{impl.name}}({{method_parameters(method)}}) {

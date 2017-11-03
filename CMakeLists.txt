@@ -71,12 +71,17 @@ endif()
 
 # Look for C#
 # FIXME: Make this less hacky, ideally using a real CMake module
-execute_process(COMMAND mcs --version RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
-if(result)
-  message(STATUS "Dotnet tests disabled: mcs executable not found.")
-else()
-  set(CSharp_FOUND 1)
-  set(CSharp_COMPILER "mcs")
+# FIXME: Get dotnet bindings working on Windows (Fix Appveyor CI failures)
+if(NOT WIN32)
+  execute_process(COMMAND dotnet --version RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
+  if(result)
+    message(STATUS "Dotnet tests disabled: dotnet executable not found.")
+  else()
+    set(dotnet_FOUND 1)
+    configure_file(${CMAKE_SOURCE_DIR}/tests/dotnet/TestShape.cs.in ${CMAKE_BINARY_DIR}/generated/TestShape.cs)
+    configure_file(${CMAKE_SOURCE_DIR}/tests/dotnet/TestTree.cs.in ${CMAKE_BINARY_DIR}/generated/TestTree.cs)
+    configure_file(${CMAKE_SOURCE_DIR}/tests/dotnet/ffig.net.csproj.in ${CMAKE_BINARY_DIR}/generated/ffig.net.csproj)
+  endif()
 endif()
 
 set(all_ffig_bindings "PYTHON;CPP;CPP_MOCKS")
@@ -88,14 +93,14 @@ if(Go_FOUND)
   list(APPEND all_ffig_bindings "GO")
 endif()
 
-if(CSharp_FOUND)
+if(dotnet_FOUND)
   list(APPEND all_ffig_bindings "DOTNET")
 endif()
 
 # Add FFIG build targets
 ffig_add_library(NAME Shape INPUTS tests/input/Shape.h ${all_ffig_bindings})
 
-if(CSharp_FOUND)
+if(dotnet_FOUND)
   ffig_add_library(NAME Tree INPUTS tests/input/Tree.h NOEXCEPT PYTHON CPP DOTNET)
 else()
   ffig_add_library(NAME Tree INPUTS tests/input/Tree.h NOEXCEPT PYTHON CPP)
@@ -143,7 +148,7 @@ add_test(
   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
 set_property(TEST test_cpp_tree PROPERTY LABELS CPP)
 
-if(CSharp_FOUND)
+if(dotnet_FOUND)
   add_test(
     NAME test_dotnet_shape_output
     COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py ${CMAKE_SOURCE_DIR}/tests/expected_output/Shape.cs ${CMAKE_BINARY_DIR}/generated/Shape.cs)
@@ -155,9 +160,10 @@ if(CSharp_FOUND)
   set_property(TEST test_dotnet_tree_output PROPERTY LABELS DOTNET)
 
   add_test(
-    NAME test_dotnet_parse_source
-    COMMAND ${CSharp_COMPILER} --parse ${CMAKE_BINARY_DIR}/generated/Shape.cs ${CMAKE_BINARY_DIR}/generated/Tree.cs)
-  set_property(TEST test_dotnet_parse_source PROPERTY LABELS DOTNET)
+    NAME test_dotnet
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/dotnet.py ${CMAKE_BINARY_DIR}/generated)
+  set_property(TEST test_dotnet PROPERTY LABELS DOTNET)
+
 endif()
 
 if(LuaJIT_FOUND)
