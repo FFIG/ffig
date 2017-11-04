@@ -43,7 +43,7 @@ def to_c(t, m):
     raise Exception('Type {} has no known c equivalent'.format(t.name))
 
 
-def to_go(t):
+def to_go(t, impl):
     if t.kind == TypeKind.INT:
         return 'int'
     if t.kind == TypeKind.DOUBLE:
@@ -52,7 +52,7 @@ def to_go(t):
         if t.pointee.kind == TypeKind.CHAR_S:
             return 'string'
         if t.pointee.kind == TypeKind.RECORD:
-            return t.pointee.name.replace('const ', '')
+            return impl
     raise Exception('Type {} has no known Go equivalent'.format(t.name))
 
 

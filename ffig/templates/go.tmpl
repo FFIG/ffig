@@ -21,20 +21,21 @@ func init() {
 }
 
 {% for class in classes %}
-type {{class.name}} struct {
+{%- for impl in class.impls %}
+type {{impl.name}} struct {
     ptr C.{{module.name}}_{{class.name}}
 }
+{% endfor -%}
 {% endfor %}
 
 {% for class in classes -%}
 {% for impl in class.impls %}
 {% for method in impl.constructors %}
-
-func {{ impl.name }}_create({{go_macros.go_method_parameters(method)}}) ({{class.name}}, bool) {
+func {{ impl.name }}_create({{go_macros.go_method_parameters(method, impl)}}) ({{impl.name}}, bool) {
     var pv C.RT_{{module.name}}_{{impl.name}}_create
     pv = C.CGo_{{module.name}}_{{impl.name}}_create({{go_macros.go_arguments_to_c_arguments(module, method)}})
 
-    var obj {{class.name}}
+    var obj {{impl.name}}
 
     if pv.status == 0 {
         obj.ptr = pv.ptr
@@ -43,16 +44,16 @@ func {{ impl.name }}_create({{go_macros.go_method_parameters(method)}}) ({{class
         return obj, true
     }
 }
-
 {%- endfor %}
 {%- endfor %}
 {% endfor %}
 
 {% for class in classes -%}
+{% for impl in class.impls %}
 {% for method in class.methods %}
-func (obj {{class.name}}) {{method.name|to_go_method_name}}({{go_macros.go_method_parameters(method)}})
+func (obj {{impl.name}}) {{method.name|to_go_method_name}}({{go_macros.go_method_parameters(method, impl)}})
         {%- if not method.returns_void -%}
-            ({{method.return_type|to_go}}, bool)
+            ({{method.return_type|to_go(impl)}}, bool)
         {%- else -%}
             bool
         {%- endif -%} {
@@ -67,10 +68,11 @@ func (obj {{class.name}}) {{method.name|to_go_method_name}}({{go_macros.go_metho
         {% else %}return rv.status{% endif %}
     } else {
         {% if not method.returns_void %}
-        var value {{method.return_type|to_go}}
+        var value {{method.return_type|to_go(impl)}}
         return value, false
         {% else %}return rv.status{% endif %}
     }
 }
+{% endfor %}
 {% endfor %}
 {%- endfor %}

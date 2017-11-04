@@ -26,9 +26,9 @@
  # go_method_parameters:
  #   List of parameter names and types converted to Go types.
  #}
-{%- macro go_method_parameters(method, leading_comma=False, trailing_comma=False) -%}
-    {%- call(arg) ffig_macros.comma_separated_list(method.arguments, leading_comma, trailing_comma) -%}
-        {{arg.name}} {{arg.type | to_go}}
+{%- macro go_method_parameters(method, impl, leading_comma=False, trailing_comma=False) -%}
+    {%- call(arg, impl) ffig_macros.comma_separated_list(method.arguments, leading_comma, trailing_comma, impl) -%}
+        {{arg.name}} {{arg.type | to_go(impl.name)}}
     {%- endcall -%}
 {%- endmacro -%}
 
