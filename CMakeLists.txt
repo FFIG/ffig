@@ -151,12 +151,16 @@ set_property(TEST test_cpp_tree PROPERTY LABELS CPP)
 if(dotnet_FOUND)
   add_test(
     NAME test_dotnet_shape_output
-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py ${CMAKE_SOURCE_DIR}/tests/expected_output/Shape.cs ${CMAKE_BINARY_DIR}/generated/Shape.cs)
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py 
+    ${CMAKE_SOURCE_DIR}/tests/expected_output/Shape.cs.expected 
+    ${CMAKE_BINARY_DIR}/generated/Shape.cs)
   set_property(TEST test_dotnet_shape_output PROPERTY LABELS DOTNET)
 
   add_test(
     NAME test_dotnet_tree_output
-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py ${CMAKE_SOURCE_DIR}/tests/expected_output/Tree.cs ${CMAKE_BINARY_DIR}/generated/Tree.cs)
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py 
+    ${CMAKE_SOURCE_DIR}/tests/expected_output/Tree.cs.expected 
+    ${CMAKE_BINARY_DIR}/generated/Tree.cs)
   set_property(TEST test_dotnet_tree_output PROPERTY LABELS DOTNET)
 
   add_test(
