@@ -1,3 +1,4 @@
+[{% for class in classes %}
 {
   "name" : "{{class.name}}"{% if class.methods %},
   "methods" : [{% for method in class.methods %}
@@ -6,4 +7,5 @@
       "return_type" : "{{method.return_type}}"
     }{% if not loop.last %},{% endif %}{% endfor %}
   ]{% endif %}
-}
+}{% if not loop.last %},{% endif %}{% endfor %}
+]
