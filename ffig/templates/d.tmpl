@@ -1,0 +1,10 @@
+{% for class in classes -%}
+class {{class.name}}
+{
+{% for method in class.methods %}
+  void {{method.name}}()
+  {
+  }
+{% endfor %}
+}
+{% endfor %}
