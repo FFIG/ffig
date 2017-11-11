@@ -13,10 +13,13 @@ module {{module.name}}_c
   attach_function :{{module.name}}_error, [], :string
   attach_function :{{module.name}}_clear_error, [], :void 
   {% for method in class.methods %}
-  attach_function :{{module.name}}_{{class.name}}_{{method.name}}, [:pointer{% for arg in method.arguments %}, :{{arg.type|to_ruby_type}}{% endfor %}, :pointer], :int{% endfor %}
+  attach_function :{{module.name}}_{{class.name}}_{{method.name}}, [:pointer{% for arg in method.arguments %}, :{{arg.type|to_ruby_type}}{% endfor %}, :pointer], :int
+  {% endfor %}
   {% for impl in class.impls %}{% for method in impl.constructors %}
-  attach_function :{{module.name}}_{{impl.name}}_create, [{% for arg in method.arguments %}:{{arg.type|to_ruby_type}},{% endfor %} :pointer], :int{% endfor %}{% endfor %}
-{% endfor -%}
+  attach_function :{{module.name}}_{{impl.name}}_create, [{% for arg in method.arguments %}:{{arg.type|to_ruby_type}},{% endfor %} :pointer], :int
+  {% endfor %}{% endfor %}
+{% endfor %}
+
 end
 
 class {{module.name}}Error < Exception

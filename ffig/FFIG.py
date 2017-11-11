@@ -126,7 +126,10 @@ def set_template_env(template_dir):
     Input:
     - template_dir path
     """
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir))
+    env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(template_dir),
+        lstrip_blocks=True,
+        trim_blocks=True)
     for f, _ in inspect.getmembers(ffig.filters.capi_filter):
         # for f in ['to_output_ctype', 'to_ctype']:
         env.filters[f] = getattr(ffig.filters.capi_filter, f)

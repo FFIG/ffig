@@ -1,20 +1,15 @@
 class Tree
 {
-
   void left_subtree()
   {
   }
-
   void right_subtree()
   {
   }
-
   void data()
   {
   }
-
   void set_data()
   {
   }
-
 }

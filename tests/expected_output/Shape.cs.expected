@@ -22,32 +22,32 @@ namespace Shape_c {
 
     [DllImport("libShape_c")]
     private static extern int Shape_AbstractShape_dispose(IntPtr c_obj);
-  
+
     [DllImport("libShape_c")]
     private static extern int Shape_AbstractShape_area(IntPtr c_obj, out double rv);
-  
+
     [DllImport("libShape_c")]
     private static extern int Shape_AbstractShape_perimeter(IntPtr c_obj, out double rv);
-  
+
     [DllImport("libShape_c")]
     private static extern int Shape_AbstractShape_name(IntPtr c_obj, out IntPtr rv);
-  
+
     [DllImport("libShape_c")]
     private static extern int Shape_AbstractShape_is_equal(IntPtr c_obj, IntPtr s, out int rv);
-  
+
     protected IntPtr c_obj_;
-  
+
     protected AbstractShape() {
     }
 
     protected AbstractShape(IntPtr c_obj) {
       c_obj_ = c_obj;
     }
-    
+
     ~AbstractShape() {
       Shape_AbstractShape_dispose(c_obj_);
     }
-  
+
     public double area() {
       double rv;
       int rc = Shape_AbstractShape_area(c_obj_, out rv);
@@ -56,7 +56,7 @@ namespace Shape_c {
       }
       return rv;
     }
-  
+
     public double perimeter() {
       double rv;
       int rc = Shape_AbstractShape_perimeter(c_obj_, out rv);
@@ -65,7 +65,7 @@ namespace Shape_c {
       }
       return rv;
     }
-  
+
     public string name() {
       IntPtr rv = IntPtr.Zero;
       int rc = Shape_AbstractShape_name(c_obj_, out rv);
@@ -74,7 +74,7 @@ namespace Shape_c {
       }
       return Marshal.PtrToStringAnsi(rv);
     }
-  
+
     public int is_equal(AbstractShape s) {
       int rv;
       int rc = Shape_AbstractShape_is_equal(c_obj_, s.c_obj_, out rv);
@@ -84,9 +84,9 @@ namespace Shape_c {
       return rv;
     }
   }
-  
+
   public class Circle : Shape_c.AbstractShape {
-    
+
     [DllImport("libShape_c")]
     private static extern int Shape_Circle_create(double radius, out IntPtr ptr);
 
@@ -97,9 +97,9 @@ namespace Shape_c {
       }
     }
   }
-  
+
   public class Square : Shape_c.AbstractShape {
-    
+
     [DllImport("libShape_c")]
     private static extern int Shape_Square_create(double side, out IntPtr ptr);
 
@@ -110,9 +110,9 @@ namespace Shape_c {
       }
     }
   }
-  
+
   public class Pentagon : Shape_c.AbstractShape {
-    
+
     [DllImport("libShape_c")]
     private static extern int Shape_Pentagon_create(double side, out IntPtr ptr);
 
@@ -123,5 +123,5 @@ namespace Shape_c {
       }
     }
   }
-  
+
 }

@@ -1,0 +1,58 @@
+{% import 'ffig.macros' as ffig_macros %}
+
+{#
+ # constructor_parameters:
+ #   Generates a list of parameter names suitable for use in a constructor
+ #   definition. Commas are inserted between each element of the list.
+ #   Leading and trailing commas can be added by setting leading_comma or
+ #   trailing_comma to True as appropriate. This is useful if there are other
+ #   parameters that must be declared.
+#}
+{% macro constructor_parameters(method, leading_comma=False, trailing_comma=False) %}
+    {% call(arg) ffig_macros.comma_separated_list(method.arguments, leading_comma, trailing_comma) -%}
+        {{arg.name}}=None
+    {%- endcall %}
+{% endmacro %}
+
+{#
+ # method_parameters:
+ #   Generates a list of parameter names suitable for use in a method
+ #   definition. Commas are inserted between each element of the list.
+ #   Leading and trailing commas can be added by setting leading_comma or
+ #   trailing_comma to True as appropriate. This is useful if there are other
+ #   parameters that must be declared.
+#}
+{% macro method_parameters(method, leading_comma=False, trailing_comma=False) %}
+    {% call(arg) ffig_macros.comma_separated_list(method.arguments, leading_comma, trailing_comma) -%}
+        {{arg.name}}
+    {%- endcall %}
+{% endmacro %}
+
+{#
+ # method_arguments:
+ #   Generates a list of argument names suitable for use in a
+ #   function call.  Commas are inserted between each element of the list.
+ #   Leading and trailing commas can be added by setting leading_comma or
+ #   trailing_comma to True as appropriate. This is useful if there are other
+ #   parameters that must be declared.
+ #}
+{% macro method_arguments(method, leading_comma=False, trailing_comma=False) %}
+    {% call(arg) ffig_macros.comma_separated_list(method.arguments, leading_comma, trailing_comma) -%}
+        {{arg.name}}
+    {%- endcall %}
+{% endmacro %}
+
+{#
+ # method_argument_types:
+ #   Generates a list of argument names suitable for use in a method
+ #   registration function call.  Commas are inserted between each element of
+ #   the list.  Leading and trailing commas can be added by setting
+ #   leading_comma or trailing_comma to True as appropriate. This is useful if
+ #   there are other parameters that must be declared.
+ #}
+{% macro method_argument_types(method, leading_comma=False, trailing_comma=False) %}
+    {% call(arg) ffig_macros.comma_separated_list(method.arguments, leading_comma, trailing_comma) -%}
+        {{arg.type | to_py2_ctype}}
+    {%- endcall %}
+{% endmacro %}
+
