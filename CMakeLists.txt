@@ -184,6 +184,7 @@ if(LuaJIT_FOUND)
     COMMAND ${LuaJIT_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_asset_bindings.lua
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
   set_property(TEST test_asset_lua PROPERTY LABELS LUA)
+  set_property(TEST test_asset_lua PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/generated")
 endif()
 
 if(Ruby_FOUND)
