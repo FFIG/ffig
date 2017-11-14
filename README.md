@@ -19,9 +19,13 @@ encourage anyone looking to generate language bindings to look at SWIG.
 
 # Setup (Linux)
 
-You will need libclang >=3.8.
+You will need Python (2 or 3), ninja-build, cmake, and gcc (or clang).
+
+You will need libclang >=3.8. 
 
 libclang can be installed from here: <http://llvm.org/releases/>
+
+If you use a package manager to install libclang you may need to set up a symlink so that the name `libclang.so` exists.
 
 Set `LD_LIBRARY_PATH` so that libclang can be found.
 
