@@ -59,6 +59,7 @@ if(NOT Ruby_FOUND)
   message(STATUS "Ruby tests disabled: Ruby interpreter not found.")
 endif()
 
+
 # Look for Lua
 # FIXME: Make this less hacky.
 execute_process(COMMAND luajit -e "print('testing')" RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
@@ -78,13 +79,13 @@ if(NOT WIN32)
     message(STATUS "Dotnet tests disabled: dotnet executable not found.")
   else()
     set(dotnet_FOUND 1)
-    configure_file(${CMAKE_SOURCE_DIR}/tests/dotnet/TestShape.cs.in ${CMAKE_BINARY_DIR}/generated/TestShape.cs)
     configure_file(${CMAKE_SOURCE_DIR}/tests/dotnet/TestTree.cs.in ${CMAKE_BINARY_DIR}/generated/TestTree.cs)
+    configure_file(${CMAKE_SOURCE_DIR}/tests/dotnet/TestShape.cs.in ${CMAKE_BINARY_DIR}/generated/TestShape.cs)
     configure_file(${CMAKE_SOURCE_DIR}/tests/dotnet/ffig.net.csproj.in ${CMAKE_BINARY_DIR}/generated/ffig.net.csproj)
   endif()
 endif()
 
-set(all_ffig_bindings "PYTHON;CPP;CPP_MOCKS")
+set(all_ffig_bindings "PYTHON;CPP;CPP_MOCKS;DOTNET")
 if(Ruby_FOUND)
   list(APPEND all_ffig_bindings "RUBY")
 endif()
@@ -93,19 +94,9 @@ if(Go_FOUND)
   list(APPEND all_ffig_bindings "GO")
 endif()
 
-if(dotnet_FOUND)
-  list(APPEND all_ffig_bindings "DOTNET")
-endif()
-
 # Add FFIG build targets
 ffig_add_library(NAME Shape INPUTS tests/input/Shape.h ${all_ffig_bindings})
-
-if(dotnet_FOUND)
-  ffig_add_library(NAME Tree INPUTS tests/input/Tree.h NOEXCEPT PYTHON CPP D DOTNET)
-else()
-  ffig_add_library(NAME Tree INPUTS tests/input/Tree.h NOEXCEPT PYTHON CPP D)
-endif()
-
+ffig_add_library(NAME Tree INPUTS tests/input/Tree.h NOEXCEPT PYTHON CPP D SWIFT DOTNET)
 ffig_add_library(NAME Asset INPUTS tests/input/Asset.h PYTHON LUA)
 ffig_add_library(NAME Animal INPUTS tests/input/Animal.h PYTHON)
     
@@ -153,23 +144,30 @@ add_test(
   COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py
   ${CMAKE_SOURCE_DIR}/tests/expected_output/Tree.d.expected
   ${CMAKE_BINARY_DIR}/generated/Tree.d)
-set_property(TEST test_d_tree_output PROPERTY LABELS D)
+set_property(TEST test_d_tree_output PROPERTY LABELS D TEXT)
+
+add_test(
+  NAME test_dotnet_shape_output
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py 
+  ${CMAKE_SOURCE_DIR}/tests/expected_output/Shape.cs.expected 
+  ${CMAKE_BINARY_DIR}/generated/Shape.cs)
+set_property(TEST test_dotnet_shape_output PROPERTY LABELS DOTNET TEXT)
+
+add_test(
+  NAME test_dotnet_tree_output
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py 
+  ${CMAKE_SOURCE_DIR}/tests/expected_output/Tree.cs.expected 
+  ${CMAKE_BINARY_DIR}/generated/Tree.cs)
+set_property(TEST test_dotnet_tree_output PROPERTY LABELS DOTNET TEXT)
+
+add_test(
+  NAME test_swift_tree_output
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py 
+  ${CMAKE_SOURCE_DIR}/tests/expected_output/Tree.swift.expected 
+  ${CMAKE_BINARY_DIR}/generated/Tree.swift)
+set_property(TEST test_swift_tree_output PROPERTY LABELS SWIFT TEXT)
 
 if(dotnet_FOUND)
-  add_test(
-    NAME test_dotnet_shape_output
-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py 
-    ${CMAKE_SOURCE_DIR}/tests/expected_output/Shape.cs.expected 
-    ${CMAKE_BINARY_DIR}/generated/Shape.cs)
-  set_property(TEST test_dotnet_shape_output PROPERTY LABELS DOTNET)
-
-  add_test(
-    NAME test_dotnet_tree_output
-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py 
-    ${CMAKE_SOURCE_DIR}/tests/expected_output/Tree.cs.expected 
-    ${CMAKE_BINARY_DIR}/generated/Tree.cs)
-  set_property(TEST test_dotnet_tree_output PROPERTY LABELS DOTNET)
-
   add_test(
     NAME test_dotnet
     COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/dotnet.py ${CMAKE_BINARY_DIR}/generated)

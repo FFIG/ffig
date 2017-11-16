@@ -29,13 +29,14 @@
 # * CPP_MOCKS - creates myModuleName_mocks.h
 
 function(ffig_add_library)
-    set(options RUBY PYTHON CPP CPP_MOCKS GO LUA DOTNET D NOEXCEPT)
+  set(options RUBY PYTHON CPP CPP_MOCKS GO LUA DOTNET D SWIFT NOEXCEPT)
   set(oneValueArgs NAME INPUTS)
   cmake_parse_arguments(ffig_add_library "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   set(module ${ffig_add_library_NAME})
   set(input ${ffig_add_library_INPUTS})
 
+  # Always generate c-api bindings as all other bindings use them.
   set(ffig_invocation "-i;${input};-m;${module};-o;${CMAKE_BINARY_DIR}/generated;-b;_c.h.tmpl;_c.cpp.tmpl")
   set(ffig_outputs "${CMAKE_BINARY_DIR}/generated/${module}_c.h;${CMAKE_BINARY_DIR}/generated/${module}_c.cpp")  
   set(ffig_output_dir "${CMAKE_BINARY_DIR}/generated")
@@ -74,6 +75,11 @@ function(ffig_add_library)
     set(ffig_invocation "${ffig_invocation};d.tmpl")
     set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/${module}.d")
   endif()
+  if(ffig_add_library_SWIFT)
+    set(ffig_invocation "${ffig_invocation};swift.tmpl")
+    set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/${module}.swift")
+  endif()
+  # NOEXCEPT must come after all the language bindings as it add another flag.
   if(ffig_add_library_NOEXCEPT)
     set(ffig_invocation "${ffig_invocation};--noexcept")
   endif()
