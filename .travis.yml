@@ -27,7 +27,7 @@ matrix:
       install:
         - brew update
         - brew install ninja python3
-        - sudo pip2 install --upgrade pip && sudo pip2 install jinja2 nose backports.typing
+        - sudo pip2 install --upgrade pip && sudo pip2 install jinja2 nose
         - sudo pip3 install --upgrade pip && sudo pip3 install jinja2 nose
         - gem install ffi
       script:
