@@ -1,6 +1,6 @@
-from Asset import *
-from Shape import *
-from Tree import *
+from asset import *
+from shape import *
+from tree import *
 from nose.tools import make_decorator
 
 if sys.version_info[0] == 3:

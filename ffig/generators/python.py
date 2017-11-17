@@ -5,7 +5,8 @@ import os
 
 
 def generator(module_name, binding, api_classes, env, output_dir):
-    module_dir = os.path.join(output_dir, module_name)
+    # Module name should be lowercase to conform with PEP-8:
+    module_dir = os.path.join(output_dir, module_name.lower())
     if not os.path.exists(module_dir):
         os.makedirs(module_dir)
 

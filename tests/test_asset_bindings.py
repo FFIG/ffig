@@ -1,4 +1,4 @@
-from Asset import *
+from asset import *
 
 
 def test_no_argument_constructor():

@@ -1,4 +1,4 @@
-from Tree import *
+from tree import *
 
 
 def test_root_node_is_non_null():
