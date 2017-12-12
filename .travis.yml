@@ -23,12 +23,12 @@ matrix:
 
     - os: osx
       language: generic
-      osx_image: xcode8
+      osx_image: xcode9.2
       install:
         - brew update
         - brew install ninja python3
-        - sudo pip2 install --upgrade pip && sudo pip2 install jinja2 nose pycodestyle
-        - sudo pip3 install --upgrade pip && sudo pip3 install jinja2 nose pycodestyle
+        - pip2 install --user --upgrade pip && pip2 install --user jinja2 nose pycodestyle
+        - pip3 install --user --upgrade pip && pip3 install --user jinja2 nose pycodestyle
         - gem install ffi
       script:
         - ./scripts/build.py -t
