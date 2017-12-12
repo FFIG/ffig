@@ -27,6 +27,7 @@ matrix:
       install:
         - brew update
         - brew install ninja python3
+        - brew cask install caskroom/cask/dotnet
         - pip2 install --user --upgrade pip && pip2 install --user jinja2 nose pycodestyle
         - pip3 install --user --upgrade pip && pip3 install --user jinja2 nose pycodestyle
         - gem install ffi
