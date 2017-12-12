@@ -40,6 +40,9 @@ Install Xcode. FFIG will use the version of libclang distributed with Xcode.
 Work in progress, minor issues expected.
 
 
+# Setup (Generic)
+The following steps will need to be performed for all build platforms.
+
 ## Submodules
 Tests use the 'catch' test framework: <https://github.com/philsquared/Catch.git>
 
@@ -49,8 +52,20 @@ To get the submodule run:
 git submodule update --init
 ```
 
+## Package Dependencies
+Python package dependencies can be installed with
 
-## Building
+```
+pip install -r requirements.txt
+```
+
+Ruby dependencies can be installed with
+
+```
+gem install ffi
+```
+
+# Building
 The build uses cmake driven by a simple Python script. To build and run tests, run the following from the console:
 
 ```
