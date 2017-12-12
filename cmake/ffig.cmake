@@ -100,5 +100,15 @@ function(ffig_add_library)
   add_custom_command(TARGET ${module}_c
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${module}_c> ${ffig_output_dir}/)
+
+  if(ffig_add_library_PYTHON)
+      # Run pycodestyle on generated Python. Ignore line-length errors,
+      # as with generated code we have no control over the length of
+      # type or function names supplied as input.
+      add_custom_command(TARGET ${module}_c
+          POST_BUILD
+          COMMAND python -m pycodestyle --ignore=E501 ${ffig_output_dir}/${module_lower}
+          DEPENDS ${ffig_outputs})
+  endif()
 endfunction()
 

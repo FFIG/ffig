@@ -59,12 +59,12 @@ class {{class.name}}:
         return cls(_p=ptr)
     {% for method in class.constructors %}
 
-    def __init__(self, {{py3_macros.constructor_parameters(method, trailing_comma=True)}} _p=None) -> '{{class.name}}':
+    def __init__(self, {{py3_macros.constructor_parameters(method, trailing_comma=True)}}_p=None) -> '{{class.name}}':
         if _p:
             self.ptr = _p
         else:
             self.ptr = c_object_p()
-            rc = conf.lib.{{module.name}}_{{ class.name }}_create({{py3_macros.method_arguments(method, trailing_comma=True)}} byref(self.ptr))
+            rc = conf.lib.{{module.name}}_{{ class.name }}_create({{py3_macros.method_arguments(method, trailing_comma=True)}}byref(self.ptr))
             if rc != 0:
                 raise {{module.name}}_error()
     {% endfor %}
@@ -114,12 +114,12 @@ class {{impl.name}}({{class.name}}):
         return cls(_p=ptr)
 {% for method in impl.constructors %}
 
-    def __init__(self, {{py3_macros.constructor_parameters(method, trailing_comma=True)}} _p=None) -> '{{impl.name}}':
+    def __init__(self, {{py3_macros.constructor_parameters(method, trailing_comma=True)}}_p=None) -> '{{impl.name}}':
         if _p:
             self.ptr = _p
         else:
             self.ptr = c_object_p()
-            rc = conf.lib.{{module.name}}_{{ impl.name }}_create({{py3_macros.method_arguments(method, trailing_comma=True)}} byref(self.ptr))
+            rc = conf.lib.{{module.name}}_{{ impl.name }}_create({{py3_macros.method_arguments(method, trailing_comma=True)}}byref(self.ptr))
             if rc != 0:
                 raise {{module.name}}_error()
 {% endfor %}
@@ -142,14 +142,14 @@ methodList = [
 {% if not class.is_abstract %}
 {% for method in class.constructors %}
     ("{{module.name}}_{{class.name}}_create",
-        [{{py3_macros.method_argument_types(method, trailing_comma=True)}} POINTER(c_object_p)],
+        [{{py3_macros.method_argument_types(method, trailing_comma=True)}}POINTER(c_object_p)],
         c_int),
 {% endfor %}
 {% endif %}
 {% for impl in class.impls %}
 {% for method in impl.constructors %}
     ("{{module.name}}_{{ impl.name }}_create",
-        [{{py3_macros.method_argument_types(method, trailing_comma=True)}} POINTER(c_object_p)],
+        [{{py3_macros.method_argument_types(method, trailing_comma=True)}}POINTER(c_object_p)],
         c_int),
 {% endfor %}
 {% endfor %}
@@ -184,7 +184,7 @@ class CachedProperty(object):
         self.wrapped = wrapped
         try:
             self.__doc__ = wrapped.__doc__
-        except:
+        except Exception:
             pass
 
     def __get__(self, instance, instance_type=None):
@@ -245,7 +245,7 @@ class Config:
                         os.path.dirname(os.path.dirname(__file__)))
                     library = cdll.LoadLibrary(
                         os.path.join(lib_file_dir, self._get_filename()))
-                except:
+                except Exception:
                     # Use system library path (last).
                     library = cdll.LoadLibrary(self._get_filename())
         except OSError as e:

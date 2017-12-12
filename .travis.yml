@@ -1,4 +1,4 @@
-# Modify this line to test Travis Integration ....
+# Modify this line to test Travis Integration ...
 sudo: required
 
 language: python
@@ -27,8 +27,8 @@ matrix:
       install:
         - brew update
         - brew install ninja python3
-        - sudo pip2 install --upgrade pip && sudo pip2 install jinja2 nose
-        - sudo pip3 install --upgrade pip && sudo pip3 install jinja2 nose
+        - sudo pip2 install --upgrade pip && sudo pip2 install jinja2 nose pycodestyle
+        - sudo pip3 install --upgrade pip && sudo pip3 install jinja2 nose pycodestyle
         - gem install ffi
       script:
         - ./scripts/build.py -t

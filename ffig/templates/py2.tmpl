@@ -34,7 +34,7 @@ class {{class.name}}:
             self.ptr = _p
         else:
             self.ptr = c_object_p()
-            rc = conf.lib.{{module.name}}_{{ class.name }}_create({{py2_macros.method_arguments(method, trailing_comma=True)}} byref(self.ptr))
+            rc = conf.lib.{{module.name}}_{{ class.name }}_create({{py2_macros.method_arguments(method, trailing_comma=True)}}byref(self.ptr))
             if rc != 0:
                 raise {{module.name}}_error()
     {% endfor %}
@@ -84,12 +84,12 @@ class {{impl.name}}({{class.name}}):
         return cls(_p=ptr)
     {% for method in impl.constructors %}
 
-    def __init__(self, {{py2_macros.constructor_parameters(method, trailing_comma=True)}} _p=None):
+    def __init__(self, {{py2_macros.constructor_parameters(method, trailing_comma=True)}}_p=None):
         if _p:
             self.ptr = _p
         else:
             self.ptr = c_object_p()
-            rc = conf.lib.{{module.name}}_{{ impl.name }}_create({{py2_macros.method_arguments(method, trailing_comma=True)}} byref(self.ptr))
+            rc = conf.lib.{{module.name}}_{{ impl.name }}_create({{py2_macros.method_arguments(method, trailing_comma=True)}}byref(self.ptr))
             if rc != 0:
                 raise {{module.name}}_error()
     {% endfor %}
@@ -150,7 +150,7 @@ class CachedProperty(object):
         self.wrapped = wrapped
         try:
             self.__doc__ = wrapped.__doc__
-        except:
+        except Exception:
             pass
 
     def __get__(self, instance, instance_type=None):
@@ -211,7 +211,7 @@ class Config:
                         os.path.dirname(os.path.dirname(__file__)))
                     library = cdll.LoadLibrary(
                         os.path.join(lib_file_dir, self._get_filename()))
-                except:
+                except Exception:
                     # Use system library path (last).
                     library = cdll.LoadLibrary(self._get_filename())
         except OSError as e:
