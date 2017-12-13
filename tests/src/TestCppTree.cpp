@@ -34,3 +34,10 @@ TEST_CASE("Test move", "[cpp_api::tree]")
   REQUIRE(uprooted.left_subtree().data() == data);
 }
 
+TEST_CASE("Test noexcept", "[cpp_api::tree, noexcept]")
+{
+    REQUIRE(noexcept(Tree(3)));
+    auto root = Tree(3);
+    REQUIRE(noexcept(root.left_subtree()));
+    REQUIRE(noexcept(root.right_subtree()));
+}

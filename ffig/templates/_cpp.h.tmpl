@@ -47,13 +47,19 @@ public:
 {% if not class.is_abstract %}
   {% for method in class.constructors %}
 
-  {{class.name}}({{method_parameters(method)}})
+  {{class.name}}({{method_parameters(method)}}) {% if method.is_noexcept %}noexcept{% endif %}
   {
-    int rc = {{module.name}}_{{class.name}}_create(
-      {{method_arguments(method, trailing_comma=True)}}
-      &object_);
-    if ( rc == {{module.name}}_RC_SUCCESS ) return;
-    throw exception();
+    {% if method.is_noexcept %}
+        object_ = {{module.name}}_{{class.name}}_create_noexcept(
+            {{method_arguments(method)}}
+            );
+    {% else %}
+        int rc = {{module.name}}_{{class.name}}_create(
+          {{method_arguments(method, trailing_comma=True)}}
+          &object_);
+        if ( rc == {{module.name}}_RC_SUCCESS ) return;
+        throw exception();
+    {% endif %}
   }
   {% endfor %}
 {% endif %}
@@ -89,32 +95,54 @@ public:
   }
 {% for method in class.methods %}
 
-  {{method.return_type | to_cpp_type}} {{method.name}}({{method_parameters(method)}}) const
+  {{method.return_type | to_cpp_type}} {{method.name}}({{method_parameters(method)}}) const {% if method.is_noexcept %}noexcept{% endif %}
   {
     {% if method.returns_void %}
-    int rc = {{module.name}}_{{class.name}}_{{method.name}}(
-      object_
-      {{method_arguments(method, leading_comma=True)}});
+        {% if method.is_noexcept %}
+            {{module.name}}_{{class.name}}_{{method.name}}_noexcept(
+                object_
+                {{method_arguments(method, leading_comma=True)}});
+        {% else %}
+            int rc = {{module.name}}_{{class.name}}_{{method.name}}(
+              object_
+              {{method_arguments(method, leading_comma=True)}});
+        {% endif %}
     {% else %}
-    {{method.return_type | to_cpp_type}} rv;
-    {% if method.returns_sub_object %}
-    int rc = {{module.name}}_{{class.name}}_{{method.name}}(
-      object_
-      {{method_arguments(method, leading_comma=True, trailing_comma=False)}},
-      &rv.object_);
-    {% else %}
-    int rc = {{module.name}}_{{class.name}}_{{method.name}}(
-      object_
-      {{method_arguments(method, leading_comma=True, trailing_comma=False)}},
-      &rv);
-    {% endif %}
+        {{method.return_type | to_cpp_type}} rv;
+        {% if method.returns_sub_object %}
+            {% if method.is_noexcept %}
+                rv.object_ = {{module.name}}_{{class.name}}_{{method.name}}_noexcept(
+                  object_
+                  {{method_arguments(method, leading_comma=True)}});
+            {% else %}
+                int rc = {{module.name}}_{{class.name}}_{{method.name}}(
+                  object_
+                  {{method_arguments(method, leading_comma=True)}},
+                  &rv.object_);
+            {% endif %}
+        {% else %}
+            {% if method.is_noexcept %}
+                rv = {{module.name}}_{{class.name}}_{{method.name}}_noexcept(
+                    object_
+                    {{method_arguments(method, leading_comma=True)}});
+            {% else %}
+                int rc = {{module.name}}_{{class.name}}_{{method.name}}(
+                  object_
+                  {{method_arguments(method, leading_comma=True)}},
+                  &rv);
+            {% endif %}
+        {% endif %}
     {% endif %}
 
-    if (rc == {{module.name}}_RC_SUCCESS)
-    {
-        return{% if not method.returns_void %} rv {% endif %};
-    }
-    throw exception();
+    {% if method.is_noexcept %}
+        return {% if not method.returns_void %} rv {% endif %};
+    {% else %}
+        if (rc == {{module.name}}_RC_SUCCESS)
+        {
+            return{% if not method.returns_void %} rv {% endif %};
+        }
+        throw exception();
+    {% endif %}
   }
 {% endfor %}
 };
@@ -125,16 +153,21 @@ class {{impl.name}} : public {{class.name}}
 public:
   {% for method in impl.constructors %}
 
-  {{impl.name}}({{method_parameters(method)}})
+  {{impl.name}}({{method_parameters(method)}}) {% if method.is_noexcept %}noexcept{% endif %}
   {
-    int rc = {{module.name}}_{{impl.name}}_create(
-      {{method_arguments(method, trailing_comma=True)}}
-      &object_);
-    if ( rc == {{module.name}}_RC_SUCCESS )
-    {
-      return;
-    }
-    throw exception();
+    {% if method.is_noexcept %}
+        object_ = {{module.name}}_{{impl.name}}_create_noexcept(
+            {{method_arguments(method)}});
+    {% else %}
+        int rc = {{module.name}}_{{impl.name}}_create(
+          {{method_arguments(method, trailing_comma=True)}}
+          &object_);
+        if ( rc == {{module.name}}_RC_SUCCESS )
+        {
+          return;
+        }
+        throw exception();
+    {% endif %}
   }
   {% endfor %}
 };
