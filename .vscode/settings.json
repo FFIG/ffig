@@ -5,14 +5,13 @@
     "files.exclude": {
         "**/.git": true,
         "**/.DS_Store": true,
-        "build/**" : true,
-        "**/*.pyc" : true,
-        "**/__pycache__" : true,
-        ".vscode/tags" : true
+        "build/**": true,
+        "**/*.pyc": true,
+        "**/__pycache__": true,
+        ".vscode/tags": true
     },
-    "python.formatting.formatOnSave": true,
+    "editor.formatOnSave": true,
     "python.autoComplete.extraPaths": [
         "build/generated"
     ]
-
 }
