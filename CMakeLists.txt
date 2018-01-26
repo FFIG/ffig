@@ -94,6 +94,8 @@ if(Go_FOUND)
   list(APPEND all_ffig_bindings "GO")
 endif()
 
+file(GLOB_RECURSE FFIG_SOURCE ${CMAKE_SOURCE_DIR}/ffig/*)
+
 # Add FFIG build targets
 ffig_add_library(NAME Shape INPUTS tests/input/Shape.h ${all_ffig_bindings})
 ffig_add_library(NAME Tree INPUTS tests/input/Tree.h NOEXCEPT PYTHON CPP D SWIFT DOTNET)

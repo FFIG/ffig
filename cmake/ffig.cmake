@@ -87,9 +87,8 @@ function(ffig_add_library)
 
   add_custom_command(OUTPUT ${ffig_outputs}
     COMMAND ${PYTHON_EXECUTABLE} -m ffig ${ffig_invocation}
-    DEPENDS ${input}
+    DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-
 
   # FIXME: This is a bit ugly. The header is copied next to the generated bindings.
   file(COPY ${input} DESTINATION ${ffig_output_dir}/)
