@@ -13,4 +13,5 @@ testEnv = os.environ.copy()
 testEnv['LD_LIBRARY_PATH'] = gen_dir
 
 subprocess.check_call("dotnet restore", cwd=gen_dir, shell=True, env=testEnv)
-subprocess.check_call("dotnet test -v diag -o .", cwd=gen_dir, shell=True, env=testEnv)
+subprocess.check_call("dotnet test -v diag -o .",
+                      cwd=gen_dir, shell=True, env=testEnv)

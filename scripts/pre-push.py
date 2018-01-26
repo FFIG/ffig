@@ -13,9 +13,11 @@ try:
     subprocess.check_call([check_script])
     sys.exit(0)
 except subprocess.CalledProcessError:
-    print('\n****')
-    print(
-        'The code checks failed. Please run\n  {0} --reformat'.format(check_script))
-    print('and commit the changes before pushing.')
-    print('****\n')
+    print("""
+****************************************
+The code checks failed. Please run
+{check_script} --reformat
+and commit the changes before pushing.
+****************************************
+""".format(check_script=check_script))
     sys.exit(1)
