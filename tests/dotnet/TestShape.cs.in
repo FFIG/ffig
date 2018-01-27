@@ -1,53 +1,54 @@
-using Xunit;
 using Shape_c;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestFFIG
 {
+    [TestClass]
     public class TestShape
     {
-        [Fact]
+        [TestMethod]
         public void CircleName()
         {
           double radius = 2.0;
           var circle = new Circle(radius);
           
-          Assert.Equal(circle.name(), "Circle");
+          Assert.AreEqual(circle.name(), "Circle");
         }
         
-        [Fact]
+        [TestMethod]
         public void CircleArea()
         {
           double radius = 2.0;
           var circle = new Circle(radius);
           
-          Assert.Equal(circle.area(), 12.56637061436, 10);
+          Assert.AreEqual(circle.area(), 12.56637061436, 10);
         }
         
-        [Fact]
+        [TestMethod]
         public void CirclePerimeter()
         {
           double radius = 2.0;
           var circle = new Circle(radius);
           
-          Assert.Equal(circle.perimeter(), 12.5663706144, 10);
+          Assert.AreEqual(circle.perimeter(), 12.5663706144, 10);
         }
         
-        [Fact]
+        [TestMethod]
         public void CircleEquality()
         {
           var circle1 = new Circle(3);
           var circle2 = new Circle(3);
           
-          Assert.Equal(circle1.is_equal(circle2), 1);
+          Assert.AreEqual(circle1.is_equal(circle2), 1);
         }
         
-        [Fact]
+        [TestMethod]
         public void CircleInequality()
         {
           var circle1 = new Circle(3);
           var circle2 = new Circle(4);
           
-          Assert.Equal(circle1.is_equal(circle2), 0);
+          Assert.AreEqual(circle1.is_equal(circle2), 0);
         }
     }
 }

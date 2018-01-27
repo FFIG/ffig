@@ -1,30 +1,31 @@
-using Xunit;
 using Tree_c;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestFFIG
 {
+    [TestClass]
     public class TestTree
     {
-        [Fact]
+        [TestMethod]
         public void DepthIsAsConstructed()
         {
           var tree = new Tree(1);
           
-          Assert.NotNull(tree.left_subtree());
-          Assert.Null(tree.left_subtree().left_subtree());
+          Assert.IsNotNull(tree.left_subtree());
+          Assert.IsNull(tree.left_subtree().left_subtree());
         }
         
-        [Fact]
+        [TestMethod]
         public void DataIsAsSet()
         {
           var tree = new Tree(1);
                             
           tree.set_data(42);
 
-          Assert.Equal(tree.data(), 42);
+          Assert.AreEqual(tree.data(), 42);
         }
         
-        [Fact]
+        [TestMethod]
         public void LifetimeExtension()
         {
           var tree = new Tree(1);
@@ -33,7 +34,7 @@ namespace TestFFIG
           tree = null;
           left.set_data(42);
 
-          Assert.Equal(left.data(), 42);
+          Assert.AreEqual(left.data(), 42);
         }
     }
 }
