@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 
 # FIXME: This silences a warning but I'm not sure why its needed.
 set(CMAKE_MACOSX_RPATH 1)
@@ -101,7 +101,20 @@ ffig_add_library(NAME Shape INPUTS tests/input/Shape.h ${all_ffig_bindings})
 ffig_add_library(NAME Tree INPUTS tests/input/Tree.h NOEXCEPT PYTHON CPP D SWIFT DOTNET)
 ffig_add_library(NAME Asset INPUTS tests/input/Asset.h PYTHON LUA)
 ffig_add_library(NAME Animal INPUTS tests/input/Animal.h PYTHON)
-    
+
+# build dotnet test dll
+# FIXME: Work out how to get dependencies calculated more robustly
+if(dotnet_FOUND)
+  file(GLOB TEST_INPUT ${CMAKE_SOURCE_DIR}/tests/input/*.h)
+  add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/generated/ffig.net.dll
+    COMMAND dotnet build ffig.net.csproj -o .
+    DEPENDS ${CMAKE_BINARY_DIR}/generated/Shape.cs;${CMAKE_BINARY_DIR}/generated/Tree.cs
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated
+    COMMENT "Building DOTNET assembly ffig.net.dll")
+  add_custom_target(ffig.net ALL
+    DEPENDS ${CMAKE_BINARY_DIR}/generated/ffig.net.dll)
+endif()
+
 add_subdirectory(tests/src)
 
 enable_testing()
@@ -150,31 +163,32 @@ set_property(TEST test_d_tree_output PROPERTY LABELS D TEXT)
 
 add_test(
   NAME test_dotnet_shape_output
-  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py 
-  ${CMAKE_SOURCE_DIR}/tests/expected_output/Shape.cs.expected 
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py
+  ${CMAKE_SOURCE_DIR}/tests/expected_output/Shape.cs.expected
   ${CMAKE_BINARY_DIR}/generated/Shape.cs)
 set_property(TEST test_dotnet_shape_output PROPERTY LABELS DOTNET TEXT)
 
 add_test(
   NAME test_dotnet_tree_output
-  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py 
-  ${CMAKE_SOURCE_DIR}/tests/expected_output/Tree.cs.expected 
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py
+  ${CMAKE_SOURCE_DIR}/tests/expected_output/Tree.cs.expected
   ${CMAKE_BINARY_DIR}/generated/Tree.cs)
 set_property(TEST test_dotnet_tree_output PROPERTY LABELS DOTNET TEXT)
 
 add_test(
   NAME test_swift_tree_output
-  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py 
-  ${CMAKE_SOURCE_DIR}/tests/expected_output/Tree.swift.expected 
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py
+  ${CMAKE_SOURCE_DIR}/tests/expected_output/Tree.swift.expected
   ${CMAKE_BINARY_DIR}/generated/Tree.swift)
 set_property(TEST test_swift_tree_output PROPERTY LABELS SWIFT TEXT)
 
 if(dotnet_FOUND)
   add_test(
     NAME test_dotnet
-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/dotnet.py ${CMAKE_BINARY_DIR}/generated)
+    COMMAND dotnet test --no-build --no-restore -o .
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
   set_property(TEST test_dotnet PROPERTY LABELS DOTNET)
-
+  set_property(TEST test_dotnet PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/generated")
 endif()
 
 if(LuaJIT_FOUND)
