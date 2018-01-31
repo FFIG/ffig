@@ -18,7 +18,7 @@ if(NOT WIN32)
   set(CMAKE_SHARED_LINKER_FLAGS_ASAN "-fsanitize=address")
 endif()
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 include(ffig)
 
 include_directories(externals/catch/include)
@@ -82,7 +82,6 @@ else()
   configure_file(${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/ffig.net.csproj.in ${CMAKE_CURRENT_BINARY_DIR}/generated/ffig.net.csproj)
 endif()
 
-
 set(all_ffig_bindings "PYTHON;CPP;CPP_MOCKS;DOTNET")
 if(Ruby_FOUND)
   list(APPEND all_ffig_bindings "RUBY")
@@ -92,7 +91,7 @@ if(Go_FOUND)
   list(APPEND all_ffig_bindings "GO")
 endif()
 
-file(GLOB_RECURSE FFIG_SOURCE ${CMAKE_SOURCE_DIR}/ffig/*)
+file(GLOB_RECURSE FFIG_SOURCE ${CMAKE_CURRENT_LIST_DIR}/ffig/*)
 
 # Add FFIG build targets
 ffig_add_library(NAME Shape INPUTS tests/input/Shape.h ${all_ffig_bindings})
@@ -103,14 +102,14 @@ ffig_add_library(NAME Animal INPUTS tests/input/Animal.h PYTHON)
 # build dotnet test dll
 # FIXME: Work out how to get dependencies calculated more robustly
 if(dotnet_FOUND)
-  file(GLOB TEST_INPUT ${CMAKE_SOURCE_DIR}/tests/input/*.h)
-  add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/generated/ffig.net.dll
+  file(GLOB TEST_INPUT ${CMAKE_CURRENT_LIST_DIR}/tests/input/*.h)
+  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/ffig.net.dll
     COMMAND dotnet build ffig.net.csproj -o .
-    DEPENDS ${CMAKE_BINARY_DIR}/generated/Shape.cs;${CMAKE_BINARY_DIR}/generated/Tree.cs
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.cs;${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.cs
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
     COMMENT "Building DOTNET assembly ffig.net.dll")
   add_custom_target(ffig.net ALL
-    DEPENDS ${CMAKE_BINARY_DIR}/generated/ffig.net.dll)
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/ffig.net.dll)
 endif()
 
 add_subdirectory(tests/src)
@@ -119,91 +118,91 @@ enable_testing()
 
 add_test(
   NAME test_cppmodel
-  COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_SOURCE_DIR}/tests/cppmodel
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/ffig)
+  COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_CURRENT_LIST_DIR}/tests/cppmodel
+  WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/ffig)
 
 add_test(
   NAME test_python_bindings
-  COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_SOURCE_DIR}/tests
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+  COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_CURRENT_LIST_DIR}/tests
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 set_property(TEST test_python_bindings PROPERTY LABELS PYTHON)
 
 add_test(
   NAME test_cpp_mocks
-  COMMAND ${CMAKE_BINARY_DIR}/tests/src/TestShapeMocks
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestShapeMocks
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 set_property(TEST test_cpp_mocks PROPERTY LABELS MOCKS)
 
 add_test(
   NAME test_cpp_circle
-  COMMAND ${CMAKE_BINARY_DIR}/tests/src/TestCppCircle
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestCppCircle
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 set_property(TEST test_cpp_circle PROPERTY LABELS CPP)
 
 add_test(
   NAME test_tree_capi
-  COMMAND ${CMAKE_BINARY_DIR}/tests/src/TestTreeCAPI
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestTreeCAPI
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 set_property(TEST test_tree_capi PROPERTY LABELS C)
 
 add_test(
   NAME test_cpp_tree
-  COMMAND ${CMAKE_BINARY_DIR}/tests/src/TestCppTree
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestCppTree
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 set_property(TEST test_cpp_tree PROPERTY LABELS CPP)
 
 add_test(
   NAME test_d_tree_output
-  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py
-  ${CMAKE_SOURCE_DIR}/tests/expected_output/Tree.d.expected
-  ${CMAKE_BINARY_DIR}/generated/Tree.d)
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
+  ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Tree.d.expected
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.d)
 set_property(TEST test_d_tree_output PROPERTY LABELS D TEXT)
 
 add_test(
   NAME test_dotnet_shape_output
-  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py
-  ${CMAKE_SOURCE_DIR}/tests/expected_output/Shape.cs.expected
-  ${CMAKE_BINARY_DIR}/generated/Shape.cs)
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
+  ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Shape.cs.expected
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.cs)
 set_property(TEST test_dotnet_shape_output PROPERTY LABELS DOTNET TEXT)
 
 add_test(
   NAME test_dotnet_tree_output
-  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py
-  ${CMAKE_SOURCE_DIR}/tests/expected_output/Tree.cs.expected
-  ${CMAKE_BINARY_DIR}/generated/Tree.cs)
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
+  ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Tree.cs.expected
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.cs)
 set_property(TEST test_dotnet_tree_output PROPERTY LABELS DOTNET TEXT)
 
 add_test(
   NAME test_swift_tree_output
-  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/pydiff.py
-  ${CMAKE_SOURCE_DIR}/tests/expected_output/Tree.swift.expected
-  ${CMAKE_BINARY_DIR}/generated/Tree.swift)
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
+  ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Tree.swift.expected
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.swift)
 set_property(TEST test_swift_tree_output PROPERTY LABELS SWIFT TEXT)
 
 if(dotnet_FOUND)
   add_test(
     NAME test_dotnet
     COMMAND dotnet test --no-build --no-restore -o .
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
   set_property(TEST test_dotnet PROPERTY LABELS DOTNET)
-  set_property(TEST test_dotnet PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/generated")
+  set_property(TEST test_dotnet PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
 endif()
 
 if(LuaJIT_FOUND)
   # FIXME: The relative paths here (and in the lua test file) are very brittle.
   add_test(
     NAME test_asset_lua
-    COMMAND ${LuaJIT_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/test_asset_bindings.lua
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+    COMMAND ${LuaJIT_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/tests/test_asset_bindings.lua
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
   set_property(TEST test_asset_lua PROPERTY LABELS LUA)
-  set_property(TEST test_asset_lua PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/generated")
+  set_property(TEST test_asset_lua PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
 endif()
 
 if(Ruby_FOUND)
   add_test(
     NAME test_ruby_bindings
-    COMMAND ${RUBY_EXECUTABLE} ${CMAKE_SOURCE_DIR}/tests/TestShape.rb ${CMAKE_SOURCE_DIR}/tests/TestShape.rb
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/generated)
+    COMMAND ${RUBY_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/tests/TestShape.rb ${CMAKE_CURRENT_LIST_DIR}/tests/TestShape.rb
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
   set_property(TEST test_ruby_bindings PROPERTY LABELS RUBY)
 endif()
 

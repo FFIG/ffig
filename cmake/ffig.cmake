@@ -6,7 +6,7 @@
 # that make use of the C-API. 
 #
 # FIXME: Make output directory user-configurable.
-# Currently the generated bindings and libraries go into ${CMAKE_BINARY_DIR}/generated.
+# Currently the generated bindings and libraries go into ${CMAKE_CURRENT_BINARY_DIR}/generated.
 #
 # Usage:
 #
@@ -37,9 +37,9 @@ function(ffig_add_library)
   set(input ${ffig_add_library_INPUTS})
 
   # Always generate c-api bindings as all other bindings use them.
-  set(ffig_invocation "-i;${input};-m;${module};-o;${CMAKE_BINARY_DIR}/generated;-b;_c.h.tmpl;_c.cpp.tmpl")
-  set(ffig_outputs "${CMAKE_BINARY_DIR}/generated/${module}_c.h;${CMAKE_BINARY_DIR}/generated/${module}_c.cpp")  
-  set(ffig_output_dir "${CMAKE_BINARY_DIR}/generated")
+  set(ffig_invocation "-i;${input};-m;${module};-o;${CMAKE_CURRENT_BINARY_DIR}/generated;-b;_c.h.tmpl;_c.cpp.tmpl")
+  set(ffig_outputs "${CMAKE_CURRENT_BINARY_DIR}/generated/${module}_c.h;${CMAKE_CURRENT_BINARY_DIR}/generated/${module}_c.cpp")  
+  set(ffig_output_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
 
   if(ffig_add_library_RUBY)
     set(ffig_invocation "${ffig_invocation};ruby")
@@ -88,7 +88,7 @@ function(ffig_add_library)
   add_custom_command(OUTPUT ${ffig_outputs}
     COMMAND ${PYTHON_EXECUTABLE} -m ffig ${ffig_invocation}
     DEPENDS ${input} ${FFIG_SOURCE}
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
     COMMENT "Generating FFIG bindings for ${input}: ${ffig_outputs}")
 
   # FIXME: This is a bit ugly. The header is copied next to the generated bindings.
