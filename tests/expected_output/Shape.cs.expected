@@ -7,10 +7,10 @@ namespace Shape_c {
 
   public class Exception : System.Exception {
 
-    [DllImport("libShape_c")]
+    [DllImport("Shape_c")]
     private static extern void Shape_clear_error();
 
-    [DllImport("libShape_c")]
+    [DllImport("Shape_c")]
     private static extern IntPtr Shape_error();
 
     public Exception() : base(Marshal.PtrToStringAnsi(Shape_error())) {
@@ -20,19 +20,19 @@ namespace Shape_c {
 
   public class AbstractShape {
 
-    [DllImport("libShape_c")]
+    [DllImport("Shape_c")]
     private static extern int Shape_AbstractShape_dispose(IntPtr c_obj);
 
-    [DllImport("libShape_c")]
+    [DllImport("Shape_c")]
     private static extern int Shape_AbstractShape_area(IntPtr c_obj, out double rv);
 
-    [DllImport("libShape_c")]
+    [DllImport("Shape_c")]
     private static extern int Shape_AbstractShape_perimeter(IntPtr c_obj, out double rv);
 
-    [DllImport("libShape_c")]
+    [DllImport("Shape_c")]
     private static extern int Shape_AbstractShape_name(IntPtr c_obj, out IntPtr rv);
 
-    [DllImport("libShape_c")]
+    [DllImport("Shape_c")]
     private static extern int Shape_AbstractShape_is_equal(IntPtr c_obj, IntPtr s, out int rv);
 
     protected IntPtr c_obj_;
@@ -87,7 +87,7 @@ namespace Shape_c {
 
   public class Circle : Shape_c.AbstractShape {
 
-    [DllImport("libShape_c")]
+    [DllImport("Shape_c")]
     private static extern int Shape_Circle_create(double radius, out IntPtr ptr);
 
     public Circle(double radius) {
@@ -100,7 +100,7 @@ namespace Shape_c {
 
   public class Square : Shape_c.AbstractShape {
 
-    [DllImport("libShape_c")]
+    [DllImport("Shape_c")]
     private static extern int Shape_Square_create(double side, out IntPtr ptr);
 
     public Square(double side) {
@@ -113,7 +113,7 @@ namespace Shape_c {
 
   public class Pentagon : Shape_c.AbstractShape {
 
-    [DllImport("libShape_c")]
+    [DllImport("Shape_c")]
     private static extern int Shape_Pentagon_create(double side, out IntPtr ptr);
 
     public Pentagon(double side) {

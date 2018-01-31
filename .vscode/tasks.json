@@ -6,7 +6,20 @@
         {
             "taskName": "build",
             "type": "shell",
-            "command": "python scripts/build.py -t"
+            "command": "python scripts/build.py",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "taskName": "test",
+            "type": "shell",
+            "command": "python scripts/build.py -t",
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
         }
     ]
 }

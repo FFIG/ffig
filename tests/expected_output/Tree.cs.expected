@@ -7,10 +7,10 @@ namespace Tree_c {
 
   public class Exception : System.Exception {
 
-    [DllImport("libTree_c")]
+    [DllImport("Tree_c")]
     private static extern void Tree_clear_error();
 
-    [DllImport("libTree_c")]
+    [DllImport("Tree_c")]
     private static extern IntPtr Tree_error();
 
     public Exception() : base(Marshal.PtrToStringAnsi(Tree_error())) {
@@ -20,22 +20,22 @@ namespace Tree_c {
 
   public class Tree {
 
-    [DllImport("libTree_c")]
+    [DllImport("Tree_c")]
     private static extern int Tree_Tree_dispose(IntPtr c_obj);
 
-    [DllImport("libTree_c")]
+    [DllImport("Tree_c")]
     private static extern int Tree_Tree_create(int levels, out IntPtr ptr);
 
-    [DllImport("libTree_c")]
+    [DllImport("Tree_c")]
     private static extern int Tree_Tree_left_subtree(IntPtr c_obj, out IntPtr rv);
 
-    [DllImport("libTree_c")]
+    [DllImport("Tree_c")]
     private static extern int Tree_Tree_right_subtree(IntPtr c_obj, out IntPtr rv);
 
-    [DllImport("libTree_c")]
+    [DllImport("Tree_c")]
     private static extern int Tree_Tree_data(IntPtr c_obj, out int rv);
 
-    [DllImport("libTree_c")]
+    [DllImport("Tree_c")]
     private static extern int Tree_Tree_set_data(IntPtr c_obj, int x);
 
     protected IntPtr c_obj_;

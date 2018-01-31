@@ -72,18 +72,16 @@ endif()
 
 # Look for C#
 # FIXME: Make this less hacky, ideally using a real CMake module
-# FIXME: Get dotnet bindings working on Windows (Fix Appveyor CI failures)
-if(NOT WIN32)
-  execute_process(COMMAND dotnet --version RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
-  if(result)
-    message(STATUS "Dotnet tests disabled: dotnet executable not found.")
-  else()
-    set(dotnet_FOUND 1)
-    configure_file(${CMAKE_SOURCE_DIR}/tests/dotnet/TestTree.cs.in ${CMAKE_BINARY_DIR}/generated/TestTree.cs)
-    configure_file(${CMAKE_SOURCE_DIR}/tests/dotnet/TestShape.cs.in ${CMAKE_BINARY_DIR}/generated/TestShape.cs)
-    configure_file(${CMAKE_SOURCE_DIR}/tests/dotnet/ffig.net.csproj.in ${CMAKE_BINARY_DIR}/generated/ffig.net.csproj)
-  endif()
+execute_process(COMMAND dotnet --version RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
+if(result)
+  message(STATUS "Dotnet tests disabled: dotnet executable not found.")
+else()
+  set(dotnet_FOUND 1)
+  configure_file(${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestTree.cs.in ${CMAKE_CURRENT_BINARY_DIR}/generated/TestTree.cs)
+  configure_file(${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestShape.cs.in ${CMAKE_CURRENT_BINARY_DIR}/generated/TestShape.cs)
+  configure_file(${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/ffig.net.csproj.in ${CMAKE_CURRENT_BINARY_DIR}/generated/ffig.net.csproj)
 endif()
+
 
 set(all_ffig_bindings "PYTHON;CPP;CPP_MOCKS;DOTNET")
 if(Ruby_FOUND)
