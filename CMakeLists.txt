@@ -21,7 +21,7 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 include(ffig)
 
-include_directories(externals/catch/include)
+include_directories(externals/catch2/single_include)
 include_directories(externals/variant/include)
 # FIXME: Use FFIG to get this path.
 include_directories(ffig/include)
