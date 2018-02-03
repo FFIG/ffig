@@ -12,7 +12,7 @@ namespace TestFFIG
           double radius = 2.0;
           var circle = new Circle(radius);
           
-          Assert.AreEqual(circle.name(), "Circle");
+          Assert.AreEqual(circle.name, "Circle");
         }
         
         [TestMethod]
@@ -21,7 +21,7 @@ namespace TestFFIG
           double radius = 2.0;
           var circle = new Circle(radius);
           
-          Assert.AreEqual(circle.area(), 12.56637061436, 10);
+          Assert.AreEqual(circle.area, 12.56637061436, 10);
         }
         
         [TestMethod]
@@ -30,7 +30,7 @@ namespace TestFFIG
           double radius = 2.0;
           var circle = new Circle(radius);
           
-          Assert.AreEqual(circle.perimeter(), 12.5663706144, 10);
+          Assert.AreEqual(circle.perimeter, 12.5663706144, 10);
         }
         
         [TestMethod]

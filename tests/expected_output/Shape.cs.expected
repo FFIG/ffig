@@ -48,31 +48,37 @@ namespace Shape_c {
       Shape_AbstractShape_dispose(c_obj_);
     }
 
-    public double area() {
-      double rv;
-      int rc = Shape_AbstractShape_area(c_obj_, out rv);
-      if(rc != 0) {
-        throw new Shape_c.Exception();
+    public double area {
+      get {
+        double rv;
+        int rc = Shape_AbstractShape_area(c_obj_, out rv);
+        if(rc != 0) {
+          throw new Shape_c.Exception();
+        }
+        return rv;
       }
-      return rv;
     }
 
-    public double perimeter() {
-      double rv;
-      int rc = Shape_AbstractShape_perimeter(c_obj_, out rv);
-      if(rc != 0) {
-        throw new Shape_c.Exception();
+    public double perimeter {
+      get {
+        double rv;
+        int rc = Shape_AbstractShape_perimeter(c_obj_, out rv);
+        if(rc != 0) {
+          throw new Shape_c.Exception();
+        }
+        return rv;
       }
-      return rv;
     }
 
-    public string name() {
-      IntPtr rv = IntPtr.Zero;
-      int rc = Shape_AbstractShape_name(c_obj_, out rv);
-      if(rc != 0) {
-        throw new Shape_c.Exception();
+    public string name {
+      get {
+        IntPtr rv = IntPtr.Zero;
+        int rc = Shape_AbstractShape_name(c_obj_, out rv);
+        if(rc != 0) {
+          throw new Shape_c.Exception();
+        }
+        return Marshal.PtrToStringAnsi(rv);
       }
-      return Marshal.PtrToStringAnsi(rv);
     }
 
     public int is_equal(AbstractShape s) {
