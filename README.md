@@ -56,7 +56,7 @@ git submodule update --init
 Python package dependencies can be installed with
 
 ```
-pip install -r requirements.txt
+pip[3] install -r requirements.txt
 ```
 
 Ruby dependencies can be installed with
@@ -69,7 +69,7 @@ gem install ffi
 The build uses cmake driven by a simple Python script. To build and run tests, run the following from the console:
 
 ```
-./scripts/build.py -t
+./scripts/build.py -t [--python-path=$(which python3)]
 ```
 
 # Continuous integration

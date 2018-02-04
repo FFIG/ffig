@@ -107,7 +107,7 @@ function(ffig_add_library)
       # type or function names supplied as input.
       add_custom_command(TARGET ${module}_c
           POST_BUILD
-          COMMAND python -m pycodestyle --ignore=E501 ${ffig_output_dir}/${module_lower}
+          COMMAND ${PYTHON_EXECUTABLE} -m pycodestyle --ignore=E501 ${ffig_output_dir}/${module_lower}
           DEPENDS ${ffig_outputs})
   endif()
 endfunction()
