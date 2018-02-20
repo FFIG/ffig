@@ -1,6 +1,6 @@
+# FIXME: Work out which CMake version we actually need.
 cmake_minimum_required(VERSION 3.5)
 
-# FIXME: This silences a warning but I'm not sure why its needed.
 set(CMAKE_MACOSX_RPATH 1)
 
 project(test_ffig)
@@ -32,72 +32,108 @@ include_directories(ffig/include)
 if(NOT PYTHON_EXECUTABLE)
   find_package(PythonInterp REQUIRED)
   if(WIN32)
-    execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; assert sys.version_info[0] == 3" RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; assert sys.version_info[0] == 3" 
+                    RESULT_VARIABLE result 
+                    OUTPUT_QUIET 
+                    ERROR_QUIET)
     if(result)
       message(FATAL_ERROR "CMake failed: Python 3 is required for Windows.")
     endif()
   endif()
 else()
-  execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import this" RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
+  execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import this" 
+                  RESULT_VARIABLE result 
+                  OUTPUT_QUIET 
+                  ERROR_QUIET)
   if(result)
     message(FATAL_ERROR "CMake failed: ${PYTHON_EXECUTABLE} cannot execute a simple Python script.")
   endif()
 endif()
 
+set(all_ffig_bindings "PYTHON;CPP;CPP_MOCKS")
+
 # Look for Go
 # FIXME: Make this less hacky, ideally using a real CMake module
-execute_process(COMMAND go version RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
+execute_process(COMMAND go version 
+                RESULT_VARIABLE result 
+                OUTPUT_QUIET 
+                ERROR_QUIET)
 if(result)
   set(Go_FOUND FALSE)
 else()
   set(Go_FOUND True)
+  list(APPEND all_ffig_bindings "GO")
 endif()
 
 # Look for Ruby
 find_package(Ruby)
 if(NOT Ruby_FOUND)
   message(STATUS "Ruby tests disabled: Ruby interpreter not found.")
+else()
+  list(APPEND all_ffig_bindings "RUBY")
 endif()
 
-
 # Look for Lua
-# FIXME: Make this less hacky.
-execute_process(COMMAND luajit -e "print('testing')" RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
+# FIXME: Make this less hacky, ideally using a real CMake module
+execute_process(COMMAND luajit -e "print('testing')" 
+                RESULT_VARIABLE result 
+                OUTPUT_QUIET 
+                ERROR_QUIET)
 if(result)
   message(STATUS "Lua tests disabled: luajit cannot execute a simple Lua script.")
 else()
   set(LuaJIT_FOUND 1)
   set(LuaJIT_EXECUTABLE "luajit")
+  # FIXME: Get Lua bindings working well enough to work with Shape classes and 
+  # add LUA to all_ffig_bindings.
 endif()
 
 # Look for C#
 # FIXME: Make this less hacky, ideally using a real CMake module
-execute_process(COMMAND dotnet --version RESULT_VARIABLE result OUTPUT_QUIET ERROR_QUIET)
+execute_process(COMMAND dotnet --version 
+                RESULT_VARIABLE result 
+                OUTPUT_QUIET 
+                ERROR_QUIET)
 if(result)
   message(STATUS "Dotnet tests disabled: dotnet executable not found.")
 else()
   set(dotnet_FOUND 1)
-  configure_file(${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestTree.cs.in ${CMAKE_CURRENT_BINARY_DIR}/generated/TestTree.cs)
-  configure_file(${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestShape.cs.in ${CMAKE_CURRENT_BINARY_DIR}/generated/TestShape.cs)
-  configure_file(${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/ffig.net.csproj.in ${CMAKE_CURRENT_BINARY_DIR}/generated/ffig.net.csproj)
+  configure_file(${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestTree.cs.in 
+                 ${CMAKE_CURRENT_BINARY_DIR}/generated/TestTree.cs)
+  configure_file(${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestShape.cs.in 
+                 ${CMAKE_CURRENT_BINARY_DIR}/generated/TestShape.cs)
+  configure_file(${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/ffig.net.csproj.in 
+                 ${CMAKE_CURRENT_BINARY_DIR}/generated/ffig.net.csproj)
+  list(APPEND all_ffig_bindings "DOTNET")
 endif()
 
-set(all_ffig_bindings "PYTHON;CPP;CPP_MOCKS;DOTNET")
-if(Ruby_FOUND)
-  list(APPEND all_ffig_bindings "RUBY")
-endif()
 
-if(Go_FOUND)
-  list(APPEND all_ffig_bindings "GO")
-endif()
-
+# Set FFIG_SOURCE so that FFIG-targets are sensitive to changes in FFIG code and templates.
+# The variable FFIG_SOURCE is used by ffig.cmake and is only needed when developing FFIG.
 file(GLOB_RECURSE FFIG_SOURCE ${CMAKE_CURRENT_LIST_DIR}/ffig/*)
 
 # Add FFIG build targets
-ffig_add_library(NAME Shape INPUTS tests/input/Shape.h ${all_ffig_bindings})
-ffig_add_library(NAME Tree INPUTS tests/input/Tree.h NOEXCEPT PYTHON CPP D SWIFT DOTNET)
-ffig_add_library(NAME Asset INPUTS tests/input/Asset.h PYTHON LUA)
-ffig_add_library(NAME Animal INPUTS tests/input/Animal.h PYTHON)
+ffig_add_library(NAME Shape 
+                 INPUTS tests/input/Shape.h 
+                 ${all_ffig_bindings})
+
+ffig_add_library(NAME Tree 
+                 INPUTS tests/input/Tree.h 
+                 CPP 
+                 D 
+                 DOTNET
+                 NOEXCEPT 
+                 PYTHON 
+                 SWIFT)
+
+ffig_add_library(NAME Asset 
+                 INPUTS tests/input/Asset.h 
+                 LUA
+                 PYTHON)
+
+ffig_add_library(NAME Animal 
+                 INPUTS tests/input/Animal.h 
+                 PYTHON)
 
 # build dotnet test dll
 # FIXME: Work out how to get dependencies calculated more robustly
@@ -116,76 +152,92 @@ add_subdirectory(tests/src)
 
 enable_testing()
 
+# FIXME: Run custom clang tests until clang 5 is commonly available.
+# clang 5 has our changes to cindex.py that enable Python3 support.
+
 add_test(
   NAME test_cppmodel
   COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_CURRENT_LIST_DIR}/tests/cppmodel
   WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/ffig)
+set_property(TEST test_cppmodel 
+  PROPERTY LABELS INFRASTRUCTURE)
 
 add_test(
   NAME test_python_bindings
   COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_CURRENT_LIST_DIR}/tests
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-set_property(TEST test_python_bindings PROPERTY LABELS PYTHON)
+set_property(TEST test_python_bindings 
+             PROPERTY LABELS PYTHON)
 
 add_test(
   NAME test_cpp_mocks
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestShapeMocks
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-set_property(TEST test_cpp_mocks PROPERTY LABELS MOCKS)
+set_property(TEST test_cpp_mocks 
+             PROPERTY LABELS MOCKS)
 
 add_test(
   NAME test_cpp_circle
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestCppCircle
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-set_property(TEST test_cpp_circle PROPERTY LABELS CPP)
+set_property(TEST test_cpp_circle 
+             PROPERTY LABELS CPP)
 
 add_test(
   NAME test_tree_capi
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestTreeCAPI
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-set_property(TEST test_tree_capi PROPERTY LABELS C)
+set_property(TEST test_tree_capi 
+             PROPERTY LABELS C)
 
 add_test(
   NAME test_cpp_tree
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestCppTree
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-set_property(TEST test_cpp_tree PROPERTY LABELS CPP)
+set_property(TEST test_cpp_tree 
+             PROPERTY LABELS CPP)
 
 add_test(
   NAME test_d_tree_output
   COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
   ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Tree.d.expected
   ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.d)
-set_property(TEST test_d_tree_output PROPERTY LABELS D TEXT)
-
-add_test(
-  NAME test_dotnet_shape_output
-  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
-  ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Shape.cs.expected
-  ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.cs)
-set_property(TEST test_dotnet_shape_output PROPERTY LABELS DOTNET TEXT)
-
-add_test(
-  NAME test_dotnet_tree_output
-  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
-  ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Tree.cs.expected
-  ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.cs)
-set_property(TEST test_dotnet_tree_output PROPERTY LABELS DOTNET TEXT)
+set_property(TEST test_d_tree_output 
+             PROPERTY LABELS D TEXT)
 
 add_test(
   NAME test_swift_tree_output
   COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
   ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Tree.swift.expected
   ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.swift)
-set_property(TEST test_swift_tree_output PROPERTY LABELS SWIFT TEXT)
+set_property(TEST test_swift_tree_output 
+             PROPERTY LABELS SWIFT TEXT)
 
 if(dotnet_FOUND)
+  add_test(
+    NAME test_dotnet_shape_output
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
+    ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Shape.cs.expected
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.cs)
+  set_property(TEST test_dotnet_shape_output 
+               PROPERTY LABELS DOTNET TEXT)
+
+  add_test(
+    NAME test_dotnet_tree_output
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
+    ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Tree.cs.expected
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.cs)
+  set_property(TEST test_dotnet_tree_output 
+               PROPERTY LABELS DOTNET TEXT)
+
   add_test(
     NAME test_dotnet
     COMMAND dotnet test --no-build --no-restore -o .
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-  set_property(TEST test_dotnet PROPERTY LABELS DOTNET)
-  set_property(TEST test_dotnet PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
+  set_property(TEST test_dotnet 
+               PROPERTY LABELS DOTNET)
+  set_property(TEST test_dotnet 
+               PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
 endif()
 
 if(LuaJIT_FOUND)
@@ -194,14 +246,16 @@ if(LuaJIT_FOUND)
     NAME test_asset_lua
     COMMAND ${LuaJIT_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/tests/test_asset_bindings.lua
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-  set_property(TEST test_asset_lua PROPERTY LABELS LUA)
-  set_property(TEST test_asset_lua PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
+  set_property(TEST test_asset_lua 
+               PROPERTY LABELS LUA)
+  set_property(TEST test_asset_lua 
+               PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
 endif()
 
 if(Ruby_FOUND)
   add_test(
     NAME test_ruby_bindings
-    COMMAND ${RUBY_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/tests/TestShape.rb ${CMAKE_CURRENT_LIST_DIR}/tests/TestShape.rb
+    COMMAND ${RUBY_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/tests/TestShape.rb
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
   set_property(TEST test_ruby_bindings PROPERTY LABELS RUBY)
 endif()
