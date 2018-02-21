@@ -50,6 +50,8 @@ else()
   endif()
 endif()
 
+# FFIG won't work without Python and a C++ compiler so we can assume
+# support for Python and C++ must exist.
 set(all_ffig_bindings "PYTHON;CPP;CPP_MOCKS")
 
 # Look for Go
@@ -71,6 +73,16 @@ if(NOT Ruby_FOUND)
   message(STATUS "Ruby tests disabled: Ruby interpreter not found.")
 else()
   list(APPEND all_ffig_bindings "RUBY")
+endif()
+
+# Look for Java
+find_package(Java)
+find_package(Java COMPONENTS Runtime)
+find_package(Java COMPONENTS Development)
+if(NOT Java_FOUND)
+  message(STATUS "Java tests disabled: Java SDK not found.")
+else()
+  list(APPEND all_ffig_bindings "JAVA")
 endif()
 
 # Look for Lua
@@ -212,6 +224,16 @@ add_test(
   ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.swift)
 set_property(TEST test_swift_tree_output 
              PROPERTY LABELS SWIFT TEXT)
+             
+if(java_FOUND)
+  add_test(
+    NAME test_java_shape_output
+    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
+    ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Shape.java.expected
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.java)
+  set_property(TEST test_java_shape_output 
+                PROPERTY LABELS JAVA TEXT)
+endif()
 
 if(dotnet_FOUND)
   add_test(

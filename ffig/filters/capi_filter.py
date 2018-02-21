@@ -398,3 +398,98 @@ def to_dotnet_return_value(t, rv):
     raise Exception(
         'Type {} has no defined dotnet return value translation (adding one may be trivial)'.format(
             t.name))
+
+
+# Java conversions
+def to_java_c_param(arg):
+    t = arg.type
+    if t.kind == TypeKind.INT:
+        return "{} {}".format(arg.type, arg.name)
+    if t.kind == TypeKind.DOUBLE:
+        return "{} {}".format(arg.type, arg.name)
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.RECORD:
+            return "Pointer {}".format(arg.name)
+    raise Exception(
+        'Type {} has no defined java C parameter translation (adding one may be trivial)'.format(
+            arg.type.name))
+
+
+def to_java_param(arg):
+    t = arg.type
+    if t.kind == TypeKind.INT:
+        return "{} {}".format(arg.type, arg.name)
+    if t.kind == TypeKind.DOUBLE:
+        return "{} {}".format(arg.type, arg.name)
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.RECORD:
+            return '{} {}'.format(
+                t.pointee.name.replace(
+                    'const ', ''), arg.name)
+    raise Exception(
+        'Type {} has no defined java parameter translation (adding one may be trivial)'.format(
+            arg.type.name))
+
+
+def to_java_output_param(t):
+    if t.kind == TypeKind.INT:
+        return "IntByReference"
+    if t.kind == TypeKind.DOUBLE:
+        return "DoubleByReference"
+    if t.kind == TypeKind.POINTER:
+        return "PointerByReference"
+    raise Exception(
+        'Type {} has no defined java output parameter translation (adding one may be trivial)'.format(
+            t.name))
+
+
+def to_java_output_value(t, rv):
+    if t.kind == TypeKind.INT:
+        return "IntByReference {} = new IntByReference();".format(rv)
+    if t.kind == TypeKind.DOUBLE:
+        return "DoubleByReference {} = new DoubleByReference();".format(rv)
+    if t.kind == TypeKind.POINTER:
+        return "PointerByReference {} = new PointerByReference();".format(rv)
+    raise Exception(
+        'Type {} has no defined java output value translation (adding one may be trivial)'.format(
+            t.name))
+
+
+def to_java_return_type(t):
+    if t.kind == TypeKind.DOUBLE:
+        return t
+    if t.kind == TypeKind.INT:
+        return t
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "String"
+    raise Exception(
+        'Type {} has no defined java return type translation (adding one may be trivial)'.format(
+            t.name))
+
+
+def java_to_c_arg(arg):
+    t = arg.type
+    if t.kind == TypeKind.DOUBLE:
+        return arg.name
+    if t.kind == TypeKind.INT:
+        return arg.name
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.RECORD:
+            return "{}.ptr".format(arg.name)
+    raise Exception(
+        'Type {} has no defined java to c argument translation (adding one may be trivial)'.format(
+            arg.type))
+
+
+def to_java_return_value(t, rv):
+    if t.kind == TypeKind.DOUBLE:
+        return "{}.getValue()".format(rv)
+    if t.kind == TypeKind.INT:
+        return "{}.getValue()".format(rv)
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "{}.getValue().getString(0)".format(rv)
+    raise Exception(
+        'Type {} has no defined java return value translation (adding one may be trivial)'.format(
+            t.name))
