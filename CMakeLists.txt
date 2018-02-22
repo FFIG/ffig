@@ -110,10 +110,6 @@ if(result)
   message(STATUS "Dotnet tests disabled: dotnet executable not found.")
 else()
   set(dotnet_FOUND 1)
-  configure_file(${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestTree.cs.in 
-                 ${CMAKE_CURRENT_BINARY_DIR}/generated/TestTree.cs)
-  configure_file(${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestShape.cs.in 
-                 ${CMAKE_CURRENT_BINARY_DIR}/generated/TestShape.cs)
   configure_file(${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/ffig.net.csproj.in 
                  ${CMAKE_CURRENT_BINARY_DIR}/generated/ffig.net.csproj)
   list(APPEND all_ffig_bindings "DOTNET")
@@ -147,17 +143,18 @@ ffig_add_library(NAME Animal
                  INPUTS tests/input/Animal.h 
                  PYTHON)
 
-# build dotnet test dll
-# FIXME: Work out how to get dependencies calculated more robustly
 if(dotnet_FOUND)
-  file(GLOB TEST_INPUT ${CMAKE_CURRENT_LIST_DIR}/tests/input/*.h)
-  add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/ffig.net.dll
-    COMMAND dotnet build ffig.net.csproj -o .
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.cs;${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.cs
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
-    COMMENT "Building DOTNET assembly ffig.net.dll")
-  add_custom_target(ffig.net ALL
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/ffig.net.dll)
+  include(dotnet)
+  set(DOTNET_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
+  add_dotnet_library(NAME ffig.net 
+    DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
+    SOURCES 
+      ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestShape.cs 
+      ${CMAKE_SOURCE_DIR}/tests/dotnet/TestTree.cs 
+      ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.cs 
+      ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.cs 
+      ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.cs
+    )
 endif()
 
 add_subdirectory(tests/src)
