@@ -1,4 +1,5 @@
 from ffig.cppmodel import TypeKind
+import platform
 
 # CPP filter to cast type if required
 
@@ -290,8 +291,15 @@ def to_lua(t, v):
         'Type {} has no defined Lua type restoration'.format(t.name))
 
 
-def to_shared_lib(module):
-    return "lib{}_c.dylib".format(module.name)
+def to_shared_lib(m):
+    name = platform.system()
+    if name == 'Darwin':
+        return 'lib{}_c.dylib'.format(m)
+    elif name == 'Windows':
+        return '{}_c.dll'.format(m)
+    else:
+        return 'lib{}_c.so'.format(m)
+    raise Exception("Unsupported platform {}".format(name))
 
 
 def to_dotnet_c_param(arg):

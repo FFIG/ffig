@@ -7,3 +7,6 @@
 [submodule "externals/catch2"]
 	path = externals/catch2
 	url = https://github.com/catchorg/Catch2.git
+[submodule "externals/ffig-jars"]
+	path = externals/ffig-jars
+	url = https://github.com/FFIG/ffig-jars.git
