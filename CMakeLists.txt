@@ -145,7 +145,7 @@ ffig_add_library(NAME Animal
 
 if(dotnet_FOUND)
   include(dotnet)
-  set(DOTNET_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
+  set(CMAKE_DOTNET_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
   add_dotnet_library(NAME ffig.net 
     DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
     SOURCES 
