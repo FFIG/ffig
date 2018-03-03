@@ -18,7 +18,8 @@
 #define EXPORT extern "C" __attribute__((visibility("default")))
 #endif
 {% for class in classes %}
-typedef const void* {{module.name}}_{{class.name}};
+struct {{module.name}}_{{class.name}}_t;
+typedef struct {{module.name}}_{{class.name}}_t* {{module.name}}_{{class.name}};
 {% endfor %}
 #ifdef __cplusplus
 extern "C"

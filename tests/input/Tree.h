@@ -22,12 +22,12 @@ class FFIG_EXPORT Tree
     right_ = std::make_shared<Tree>(levels-1);
   }
 
-  const Tree* left_subtree() const
+  Tree* left_subtree() const
   {
     return left_.get();
   }
 
-  const Tree* right_subtree() const
+  Tree* right_subtree() const
   {
     return right_.get();
   }
