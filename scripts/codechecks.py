@@ -3,6 +3,7 @@
 import argparse
 import collections
 import logging
+import platform
 import subprocess
 import sys
 import os
@@ -12,6 +13,13 @@ log = logging.getLogger('codechecks')
 
 ProcessResult = collections.namedtuple('ProcessResult',
                                        ['stdout', 'stderr', 'returncode'])
+
+
+def _decode_terminal_output(s):
+    '''Translate teminal output into a Python string'''
+    if platform.python_version_tuple()[0] == '3':
+        return s.decode("utf8")
+    return s
 
 
 def _capture_output(command):
@@ -44,12 +52,14 @@ def python_checks(files, reformat=False):
     ]
 
     if reformat:
-        command = ['python', '-m', 'autopep8', '--aggressive', '--aggressive', '--in-place']
+        command = ['python', '-m', 'autopep8',
+                   '--aggressive', '--aggressive', '--in-place']
         command.extend(files)
         if not _capture_output(command):
             return False
 
-    command = ['python', '-m', 'autopep8', '--ignore={0}'.format(','.join(ignored))]
+    command = ['python', '-m', 'autopep8',
+               '--ignore={0}'.format(','.join(ignored))]
     return all([_capture_output(command + [f]) for f in files])
 
 
@@ -65,7 +75,8 @@ def main():
     args = parser.parse_args()
 
     # Get a list of all the files in this repository:
-    files = subprocess.check_output(['git', 'ls-files']).split('\n')
+    files = _decode_terminal_output(
+        subprocess.check_output(['git', 'ls-files'])).split('\n')
 
     # Ignore files taken and modified from llvm/clang as reformatting makes
     # upstreaming changes hard.
@@ -89,6 +100,7 @@ def main():
     else:
         log.info('Checks passed')
         sys.exit(0)
+
 
 if __name__ == '__main__':
     main()
