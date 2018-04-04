@@ -18,6 +18,7 @@ def find_clang_library_path():
             return path
     raise Exception('Unable to find libclang.dylib')
 
+
 if sys.platform == 'darwin':
     # OS X doesn't use DYLD_LIBRARY_PATH if System Integrity Protection is
     # enabled. Set the library path for libclang manually.

@@ -106,6 +106,12 @@ int {{module.name}}_{{class.name}}_{{method.name}}(
         {% if method.returns_void %}
         (*capi_to_cpp_cast<{{class.impl_name}}>(my{{class.name}}))->{{method.impl_name}}(
             {{c_macros.method_arguments(method)}});
+        {% elif method.returns_object_by_value %}
+        auto p = capi_to_cpp_cast<{{class.impl_name}}>(my{{class.name}});
+        auto subobj_v = (*p)->{{method.impl_name}}({{c_macros.method_arguments(method)}});
+        auto subobj_p = std::make_unique<decltype(subobj_v)>(std::move(subobj_v));
+        auto new_obj = new std::shared_ptr<decltype(subobj_v)>(subobj_p.release());
+        *rv = cpp_to_capi_cast(new_obj);
         {% elif not method.returns_sub_object %}
         *rv = (*capi_to_cpp_cast<{{class.impl_name}}>(my{{class.name}}))->{{method.impl_name}}(
             {{c_macros.method_arguments(method)}});

@@ -145,6 +145,9 @@ ffig_add_library(NAME Animal
                  INPUTS tests/input/Animal.h 
                  PYTHON)
 
+ffig_add_library(NAME Number
+                 INPUTS tests/input/Number.h)
+
 enable_testing()
 add_subdirectory(tests/src)
 
@@ -184,6 +187,13 @@ add_test(
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestTreeCAPI
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 set_property(TEST test_tree_capi 
+             PROPERTY LABELS C)
+
+add_test(
+  NAME test_number_capi
+  COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestNumberCAPI
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
+set_property(TEST test_number_capi 
              PROPERTY LABELS C)
 
 add_test(

@@ -123,6 +123,7 @@ class GeneratorContext(object):
             return default_generator(
                 module_name, binding, api_classes, env, output_dir)
 
+
 # This is the default generator context.
 generator_context = GeneratorContext()
 
@@ -175,6 +176,7 @@ def _scan_plugins():
         elif os.path.isfile(filepath) and entry.endswith('.py'):
             log.info('Found plugin module {}'.format(entry))
             _activate_plugin(os.path.basename(entry)[:-3])
+
 
 # Scan the generators directory for plugins and register them on
 # initialisation.

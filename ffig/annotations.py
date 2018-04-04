@@ -31,5 +31,6 @@ def apply_class_annotations(model_class):
         elif m.return_type.kind == TypeKind.LVALUEREFERENCE:
             m.returns_sub_object = True
             m.returns_nullable = False
-
+        elif m.return_type.kind == TypeKind.RECORD:
+            m.returns_object_by_value = True
     return model_class

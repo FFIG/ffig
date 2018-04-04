@@ -10,6 +10,9 @@ target_link_libraries(TestCppTree Tree_c)
 add_executable(TestTreeCAPI TestTreeCAPI.cpp)
 target_link_libraries(TestTreeCAPI Tree_c)
 
+add_executable(TestNumberCAPI TestNumberCAPI.cpp)
+target_link_libraries(TestNumberCAPI Number_c)
+
 add_executable(TestCppCircle TestCppCircle.cpp)
 target_link_libraries(TestCppCircle Shape_c)
 

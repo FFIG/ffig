@@ -41,6 +41,9 @@ def to_c(t, m):
             return 'const char*'
         if t.pointee.kind == TypeKind.RECORD:
             return '{}_{}'.format(m, t.pointee.name.replace('const ', ''))
+    # Hoist any record-type we don't recognize onto the heap
+    if t.kind == TypeKind.RECORD:
+        return '{}_{}'.format(m, t.name)
     raise Exception('Type {} has no known c equivalent'.format(t.name))
 
 
