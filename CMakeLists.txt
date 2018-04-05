@@ -146,7 +146,8 @@ ffig_add_library(NAME Animal
                  PYTHON)
 
 ffig_add_library(NAME Number
-                 INPUTS tests/input/Number.h)
+                 INPUTS tests/input/Number.h
+                 PYTHON)
 
 enable_testing()
 add_subdirectory(tests/src)

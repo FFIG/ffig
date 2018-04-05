@@ -79,17 +79,17 @@ class {{class.name}}:
         rc = conf.lib.{{module.name}}_{{class.name}}_{{method.name}}(self{{py3_macros.method_arguments(method, leading_comma=True)}})
         if rc != 0:
             raise {{module.name}}_error()
-    {% elif not method.returns_sub_object %}
-        rv = {{method.return_type|to_output_py3_ctype}}()
-        rc = conf.lib.{{module.name}}_{{class.name}}_{{method.name}}(self{{py3_macros.method_arguments(method, leading_comma=True)}}, byref(rv))
-        if rc == 0:
-            return rv.value
-        raise {{module.name}}_error()
-    {% else %}
+    {% elif method.returns_sub_object or method.returns_object_by_value %}
         rv = c_object_p()
         rc = conf.lib.{{module.name}}_{{class.name}}_{{method.name}}(self{{py3_macros.method_arguments(method, leading_comma=True)}}, byref(rv))
         if rc == 0:
             return {{method.return_type|to_py3_ctype}}.from_capi(rv)
+        raise {{module.name}}_error()
+    {% else %}
+        rv = {{method.return_type|to_output_py3_ctype}}()
+        rc = conf.lib.{{module.name}}_{{class.name}}_{{method.name}}(self{{py3_macros.method_arguments(method, leading_comma=True)}}, byref(rv))
+        if rc == 0:
+            return rv.value
         raise {{module.name}}_error()
     {% endif %}
 {% endfor %}

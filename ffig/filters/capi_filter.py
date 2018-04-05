@@ -115,8 +115,7 @@ def c_object(a):
         if t.pointee.kind == TypeKind.RECORD:
             return '{}->object_'.format(n)
     raise Exception(
-        'No object extraction is defined for type {}'.format(
-            t.name))
+        'No object extraction is defined for type {}'.format(t.name))
 
 
 # Python filter to translate C-type to Python ctype type
@@ -135,9 +134,10 @@ def to_py3_ctype(t):
         if t.pointee.kind == TypeKind.RECORD:
             # This is a hack until we can get an unqualified type from libclang
             return t.pointee.name.replace('const ', '')
+    if t.kind == TypeKind.RECORD:
+        return t.name
     raise Exception(
-        'No ctypes equivalent is defined for type {}'.format(
-            t.name))
+        'No ctypes equivalent is defined for type {}'.format(t.name))
 
 
 def to_hint_type(t):
@@ -156,9 +156,10 @@ def to_hint_type(t):
             # This is encoding the assumption that the name of a binding class
             # is the same as the name of the underlying C++ class.
             return to_cpp_type(t)
+    if t.kind == TypeKind.RECORD:
+        return to_cpp_type(t)
     raise Exception(
-        'No ctypes equivalent is defined for type {}'.format(
-            t.name))
+        'No ctypes equivalent is defined for type {}'.format(t.name))
 
 
 def to_output_py3_ctype(t):
@@ -175,9 +176,10 @@ def to_output_py3_ctype(t):
             return 'c_interop_string'
         if t.pointee.kind == TypeKind.RECORD:
             return 'c_object_p'
+    if t.kind == TypeKind.RECORD:
+        return 'c_object_p'
     raise Exception(
-        'No ctypes equivalent is defined for type {}'.format(
-            t.name))
+        'No ctypes equivalent is defined for type {}'.format(t.name))
 
 
 def to_py2_ctype(t):
@@ -195,6 +197,8 @@ def to_py2_ctype(t):
         if t.pointee.kind == TypeKind.RECORD:
             # This is a hack until we can get an unqualified type from libclang
             return t.pointee.name.replace('const ', '')
+    if t.kind == TypeKind.RECORD:
+        return t.name
     raise Exception(
         'No ctypes equivalent is defined for type {}'.format(
             t.name))
@@ -213,6 +217,8 @@ def to_output_py2_ctype(t):
         if t.pointee.kind == TypeKind.CHAR_S:
             return 'c_char_p'
         if t.pointee.kind == TypeKind.RECORD:
+            return 'c_object_p'
+    if t.kind == TypeKind.RECORD:
             return 'c_object_p'
     raise Exception(
         'No ctypes equivalent is defined for type {}'.format(
@@ -234,6 +240,8 @@ def to_cpp_type(t):
         if t.pointee.kind == TypeKind.RECORD:
             # This is a hack until we can get an unqualified type from libclang
             return t.pointee.name.replace('const ', '')
+    if t.kind == TypeKind.RECORD:
+        return t.name
     raise Exception(
         'No c++ type equivalent is defined for type {} (adding one for primitives is trivial)'.format(t.name))
 
