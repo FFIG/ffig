@@ -38,6 +38,8 @@ Set `LD_LIBRARY_PATH` so that libclang can be found.
 
 # Setup (macOS)
 
+[Install Ninja build](http://macappstore.org/ninja/).
+
 Install Xcode. FFIG will use the version of libclang distributed with Xcode.
 
 

@@ -12,7 +12,7 @@ def check_for_executable(exe_name, args=['--version']):
         cmd.extend(args)
         subprocess.check_output(cmd)
         return True
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, FileNotFoundError):
         return False
 
 

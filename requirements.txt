@@ -1,3 +1,4 @@
 jinja2
 nose
 pycodestyle
+autopep8
