@@ -97,8 +97,7 @@ if(result)
 else()
   set(LuaJIT_FOUND 1)
   set(LuaJIT_EXECUTABLE "luajit")
-  # FIXME: Get Lua bindings working well enough to work with Shape classes and 
-  # add LUA to all_ffig_bindings.
+  list(APPEND all_ffig_bindings "LUA")
 endif()
 
 # Look for C#
@@ -333,6 +332,14 @@ if(LuaJIT_FOUND)
   set_property(TEST test_asset_lua 
                PROPERTY LABELS LUA)
   set_property(TEST test_asset_lua 
+               PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
+  add_test(
+    NAME test_shape_lua
+    COMMAND ${LuaJIT_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/tests/test_shape_bindings.lua
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
+  set_property(TEST test_shape_lua 
+               PROPERTY LABELS LUA)
+  set_property(TEST test_shape_lua 
                PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
 endif()
 
