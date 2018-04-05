@@ -147,6 +147,7 @@ ffig_add_library(NAME Animal
 
 ffig_add_library(NAME Number
                  INPUTS tests/input/Number.h
+                 DOTNET
                  PYTHON)
 
 enable_testing()
@@ -210,11 +211,12 @@ if(dotnet_FOUND)
   add_dotnet_library(NAME ffig.net 
     DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
     SOURCES 
+      ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestNumber.cs 
       ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestShape.cs 
-      ${CMAKE_SOURCE_DIR}/tests/dotnet/TestTree.cs 
-      ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.cs 
-      ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.cs 
+      ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestTree.cs 
+      ${CMAKE_CURRENT_BINARY_DIR}/generated/Number.cs 
       ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.cs
+      ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.cs 
   )
 
   add_test(

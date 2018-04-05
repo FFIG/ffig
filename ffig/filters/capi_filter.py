@@ -353,6 +353,8 @@ def to_dotnet_output_param(t):
             return "IntPtr"
         if t.pointee.kind == TypeKind.RECORD:
             return "IntPtr"
+    if t.kind == TypeKind.RECORD:
+        return "IntPtr"
     raise Exception(
         'Type {} has no defined dotnet output parameter translation (adding one may be trivial)'.format(
             t.name))
@@ -368,6 +370,8 @@ def to_dotnet_output_value(t, rv):
             return "IntPtr {} = IntPtr.Zero".format(rv)
         if t.pointee.kind == TypeKind.RECORD:
             return "IntPtr {} = IntPtr.Zero".format(rv)
+    if t.kind == TypeKind.RECORD:
+        return "IntPtr {} = IntPtr.Zero".format(rv)
     raise Exception(
         'Type {} has no defined dotnet output value translation (adding one may be trivial)'.format(
             t.name))
@@ -383,6 +387,8 @@ def to_dotnet_return_type(t):
             return "string"
         if t.pointee.kind == TypeKind.RECORD:
             return t.pointee.name.replace('const ', '')
+    if t.kind == TypeKind.RECORD:
+        return t.name
     raise Exception(
         'Type {} has no defined dotnet return type translation (adding one may be trivial)'.format(
             t.name))
@@ -414,6 +420,8 @@ def to_dotnet_return_value(t, rv):
             return 'new {}({})'.format(
                 t.pointee.name.replace(
                     'const ', ''), rv)
+    if t.kind == TypeKind.RECORD:
+        return 'new {}({})'.format(t.name, rv)
     raise Exception(
         'Type {} has no defined dotnet return value translation (adding one may be trivial)'.format(
             t.name))
