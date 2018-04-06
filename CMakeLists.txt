@@ -72,7 +72,15 @@ find_package(Ruby)
 if(NOT Ruby_FOUND)
   message(STATUS "Ruby tests disabled: Ruby interpreter not found.")
 else()
-  list(APPEND all_ffig_bindings "RUBY")
+  execute_process(COMMAND ${RUBY_EXECUTABLE} -rffi -e "puts FFI"
+                  RESULT_VARIABLE result
+                  OUTPUT_QUIET
+                  ERROR_QUIET)
+  if(result)
+    message(WARNING "CMake failed: Ruby FFI dependencies is required.  Run 'gem install ffi' to install FFI dependency")
+  else()
+    list(APPEND all_ffig_bindings "RUBY")
+  endif()
 endif()
 
 # Look for Java
