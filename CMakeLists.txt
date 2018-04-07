@@ -291,7 +291,6 @@ if(Java_FOUND)
             ${JUNIT_JAR} 
             ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.jar)
 
-  set(JAVA_JARS "")
   list(APPEND JAVA_JARS
        ${JNA_JAR}
        ${JUNIT_JAR}

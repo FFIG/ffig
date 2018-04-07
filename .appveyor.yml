@@ -1,16 +1,21 @@
-# clone directory
-clone_folder: c:\projects\ffig
+services:
+- docker
+
+image:
+- Visual Studio 2017
+- Ubuntu
 
 install:
-  - set PATH="C:\Program Files\LLVM\bin";C:\mingw-w64\i686-5.3.0-posix-dwarf-rt_v4-rev0\mingw32\bin;%PATH%
   - git submodule update --init
-  - python -m pip install pycodestyle
-  - C:\Python36-x64\python -m pip install jinja2 nose pycodestyle
-
-# scripts to run before build (We use this to build and run tests)
-before_build:
-  - cd c:\projects\ffig
+  - cmd: set PATH="C:\Program Files\LLVM\bin";C:\mingw-w64\i686-5.3.0-posix-dwarf-rt_v4-rev0\mingw32\bin;%PATH%
+  - cmd: C:\Python36-x64\python -m pip install jinja2 nose pycodestyle
   
 build_script:
-  - python scripts\build.py -t --python-path "C:\\Python36-x64\\python"
+  - cmd: python scripts\build.py -t --python-path "C:\\Python36-x64\\python"
+  - sh: docker pull ffig/ffig-base
+  - sh: docker build . -t ffig-ci
+  - sh: docker run ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python2 --venv"
+  - sh: docker run ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python2 --venv"
+  - sh: docker run ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python3 --venv"
+  - sh: docker run ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python3 --venv"
 
