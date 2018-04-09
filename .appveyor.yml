@@ -15,7 +15,5 @@ build_script:
   - sh: docker pull ffig/ffig-base
   - sh: docker build . -t ffig-ci
   - sh: docker run ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python2 --venv"
-  - sh: docker run ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python2 --venv"
   - sh: docker run ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python3 --venv"
-  - sh: docker run ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python3 --venv"
 
