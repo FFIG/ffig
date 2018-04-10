@@ -1,9 +1,5 @@
-services:
-- docker
-
 image:
 - Visual Studio 2017
-- Ubuntu
 
 install:
   - git submodule update --init
@@ -12,8 +8,3 @@ install:
   
 build_script:
   - cmd: python scripts\build.py -t --python-path "C:\\Python36-x64\\python"
-  - sh: docker pull ffig/ffig-base
-  - sh: docker build . -t ffig-ci
-  - sh: docker run ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python2 --venv"
-  - sh: docker run ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python3 --venv"
-
