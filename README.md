@@ -1,12 +1,8 @@
-# Continuous integration
-
 **Build status (on Travis-CI):** [![Build Status](https://travis-ci.org/FFIG/ffig.svg?branch=master)](https://travis-ci.org/FFIG/ffig)
 
 **Build status (on AppVeyor):** [![Build Status](https://ci.appveyor.com/api/projects/status/github/ffig/ffig?branch=master)](https://ci.appveyor.com/project/jbcoe/ffig?branch=master)
 
-# Description
-
-FFIG is a Foreign Function Interface Generator.
+# FFIG - a Foreign Function Interface Generator.
 
 This project uses libclang to read existing C++ class definitions and create
 equivalent classes in other languages (primarily Python for now) and binds them
