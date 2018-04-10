@@ -75,6 +75,16 @@ class {{class.name}}:
     @property
     {% endif %}
     def {{method.name}}(self{{py3_macros.method_parameters(method, leading_comma=True)}}) -> '{{method.return_type|to_hint_type}}':
+  {% if method.is_noexcept %}
+    {% if method.returns_void %}
+        conf.lib.{{module.name}}_{{class.name}}_{{method.name}}_noexcept(self{{py3_macros.method_arguments(method, leading_comma=True)}})
+    {% elif method.returns_sub_object or method.returns_object_by_value %}
+        rv = conf.lib.{{module.name}}_{{class.name}}_{{method.name}}_noexcept(self{{py3_macros.method_arguments(method, leading_comma=True)}})
+        return {{method.return_type|to_py3_ctype}}.from_capi(rv)
+    {% else %}
+        return conf.lib.{{module.name}}_{{class.name}}_{{method.name}}_noexcept(self{{py3_macros.method_arguments(method, leading_comma=True)}})
+    {% endif %} 
+  {%- else -%}
     {% if method.returns_void %}
         rc = conf.lib.{{module.name}}_{{class.name}}_{{method.name}}(self{{py3_macros.method_arguments(method, leading_comma=True)}})
         if rc != 0:
@@ -91,7 +101,8 @@ class {{class.name}}:
         if rc == 0:
             return rv.value
         raise {{module.name}}_error()
-    {% endif %}
+    {% endif -%} 
+  {%- endif -%}
 {% endfor %}
 
     @classmethod
@@ -154,9 +165,15 @@ methodList = [
 {% endfor %}
 {% endfor %}
 {% for method in class.methods %}
+    {% if method.is_noexcept %}
+    ("{{module.name}}_{{ class.name }}_{{method.name}}_noexcept",
+        [{{class.name}}{{py3_macros.method_argument_types(method, leading_comma=True)}}{% if not method.returns_void %}{% endif %}],
+        {{method.return_type|to_output_py3_ctype}}),
+    {% else %}
     ("{{module.name}}_{{ class.name }}_{{method.name}}",
         [{{class.name}}{{py3_macros.method_argument_types(method, leading_comma=True)}}{% if not method.returns_void %}, POINTER({{method.return_type|to_output_py3_ctype}}){% endif %}],
         c_int),
+    {% endif %}
 {% endfor %}
 {% endfor %}
 ]
