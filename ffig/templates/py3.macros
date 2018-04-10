@@ -10,7 +10,7 @@
 #}
 {% macro constructor_parameters(method, leading_comma=False, trailing_comma=False) %}
     {% call(arg) ffig_macros.comma_separated_list(method.arguments, leading_comma, trailing_comma) -%}
-        {{arg.name}}: '{{arg.type|to_hint_type}}'=None
+        {{arg.name}}: '{{arg.type|to_hint_type}}' = None
     {%- endcall %}
 {% endmacro %}
 
