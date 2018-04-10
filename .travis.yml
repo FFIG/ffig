@@ -1,4 +1,4 @@
-# Modify this line to test Travis Integration ...
+# Modify this line to test Travis Integration ..
 sudo: required
 
 language: python
@@ -23,7 +23,7 @@ matrix:
 
     - os: osx
       language: generic
-      osx_image: xcode9.2
+      osx_image: xcode9.3
       install:
         - brew update
         - brew install ninja && brew upgrade python && brew install python@2

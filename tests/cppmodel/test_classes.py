@@ -187,11 +187,11 @@ def test_string_representation():
 def test_noexcept():
     source = """
     class A {
-        virtual int foo();
+        virtual int foo() noexcept;
     };"""
     tu = get_tu(source, 'cpp')
 
-    model = ffig.cppmodel.Model(tu, force_noexcept=True)
+    model = ffig.cppmodel.Model(tu)
     classes = model.classes
     methods = classes[0].methods
 

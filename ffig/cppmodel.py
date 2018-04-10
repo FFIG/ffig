@@ -1,6 +1,9 @@
 import os
 import sys
-from ffig.clang.cindex import AccessSpecifier, CursorKind, TypeKind
+from ffig.clang.cindex import AccessSpecifier
+from ffig.clang.cindex import CursorKind
+from ffig.clang.cindex import ExceptionSpecificationKind
+from ffig.clang.cindex import TypeKind
 
 
 def _get_annotations(node):
@@ -49,13 +52,11 @@ class FunctionArgument:
 
 class _Function(object):
 
-    def __init__(self, cursor, force_noexcept):
+    def __init__(self, cursor):
         self.name = cursor.spelling
         arguments = [x.spelling or None for x in cursor.get_arguments()]
         argument_types = [Type(x) for x in cursor.type.argument_types()]
-
-        # FIXME: Get noexcept info from the clang.cindex cursor
-        self.is_noexcept = force_noexcept
+        self.is_noexcept = (cursor.exception_specification_kind == ExceptionSpecificationKind.BASIC_NOEXCEPT)
         self.return_type = Type(cursor.type.get_result())
         self.arguments = []
         self.annotations = _get_annotations(cursor)
@@ -73,8 +74,8 @@ class _Function(object):
 
 class Function(_Function):
 
-    def __init__(self, cursor, namespaces=[], force_noexcept=False):
-        _Function.__init__(self, cursor, force_noexcept)
+    def __init__(self, cursor, namespaces=[]):
+        _Function.__init__(self, cursor)
         self.namespace = '::'.join(namespaces)
         if self.namespace:
             self.qualified_name = '::'.join([self.namespace, self.name])
@@ -101,8 +102,8 @@ class Function(_Function):
 
 class Method(_Function):
 
-    def __init__(self, cursor, force_noexcept=False):
-        _Function.__init__(self, cursor, force_noexcept)
+    def __init__(self, cursor):
+        _Function.__init__(self, cursor)
         self.is_const = cursor.is_const_method()
         self.is_virtual = cursor.is_virtual_method()
         self.is_pure_virtual = cursor.is_pure_virtual_method()
@@ -124,7 +125,7 @@ class Class(object):
     def __repr__(self):
         return "<cppmodel.Class {}>".format(self.name)
 
-    def __init__(self, cursor, namespaces, force_noexcept=False):
+    def __init__(self, cursor, namespaces):
         self.name = cursor.spelling
         self.namespace = '::'.join(namespaces)
         if self.namespace:
@@ -143,10 +144,10 @@ class Class(object):
 
         for c in cursor.get_children():
             if c.kind == CursorKind.CXX_METHOD and c.type.kind == TypeKind.FUNCTIONPROTO:
-                f = Method(c, force_noexcept)
+                f = Method(c)
                 self.methods.append(f)
             elif c.kind == CursorKind.CONSTRUCTOR and c.type.kind == TypeKind.FUNCTIONPROTO:
-                f = Method(c, force_noexcept)
+                f = Method(c)
                 self.constructors.append(f)
             elif c.kind == CursorKind.FIELD_DECL:
                 f = Member(c)
@@ -157,11 +158,11 @@ class Class(object):
 
 class Model(object):
 
-    def __init__(self, translation_unit, force_noexcept=False):
+    def __init__(self, translation_unit):
         self.filename = translation_unit.spelling
         self.functions = []
         self.classes = []
-        self.add_child_nodes(translation_unit.cursor, [], force_noexcept)
+        self.add_child_nodes(translation_unit.cursor, [])
 
     def __repr__(self):
         return "<cppmodel.Model filename={}, classes={}, functions={}>".format(
@@ -194,12 +195,12 @@ class Model(object):
             if is_new:
                 self.functions.append(new_function)
 
-    def add_child_nodes(self, cursor, namespaces=[], force_noexcept=False):
+    def add_child_nodes(self, cursor, namespaces=[]):
         for c in cursor.get_children():
             if c.kind == CursorKind.CLASS_DECL or c.kind == CursorKind.STRUCT_DECL:
-                self.classes.append(Class(c, namespaces, force_noexcept))
+                self.classes.append(Class(c, namespaces))
             if c.kind == CursorKind.FUNCTION_DECL and c.type.kind == TypeKind.FUNCTIONPROTO:
-                self.functions.append(Function(c, namespaces, force_noexcept))
+                self.functions.append(Function(c, namespaces))
             elif c.kind == CursorKind.NAMESPACE:
                 child_namespaces = list(namespaces)
                 child_namespaces.append(c.spelling)

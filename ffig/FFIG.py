@@ -86,8 +86,7 @@ def write_bindings_to_disk(
 
 def build_model_from_source(
         path_to_source,
-        module_name,
-        treat_methods_as_noexcept):
+        module_name):
     """
     Input:
     - full path to source file
@@ -101,7 +100,7 @@ def build_model_from_source(
         path_to_source,
         '-x c++ -std=c++14 -stdlib=libc++ -I{}'.format(ffig_include_dir).split())
 
-    model = ffig.cppmodel.Model(tu, treat_methods_as_noexcept)
+    model = ffig.cppmodel.Model(tu)
     model.module_name = module_name
 
     return model
@@ -147,7 +146,7 @@ def run(args):
     # FIXME: Loop over files and extend the model once we can handle multiple
     # input files.
     input_file = os.path.join(cwd, args.inputs[0])
-    m = build_model_from_source(input_file, args.module_name, args.noexcept)
+    m = build_model_from_source(input_file, args.module_name)
     classes = m.classes
     api_classes = collect_api_and_obj_classes(classes, 'FFIG:EXPORT')
 
@@ -197,11 +196,6 @@ def main():
         help='module name for generated files',
         dest='module_name',
         required=True)
-    parser.add_argument(
-        '--noexcept',
-        help='treat all methods as if they were marked noexcept',
-        dest='noexcept',
-        action='store_true')
 
     args = parser.parse_args()
 

@@ -13,8 +13,9 @@ class FFIG_EXPORT Tree
   std::shared_ptr<Tree> right_;
 
   public:
-
-  Tree(int levels=0)
+  
+  // FIXME: Should not be noexcept as it allocates
+  Tree(int levels=0) noexcept 
   {
     data_ = gen();
     if ( levels <= 0 ) return;
@@ -22,22 +23,22 @@ class FFIG_EXPORT Tree
     right_ = std::make_shared<Tree>(levels-1);
   }
 
-  Tree* left_subtree() const
+  Tree* left_subtree() const noexcept
   {
     return left_.get();
   }
 
-  Tree* right_subtree() const
+  Tree* right_subtree() const noexcept
   {
     return right_.get();
   }
 
-  int data() const
+  int data() const noexcept
   {
     return data_;
   }
   
-  void set_data(int x)
+  void set_data(int x) noexcept
   {
     data_ = x;
   }

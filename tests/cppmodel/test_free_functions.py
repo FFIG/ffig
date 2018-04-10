@@ -93,14 +93,14 @@ def test_string_representation():
                   '<cppmodel.Function double foo(int, char)>')
 
 
-def test_force_noexcept():
+def test_noexcept():
     source = """
-    double foo(int, char);
+    double foo(int, char) noexcept;
     """
 
     tu = get_tu(source, 'cpp')
 
-    model = ffig.cppmodel.Model(tu, force_noexcept=True)
+    model = ffig.cppmodel.Model(tu)
     functions = model.functions
 
     assert_equals(str(functions[0]),

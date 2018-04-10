@@ -139,7 +139,6 @@ ffig_add_library(NAME Tree
                  CPP 
                  D 
                  DOTNET
-                 NOEXCEPT 
                  PYTHON 
                  SWIFT)
 
