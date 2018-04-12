@@ -22,16 +22,12 @@ namespace Shape_c {
 
     [DllImport("Shape_c")]
     private static extern int Shape_AbstractShape_dispose(IntPtr c_obj);
-
     [DllImport("Shape_c")]
     private static extern int Shape_AbstractShape_area(IntPtr c_obj, out double rv);
-
     [DllImport("Shape_c")]
     private static extern int Shape_AbstractShape_perimeter(IntPtr c_obj, out double rv);
-
     [DllImport("Shape_c")]
     private static extern int Shape_AbstractShape_name(IntPtr c_obj, out IntPtr rv);
-
     [DllImport("Shape_c")]
     private static extern int Shape_AbstractShape_is_equal(IntPtr c_obj, IntPtr s, out int rv);
 
@@ -47,7 +43,6 @@ namespace Shape_c {
     ~AbstractShape() {
       Shape_AbstractShape_dispose(c_obj_);
     }
-
     public double area {
       get {
         double rv;
@@ -58,7 +53,6 @@ namespace Shape_c {
         return rv;
       }
     }
-
     public double perimeter {
       get {
         double rv;
@@ -69,7 +63,6 @@ namespace Shape_c {
         return rv;
       }
     }
-
     public string name {
       get {
         IntPtr rv = IntPtr.Zero;
@@ -80,7 +73,6 @@ namespace Shape_c {
         return Marshal.PtrToStringAnsi(rv);
       }
     }
-
     public int is_equal(AbstractShape s) {
       int rv;
       int rc = Shape_AbstractShape_is_equal(c_obj_, s.c_obj_, out rv);

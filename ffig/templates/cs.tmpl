@@ -30,14 +30,23 @@ namespace {{module.name}}_c {
     private static extern int {{module.name}}_{{class.name}}_create({{cs_macros.method_c_parameters(method, trailing_comma=True)}}out IntPtr ptr);
   {% endfor %}
   {% for method in class.methods %}
-
-    {% if not method.returns_void %}
+  {% if method.is_noexcept %}
+    {% if method.returns_void %}
     [DllImport("{{module.name}}_c")]
-    private static extern int {{module.name}}_{{class.name}}_{{method.name}}(IntPtr c_obj, {{cs_macros.method_c_parameters(method, trailing_comma=True)}}out {{method.return_type|to_dotnet_output_param}} rv);
+    private static extern void {{module.name}}_{{class.name}}_{{method.name}}_noexcept(IntPtr c_obj{{cs_macros.method_c_parameters(method, leading_comma=True)}});
     {% else %}
     [DllImport("{{module.name}}_c")]
-    private static extern int {{module.name}}_{{class.name}}_{{method.name}}(IntPtr c_obj, {{cs_macros.method_c_parameters(method)}});
+    private static extern {{method.return_type|to_dotnet_output_param}} {{module.name}}_{{class.name}}_{{method.name}}_noexcept(IntPtr c_obj{{cs_macros.method_c_parameters(method, leading_comma=True)}});
     {% endif %}
+  {% else %}
+  {% if method.returns_void %}
+    [DllImport("{{module.name}}_c")]
+    private static extern int {{module.name}}_{{class.name}}_{{method.name}}(IntPtr c_obj, {{cs_macros.method_c_parameters(method)}});
+    {% else %}
+    [DllImport("{{module.name}}_c")]
+    private static extern int {{module.name}}_{{class.name}}_{{method.name}}(IntPtr c_obj, {{cs_macros.method_c_parameters(method, trailing_comma=True)}}out {{method.return_type|to_dotnet_output_param}} rv);
+    {% endif %}
+  {% endif %}
   {% endfor %}
 
     protected IntPtr c_obj_;
@@ -64,15 +73,27 @@ namespace {{module.name}}_c {
       {{module.name}}_{{class.name}}_dispose(c_obj_);
     }
   {% for method in class.methods %}
-
-    {% if not method.returns_void %}
-    {% if not method.is_property %}
-    public {{method.return_type|to_dotnet_return_type}} {{method.name}}({{cs_macros.method_parameters(method)}}) {
-      {{method.return_type|to_dotnet_output_value("rv")}};
-      int rc = {{module.name}}_{{class.name}}_{{method.name}}(c_obj_, {{cs_macros.method_arguments(method, trailing_comma=True)}}out rv);
-      if(rc != 0) {
-        throw new {{module.name}}_c.Exception();
+   {% if method.is_noexcept %}
+    {% if method.returns_void %}
+    public void {{method.name}}({{cs_macros.method_parameters(method)}}) {
+      {{module.name}}_{{class.name}}_{{method.name}}_noexcept(c_obj_, {{cs_macros.method_arguments(method)}});
+    }
+    {% elif method.is_property %}
+    public {{method.return_type|to_dotnet_return_type}} {{method.name}} {
+      get {
+        {{method.return_type|to_dotnet_output_value("rv")}};
+        var rv = {{module.name}}_{{class.name}}_{{method.name}}_noexcept(c_obj_{{cs_macros.method_arguments(method, leading_comma=True)}});
+        {% if method.returns_nullable %}
+        if(rv == IntPtr.Zero) {
+          return null;
+        }
+        {% endif %}
+        return {{method.return_type|to_dotnet_return_value("rv")}};
       }
+    }
+    {% else %}
+    public {{method.return_type|to_dotnet_return_type}} {{method.name}}({{cs_macros.method_parameters(method)}}) {
+      var rv = {{module.name}}_{{class.name}}_{{method.name}}_noexcept(c_obj_{{cs_macros.method_arguments(method, leading_comma=True)}});
       {% if method.returns_nullable %}
       if(rv == IntPtr.Zero) {
         return null;
@@ -80,7 +101,16 @@ namespace {{module.name}}_c {
       {% endif %}
       return {{method.return_type|to_dotnet_return_value("rv")}};
     }
-    {% else %}
+    {% endif %}
+   {% else %}
+    {% if method.returns_void %}
+    public void {{method.name}}({{cs_macros.method_parameters(method)}}) {
+      int rc = {{module.name}}_{{class.name}}_{{method.name}}(c_obj_, {{cs_macros.method_arguments(method)}});
+      if(rc != 0) {
+        throw new {{module.name}}_c.Exception();
+      }
+    }
+    {% elif method.is_property %}
     public {{method.return_type|to_dotnet_return_type}} {{method.name}} {
       get {
         {{method.return_type|to_dotnet_output_value("rv")}};
@@ -96,15 +126,22 @@ namespace {{module.name}}_c {
         return {{method.return_type|to_dotnet_return_value("rv")}};
       }
     }
-    {% endif %}
     {% else %}
-    public void {{method.name}}({{cs_macros.method_parameters(method)}}) {
-      int rc = {{module.name}}_{{class.name}}_{{method.name}}(c_obj_, {{cs_macros.method_arguments(method)}});
+    public {{method.return_type|to_dotnet_return_type}} {{method.name}}({{cs_macros.method_parameters(method)}}) {
+      {{method.return_type|to_dotnet_output_value("rv")}};
+      int rc = {{module.name}}_{{class.name}}_{{method.name}}(c_obj_, {{cs_macros.method_arguments(method, trailing_comma=True)}}out rv);
       if(rc != 0) {
         throw new {{module.name}}_c.Exception();
       }
+      {% if method.returns_nullable %}
+      if(rv == IntPtr.Zero) {
+        return null;
+      }
+      {% endif %}
+      return {{method.return_type|to_dotnet_return_value("rv")}};
     }
     {% endif %}
+   {% endif %}
   {% endfor %}
   }
   {% for impl in class.impls %}
