@@ -81,7 +81,6 @@ namespace {{module.name}}_c {
     {% elif method.is_property %}
     public {{method.return_type|to_dotnet_return_type}} {{method.name}} {
       get {
-        {{method.return_type|to_dotnet_output_value("rv")}};
         var rv = {{module.name}}_{{class.name}}_{{method.name}}_noexcept(c_obj_{{cs_macros.method_arguments(method, leading_comma=True)}});
         {% if method.returns_nullable %}
         if(rv == IntPtr.Zero) {

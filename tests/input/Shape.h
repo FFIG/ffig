@@ -8,10 +8,10 @@ struct FFIG_EXPORT AbstractShape
   virtual ~AbstractShape()
   {
   }
-  virtual FFIG_PROPERTY double area() const = 0;
-  virtual FFIG_PROPERTY double perimeter() const = 0;
-  virtual FFIG_PROPERTY const char* name() const = 0;
-  virtual int is_equal(const AbstractShape* s) const = 0;
+  virtual FFIG_PROPERTY double area() const noexcept = 0;
+  virtual FFIG_PROPERTY double perimeter() const noexcept = 0;
+  virtual FFIG_PROPERTY const char* name() const noexcept = 0;
+  virtual int is_equal(const AbstractShape* s) const noexcept = 0;
 };
 
 static const double pi = 3.14159265359;
@@ -21,22 +21,22 @@ class Circle : public AbstractShape
   const double radius_;
 
 public:
-  double area() const override
+  double area() const noexcept override
   {
     return pi * radius_ * radius_;
   }
 
-  double perimeter() const override
+  double perimeter() const noexcept override
   {
     return 2 * pi * radius_;
   }
 
-  const char* name() const override
+  const char* name() const noexcept override
   {
     return "Circle";
   }
 
-  int is_equal(const AbstractShape* s) const override
+  int is_equal(const AbstractShape* s) const noexcept override
   {
     if ( auto c = dynamic_cast<const Circle*>(s) )
       return c->radius_ == radius_;
@@ -58,22 +58,22 @@ class Square : public AbstractShape
   const double side_;
 
 public:
-  double area() const override
+  double area() const noexcept override
   {
     return side_ * side_;
   }
 
-  double perimeter() const override
+  double perimeter() const noexcept override
   {
     return 4.0 * side_;
   }
 
-  const char* name() const override
+  const char* name() const noexcept override
   {
     return "Square";
   }
 
-  int is_equal(const AbstractShape* s) const override
+  int is_equal(const AbstractShape* s) const noexcept override
   {
     if ( auto sq = dynamic_cast<const Square*>(s) )
       return sq->side_ == side_;
@@ -95,22 +95,22 @@ class Pentagon : public AbstractShape
   const double side_;
 
 public:
-  double area() const override
+  double area() const noexcept override
   {
     return 0.25 * sqrt(5. * (5. + 2. * sqrt(5.))) * side_ * side_;
   }
 
-  double perimeter() const override
+  double perimeter() const noexcept override
   {
     return 5.0 * side_;
   }
 
-  const char* name() const override
+  const char* name() const noexcept override
   {
     return "Pentagon";
   }
 
-  int is_equal(const AbstractShape* s) const override
+  int is_equal(const AbstractShape* s) const noexcept override
   {
     if ( auto p = dynamic_cast<const Pentagon*>(s) )
       return p->side_ == side_;

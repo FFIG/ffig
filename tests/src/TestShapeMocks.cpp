@@ -10,26 +10,6 @@ TEST_CASE("MockAbstractShape", "[mocks::MockAbstractShape]")
 {
   static_assert(std::is_base_of<AbstractShape,mocks::MockAbstractShape>::value,"");
 
-  GIVEN("A mock shape with no expected values set")
-  {
-    mocks::MockAbstractShape shape;
-
-    THEN("All method invocations lead to exceptions")
-    {
-      REQUIRE_THROWS_AS(shape.name(),
-                        mocks::MockAbstractShape::MockMethodResultNotSpecified);
-
-      REQUIRE_THROWS_AS(shape.area(),
-                        mocks::MockAbstractShape::MockMethodResultNotSpecified);
-
-      REQUIRE_THROWS_AS(shape.perimeter(),
-                        mocks::MockAbstractShape::MockMethodResultNotSpecified);
-
-      //REQUIRE_THROWS_AS(shape.is_equal(&shape),
-      //                  mocks::MockAbstractShape::MockMethodResultNotSpecified);
-    }
-  }
-
   GIVEN("A mock shape with expected values set")
   {
     mocks::MockAbstractShape shape;

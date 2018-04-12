@@ -23,13 +23,13 @@ namespace Shape_c {
     [DllImport("Shape_c")]
     private static extern int Shape_AbstractShape_dispose(IntPtr c_obj);
     [DllImport("Shape_c")]
-    private static extern int Shape_AbstractShape_area(IntPtr c_obj, out double rv);
+    private static extern double Shape_AbstractShape_area_noexcept(IntPtr c_obj);
     [DllImport("Shape_c")]
-    private static extern int Shape_AbstractShape_perimeter(IntPtr c_obj, out double rv);
+    private static extern double Shape_AbstractShape_perimeter_noexcept(IntPtr c_obj);
     [DllImport("Shape_c")]
-    private static extern int Shape_AbstractShape_name(IntPtr c_obj, out IntPtr rv);
+    private static extern IntPtr Shape_AbstractShape_name_noexcept(IntPtr c_obj);
     [DllImport("Shape_c")]
-    private static extern int Shape_AbstractShape_is_equal(IntPtr c_obj, IntPtr s, out int rv);
+    private static extern int Shape_AbstractShape_is_equal_noexcept(IntPtr c_obj, IntPtr s);
 
     protected IntPtr c_obj_;
 
@@ -45,40 +45,24 @@ namespace Shape_c {
     }
     public double area {
       get {
-        double rv;
-        int rc = Shape_AbstractShape_area(c_obj_, out rv);
-        if(rc != 0) {
-          throw new Shape_c.Exception();
-        }
+        var rv = Shape_AbstractShape_area_noexcept(c_obj_);
         return rv;
       }
     }
     public double perimeter {
       get {
-        double rv;
-        int rc = Shape_AbstractShape_perimeter(c_obj_, out rv);
-        if(rc != 0) {
-          throw new Shape_c.Exception();
-        }
+        var rv = Shape_AbstractShape_perimeter_noexcept(c_obj_);
         return rv;
       }
     }
     public string name {
       get {
-        IntPtr rv = IntPtr.Zero;
-        int rc = Shape_AbstractShape_name(c_obj_, out rv);
-        if(rc != 0) {
-          throw new Shape_c.Exception();
-        }
+        var rv = Shape_AbstractShape_name_noexcept(c_obj_);
         return Marshal.PtrToStringAnsi(rv);
       }
     }
     public int is_equal(AbstractShape s) {
-      int rv;
-      int rc = Shape_AbstractShape_is_equal(c_obj_, s.c_obj_, out rv);
-      if(rc != 0) {
-        throw new Shape_c.Exception();
-      }
+      var rv = Shape_AbstractShape_is_equal_noexcept(c_obj_, s.c_obj_);
       return rv;
     }
   }

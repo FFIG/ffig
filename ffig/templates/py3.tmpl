@@ -168,7 +168,9 @@ methodList = [
     {% if method.is_noexcept %}
     ("{{module.name}}_{{ class.name }}_{{method.name}}_noexcept",
         [{{class.name}}{{py3_macros.method_argument_types(method, leading_comma=True)}}{% if not method.returns_void %}{% endif %}],
-        {{method.return_type|to_output_py3_ctype}}),
+        {{method.return_type|to_output_py3_ctype}}{% if method.returns_chars %},
+        c_interop_string.to_python_string{% endif -%}
+        ),
     {% else %}
     ("{{module.name}}_{{ class.name }}_{{method.name}}",
         [{{class.name}}{{py3_macros.method_argument_types(method, leading_comma=True)}}{% if not method.returns_void %}, POINTER({{method.return_type|to_output_py3_ctype}}){% endif %}],
