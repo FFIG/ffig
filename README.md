@@ -23,7 +23,7 @@ encourage anyone looking to generate language bindings to look at SWIG.
 
 You will need Python (2 or 3), ninja-build, cmake, and gcc (or clang).
 
-You will need libclang >=3.8. 
+You will need libclang >=5.0. 
 
 libclang can be installed from here: <http://llvm.org/releases/>
 
@@ -36,7 +36,7 @@ Set `LD_LIBRARY_PATH` so that libclang can be found.
 
 [Install Ninja build](http://macappstore.org/ninja/).
 
-Install Xcode. FFIG will use the version of libclang distributed with Xcode.
+Install Xcode 9.3 or later. FFIG will use the version of libclang distributed with Xcode.
 
 
 # Setup (Windows)
