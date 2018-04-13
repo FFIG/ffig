@@ -31,6 +31,17 @@ static {{module.name}}_{{impl.name}}_create_Ptr {{module.name}}_{{impl.name}}_cr
 
 {% for class in classes %}
 {% for method in class.methods %}
+{% if method.is_noexcept %}
+    {% if method.returns_void %}
+    typedef void (*{{module.name}}_{{class.name}}_{{method.name}}_Ptr)(
+            const void*
+            {{go_macros.c_method_parameters(module, method, leading_comma=True)}});
+    {% else %}
+    typedef {{method.return_type|to_c(module.name)}} (*{{module.name}}_{{class.name}}_{{method.name}}_Ptr)(
+            const void*
+            {{go_macros.c_method_parameters(module, method, leading_comma=True)}});
+    {% endif %}
+{% else %}
 typedef int (*{{module.name}}_{{class.name}}_{{method.name}}_Ptr)(
     const void*
     {{go_macros.c_method_parameters(module, method, leading_comma=True)}}
@@ -38,6 +49,7 @@ typedef int (*{{module.name}}_{{class.name}}_{{method.name}}_Ptr)(
         , {{method.return_type|to_c(module.name)}}* rv
     {%- endif -%}
     );
+{% endif %}
 static {{module.name}}_{{class.name}}_{{method.name}}_Ptr {{module.name}}_{{class.name}}_{{method.name}}_ptr = NULL;
 {% endfor %} 
 {%- endfor %} 
@@ -94,7 +106,11 @@ int init() {
     {%- for class in classes %}
     {%- for method in class.methods %}
     ++progress_code;
+    {% if method.is_noexcept %}
+    symbol = dlsym(dynamic_library, "{{module.name}}_{{class.name}}_{{method.name}}_noexcept");
+    {% else %}
     symbol = dlsym(dynamic_library, "{{module.name}}_{{class.name}}_{{method.name}}");
+    {% endif %}
     if (!symbol) {
         return progress_code;
     }
@@ -138,12 +154,25 @@ typedef struct {{module.name}}_{{class.name}}_{{method.name}}_return_type {
 RT_{{module.name}}_{{class.name}}_{{method.name}} CGo_{{module.name}}_{{class.name}}_{{method.name}}(
     {{module.name}}_{{class.name}} my{{class.name}} {{go_macros.c_method_parameters(module, method, leading_comma=True)}}) {
     RT_{{module.name}}_{{class.name}}_{{method.name}} rv;
+    {% if method.is_noexcept %}
+    rv.status = 0;
+        {% if method.returns_void %}
+        {{module.name}}_{{class.name}}_{{method.name}}_ptr(
+            my{{class.name}}
+            {{go_macros.c_method_arguments(method, leading_comma=True)}});
+        {% else %}
+        rv.value = {{module.name}}_{{class.name}}_{{method.name}}_ptr(
+                my{{class.name}}
+                {{go_macros.c_method_arguments(method, leading_comma=True)}});
+        {% endif %}
+    {% else %}
     rv.status = {{module.name}}_{{class.name}}_{{method.name}}_ptr(
         my{{class.name}}
         {{go_macros.c_method_arguments(method, leading_comma=True)}}
         {%- if not method.returns_void -%},
         &rv.value
         {%- endif -%});
+    {% endif %}
     return rv;
 }
 {% endfor %}  
