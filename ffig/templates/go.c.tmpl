@@ -25,7 +25,7 @@ typedef int (*{{module.name}}_{{impl.name}}_create_Ptr)(
     {{go_macros.c_method_parameters(module, method, trailing_comma=True)}}
     {{module.name}}_{{class.name}}* object);
 static {{module.name}}_{{impl.name}}_create_Ptr {{module.name}}_{{impl.name}}_create_ptr = NULL;
-{%- endfor -%}
+{% endfor %}
 {%- endfor -%}
 {%- endfor %}
 
@@ -38,7 +38,7 @@ typedef int (*{{module.name}}_{{class.name}}_{{method.name}}_Ptr)(
         , {{method.return_type|to_c(module.name)}}* rv
     {%- endif -%}
     );
-static {{module.name}}_{{class.name}}_{{method.name}}_Ptr {{module.name}}_{{class.name}}_{{method.name}}_ptr;
+static {{module.name}}_{{class.name}}_{{method.name}}_Ptr {{module.name}}_{{class.name}}_{{method.name}}_ptr = NULL;
 {% endfor %} 
 {%- endfor %} 
 
