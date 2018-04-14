@@ -234,22 +234,6 @@ if(dotnet_FOUND)
   )
 
   add_test(
-    NAME test_dotnet_shape_output
-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
-    ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Shape.cs.expected
-    ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.cs)
-  set_property(TEST test_dotnet_shape_output 
-               PROPERTY LABELS DOTNET TEXT)
-
-  add_test(
-    NAME test_dotnet_tree_output
-    COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
-    ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Tree.cs.expected
-    ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.cs)
-  set_property(TEST test_dotnet_tree_output 
-               PROPERTY LABELS DOTNET TEXT)
-
-  add_test(
     NAME test_dotnet
     COMMAND dotnet test --no-build --no-restore -o .
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
