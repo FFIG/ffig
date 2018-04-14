@@ -4,15 +4,15 @@
 import ffig.generators
 
 aliases = {
-    'dotnet': 'cs.tmpl',
-    'lua': 'lua.tmpl',
-    'ruby': 'rb.tmpl',
+    'dotnet': ('cs.tmpl', 'dotnet (C#) bindings'),
+    'lua': ('lua.tmpl', 'Lua bindings'),
+    'ruby': ('rb.tmpl', 'Ruby bindings'),
 }
 
 
 def aliased_generator(module_name, binding, api_classes, env, output_dir):
     try:
-        binding = aliases[binding]
+        binding = aliases[binding][0]
     except KeyError:
         raise Exception('No alias for {0}'.format(binding))
 
@@ -21,4 +21,5 @@ def aliased_generator(module_name, binding, api_classes, env, output_dir):
 
 
 def setup_plugin(context):
-    context.register(aliased_generator, aliases.keys())
+    bindings = [(key, value[1]) for key, value in aliases.items()]
+    context.register(aliased_generator, bindings)

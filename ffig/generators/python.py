@@ -30,4 +30,8 @@ def generator(module_name, binding, api_classes, env, output_dir):
 
 
 def setup_plugin(context):
-    context.register(generator, ['python'])
+    context.register(
+            generator,
+            [
+                ('python', 'Python2 and Python3 generator using ctypes')
+            ])

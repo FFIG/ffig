@@ -1,3 +1,4 @@
+import collections
 import logging
 import os
 import os.path
@@ -87,9 +88,14 @@ def default_generator(module_name, binding, api_classes, env, output_dir):
 class GeneratorContext(object):
     '''Holds a mapping of bindings to custom generators.'''
 
+    GeneratorRecord = collections.namedtuple(
+            'GeneratorRecord', ['function', 'description'])
+
+
     def __init__(self):
         '''Initialise with no custom generators'''
         self._generator_map = {}
+
 
     def register(self, generator_function, bindings):
         '''
@@ -97,10 +103,26 @@ class GeneratorContext(object):
 
         Input:
          - generator_function: f(module_name, binding, api_classes, env, output_dir).
-         - bindings: List of bindings that this function generates.
+         - bindings: List of tuples describing bindings that this function generates.
+           The format is [(binding_name, description), ...]
         '''
         for binding in bindings:
-            self._generator_map[binding] = generator_function
+            binding_name = binding[0]
+            description = binding[1]
+            record = GeneratorContext.GeneratorRecord(generator_function, description)
+            self._generator_map[binding_name] = record
+
+
+    def list_generators(self):
+        '''
+        Return a list of registered binding generators.
+
+        Output:
+        - List of (binding_name, description) tuples
+        '''
+        return [(binding, record.description)
+            for binding, record in self._generator_map.items()]
+
 
     def generate(self, module_name, binding, api_classes, env, output_dir):
         '''
@@ -116,8 +138,8 @@ class GeneratorContext(object):
         log.info('Finding generator for {}'.format(binding))
         if binding in self._generator_map:
             log.info('  found in map')
-            return self._generator_map[binding](
-                module_name, binding, api_classes, env, output_dir)
+            generator_func = self._generator_map[binding].function
+            return generator_func(module_name, binding, api_classes, env, output_dir)
         else:
             log.info('  using default')
             return default_generator(
@@ -154,7 +176,7 @@ def _scan_plugins():
         generator functions against a list of one or more binding names:
 
             def setup_plugin(context):
-                context.register(generator_func, [binding, ...])
+                context.register(generator_func, [(binding, description), ...])
 
         where generator_func is a function of the form
 
