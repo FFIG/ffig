@@ -74,7 +74,11 @@ struct Mock{{class.name}} : {{class.name}}
 {%endfor%}
 
 {% for method in class.methods %}
+  {% if method.is_noexcept %}
+  {{method.return_type}} {{method.name}}({{method_parameters(method)}}) const noexcept override
+  {% else %}
   {{method.return_type}} {{method.name}}({{method_parameters(method)}}) const override
+  {% endif %}
   {
     return MockMethodResult()("{{method.name}}", {{method.name}}_
             {{method_arguments(method, leading_comma=True)}});

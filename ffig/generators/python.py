@@ -25,8 +25,8 @@ def generator(module_name, binding, api_classes, env, output_dir):
     return [
         os.path.join(module_dir, x) for x in [
             '__init__.py',
-            'interop_py2.py',
-            'interop_py3.py']]
+            '_py2.py',
+            '_py3.py']]
 
 
 def setup_plugin(context):

@@ -1,6 +1,5 @@
 from util import get_tu
 import ffig.cppmodel
-from ffig.clang.cindex import TypeKind
 from nose.tools import assert_equals
 
 

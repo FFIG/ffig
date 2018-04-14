@@ -171,6 +171,13 @@ set_property(TEST test_cppmodel
   PROPERTY LABELS INFRASTRUCTURE)
 
 add_test(
+  NAME test_ffig
+  COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_CURRENT_LIST_DIR}/tests/ffig
+  WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/ffig)
+set_property(TEST test_ffig
+  PROPERTY LABELS INFRASTRUCTURE)
+
+add_test(
   NAME test_python_bindings
   COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_CURRENT_LIST_DIR}/tests
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)

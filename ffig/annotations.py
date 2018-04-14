@@ -24,7 +24,7 @@ def apply_class_annotations(model_class):
         elif m.return_type.kind in [TypeKind.INT, TypeKind.BOOL, TypeKind.DOUBLE]:
             pass
         elif m.return_type.kind == TypeKind.POINTER and m.return_type.pointee.kind == TypeKind.CHAR_S:
-            pass
+            m.returns_chars = True
         elif m.return_type.kind == TypeKind.POINTER:
             m.returns_sub_object = True
             m.returns_nullable = True

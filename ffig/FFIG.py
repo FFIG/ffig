@@ -86,11 +86,14 @@ def write_bindings_to_disk(
 
 def build_model_from_source(
         path_to_source,
-        module_name):
+        module_name,
+        unsaved_files=None):
     """
     Input:
     - full path to source file
     - module_name taken from args
+    - [Optional] List of 2-tuples of unsaved file content in the format:
+      (filename, content_string)
 
     Returns:
     - model built from a clang.cindex TranslationUnit with a name from args
@@ -98,7 +101,8 @@ def build_model_from_source(
     ffig_include_dir = os.path.join(os.path.dirname(__file__), 'include')
     tu = clang.cindex.TranslationUnit.from_source(
         path_to_source,
-        '-x c++ -std=c++14 -stdlib=libc++ -I{}'.format(ffig_include_dir).split())
+        '-x c++ -std=c++14 -stdlib=libc++ -I{}'.format(ffig_include_dir).split(),
+        unsaved_files=unsaved_files)
 
     model = ffig.cppmodel.Model(tu)
     model.module_name = module_name
