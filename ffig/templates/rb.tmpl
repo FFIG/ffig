@@ -13,7 +13,11 @@ module {{module.name}}_c
   attach_function :{{module.name}}_error, [], :string
   attach_function :{{module.name}}_clear_error, [], :void 
   {% for method in class.methods %}
+  {% if method.is_noexcept %}
+  attach_function :{{module.name}}_{{class.name}}_{{method.name}}_noexcept, [:pointer{% for arg in method.arguments %}, :{{arg.type|to_ruby_type}}{% endfor %}], :{{method.return_type|to_ruby_type}}
+  {% else %}
   attach_function :{{module.name}}_{{class.name}}_{{method.name}}, [:pointer{% for arg in method.arguments %}, :{{arg.type|to_ruby_type}}{% endfor %}, :pointer], :int
+  {% endif %}
   {% endfor %}
   {% for impl in class.impls %}{% for method in impl.constructors %}
   attach_function :{{module.name}}_{{impl.name}}_create, [{% for arg in method.arguments %}:{{arg.type|to_ruby_type}},{% endfor %} :pointer], :int
@@ -41,6 +45,11 @@ class {{class.name}}
     proc { {{module.name}}_c.{{module.name}}_{{class.name}}_dispose(ptr) }
   end
   {% for method in class.methods %}
+  {% if method.is_noexcept %}
+  def {{method.name}}()
+    return {{module.name}}_c.{{module.name}}_{{class.name}}_{{method.name}}_noexcept(@ptr)
+  end
+  {% else %}
   def {{method.name}}()
     dptr = {{method.return_type|to_ruby_output_type}}
     rc = {{module.name}}_c.{{module.name}}_{{class.name}}_{{method.name}}(@ptr, dptr)
@@ -49,6 +58,7 @@ class {{class.name}}
     end
     dptr.{{method.return_type|restore_ruby_type}}
   end
+  {% endif %}
 {% endfor %}end
 
 {% for impl in class.impls %}{% for method in impl.constructors %}
