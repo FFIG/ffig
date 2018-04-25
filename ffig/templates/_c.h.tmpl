@@ -15,8 +15,13 @@
 #define EXPORT extern "C" __declspec(dllimport)
 #endif
 #else
+#ifdef __cplusplus
 #define EXPORT extern "C" __attribute__((visibility("default")))
+#else
+#define EXPORT
 #endif
+#endif
+
 {% for class in classes %}
 struct {{module.name}}_{{class.name}}_t;
 typedef struct {{module.name}}_{{class.name}}_t* {{module.name}}_{{class.name}};
