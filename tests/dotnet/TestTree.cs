@@ -1,12 +1,12 @@
+using NUnit.Framework;
 using Tree_c;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestFFIG
 {
-    [TestClass]
+    [TestFixture]
     public class TestTree
     {
-        [TestMethod]
+        [Test]
         public void DepthIsAsConstructed()
         {
           var tree = new Tree(1);
@@ -15,7 +15,7 @@ namespace TestFFIG
           Assert.IsNull(tree.left_subtree().left_subtree());
         }
         
-        [TestMethod]
+        [Test]
         public void DataIsAsSet()
         {
           var tree = new Tree(1);
@@ -25,7 +25,7 @@ namespace TestFFIG
           Assert.AreEqual(tree.data(), 42);
         }
         
-        [TestMethod]
+        [Test]
         public void LifetimeExtension()
         {
           var tree = new Tree(1);

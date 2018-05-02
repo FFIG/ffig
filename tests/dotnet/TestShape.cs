@@ -1,12 +1,12 @@
+using NUnit.Framework;
 using Shape_c;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace TestFFIG
 {
-    [TestClass]
+    [TestFixture]
     public class TestShape
     {
-        [TestMethod]
+        [Test]
         public void CircleName()
         {
           double radius = 2.0;
@@ -15,7 +15,7 @@ namespace TestFFIG
           Assert.AreEqual(circle.name, "Circle");
         }
         
-        [TestMethod]
+        [Test]
         public void CircleArea()
         {
           double radius = 2.0;
@@ -24,7 +24,7 @@ namespace TestFFIG
           Assert.AreEqual(circle.area, 12.56637061436, 10);
         }
         
-        [TestMethod]
+        [Test]
         public void CirclePerimeter()
         {
           double radius = 2.0;
@@ -33,7 +33,7 @@ namespace TestFFIG
           Assert.AreEqual(circle.perimeter, 12.5663706144, 10);
         }
         
-        [TestMethod]
+        [Test]
         public void CircleEquality()
         {
           var circle1 = new Circle(3);
@@ -42,7 +42,7 @@ namespace TestFFIG
           Assert.AreEqual(circle1.is_equal(circle2), 1);
         }
         
-        [TestMethod]
+        [Test]
         public void CircleInequality()
         {
           var circle1 = new Circle(3);
