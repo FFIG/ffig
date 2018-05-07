@@ -16,7 +16,25 @@ def check_for_executable(exe_name, args=['--version']):
         return False
 
 
+def process_optional_bindings(required, disabled):
+    if disabled is None:
+        disabled = []
+    if required is None:
+        required = []
+
+    output = []
+
+    for lang in required:
+        output.append('-DFFIG_REQUIRE_{}=1'.format(lang.upper()))
+    for lang in disabled:
+        output.append('-DFFIG_DISABLE_{}=1'.format(lang.upper()))
+
+    return output
+
+
 def main():
+    optional_languages = ('dotnet', 'go', 'lua', 'java', 'swift', 'ruby')
+
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -59,6 +77,21 @@ def main():
             help='Build 32-bit libraries',
             action='store_true',
             dest='win32')
+
+    for lang in optional_languages:
+        group = parser.add_mutually_exclusive_group()
+        group.add_argument(
+            '--disable-{}'.format(lang),
+            dest='disabled_bindings',
+            action='append_const',
+            const=lang,
+            help='Disable generation of bindings for {}'.format(lang))
+        group.add_argument(
+            '--require-{}'.format(lang),
+            dest='required_bindings',
+            action='append_const',
+            const=lang,
+            help='Require generation of bindings for {}'.format(lang))
 
     args = parser.parse_args()
     args.platform = platform.system()
@@ -103,6 +136,11 @@ def main():
     if args.python_path:
         cmake_invocation.append(
             '-DPYTHON_EXECUTABLE={}'.format(args.python_path))
+
+    # Add required / disabled binding options
+    cmake_invocation.extend(
+        process_optional_bindings(
+            args.required_bindings, args.disabled_bindings))
 
     subprocess.check_call(cmake_invocation, cwd=src_dir)
     subprocess.check_call(

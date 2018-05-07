@@ -33,18 +33,18 @@ include_directories(ffig/include)
 if(NOT PYTHON_EXECUTABLE)
   find_package(PythonInterp REQUIRED)
   if(WIN32)
-    execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; assert sys.version_info[0] == 3" 
-                    RESULT_VARIABLE result 
-                    OUTPUT_QUIET 
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; assert sys.version_info[0] == 3"
+                    RESULT_VARIABLE result
+                    OUTPUT_QUIET
                     ERROR_QUIET)
     if(result)
       message(FATAL_ERROR "CMake failed: Python 3 is required for Windows.")
     endif()
   endif()
 else()
-  execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import this" 
-                  RESULT_VARIABLE result 
-                  OUTPUT_QUIET 
+  execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import this"
+                  RESULT_VARIABLE result
+                  OUTPUT_QUIET
                   ERROR_QUIET)
   if(result)
     message(FATAL_ERROR "CMake failed: ${PYTHON_EXECUTABLE} cannot execute a simple Python script.")
@@ -57,85 +57,120 @@ set(all_ffig_bindings "PYTHON;CPP;CPP_MOCKS")
 
 # Look for Go
 # FIXME: Make this less hacky, ideally using a real CMake module
-execute_process(COMMAND go version 
-                RESULT_VARIABLE result 
-                OUTPUT_QUIET 
-                ERROR_QUIET)
-if(result)
-  set(Go_FOUND FALSE)
-  message(STATUS "Go tests disabled: Go compiler not found.")
-else()
-  set(Go_FOUND True)
-  list(APPEND all_ffig_bindings "GO")
-endif()
-
-# Look for Swift
-execute_process(COMMAND swiftc --version
-                RESULT_VARIABLE result
-                OUTPUT_QUIET
-                ERROR_QUIET)
-if(result)
-  set(Swift_FOUND FALSE)
-  message(STATUS "Swift tests disabled: Swift compiler not found.")
-else()
-  set(Swift_FOUND True)
-  list(APPEND all_ffig_bindings "SWIFT")
-endif()
-
-
-# Look for Ruby
-find_package(Ruby)
-if(NOT Ruby_FOUND)
-  message(STATUS "Ruby tests disabled: Ruby interpreter not found.")
-else()
-  execute_process(COMMAND ${RUBY_EXECUTABLE} -rffi -e "puts FFI"
+if(NOT FFIG_DISABLE_GO)
+  execute_process(COMMAND go version
                   RESULT_VARIABLE result
                   OUTPUT_QUIET
                   ERROR_QUIET)
   if(result)
-    message(WARNING "CMake failed: Ruby FFI dependencies is required.  Run 'gem install ffi' to install FFI dependency")
+    if(FFIG_REQUIRE_GO)
+      message(FATAL_ERROR "CMake failed: Go not found but is required by this build.")
+    endif()
+    set(Go_FOUND FALSE)
+    message(STATUS "Go tests disabled: Go compiler not found.")
   else()
-    list(APPEND all_ffig_bindings "RUBY")
+    message(STATUS "Found Go. Generating Go bindings.")
+    set(Go_FOUND True)
+    list(APPEND all_ffig_bindings "GO")
+  endif()
+endif()
+
+# Look for Swift
+if(NOT FFIG_DISABLE_SWIFT)
+  execute_process(COMMAND swiftc --version
+                  RESULT_VARIABLE result
+                  OUTPUT_QUIET
+                  ERROR_QUIET)
+  if(result)
+    if(FFIG_REQUIRE_SWIFT)
+      message(FATAL_ERROR "CMake failed: swiftc not found but is required by this build.")
+    endif()
+    set(Swift_FOUND FALSE)
+    message(STATUS "Swift tests disabled: Swift compiler not found.")
+  else()
+    message(STATUS "Found Swift. Generating Swift bindings.")
+    set(Swift_FOUND True)
+    list(APPEND all_ffig_bindings "SWIFT")
+  endif()
+endif()
+
+# Look for Ruby
+if(NOT FFIG_DISABLE_RUBY)
+  find_package(Ruby)
+  if(NOT Ruby_FOUND)
+    if(FFIG_REQUIRE_RUBY)
+      message(FATAL_ERROR "CMake failed: Ruby not found but is required by this build.")
+    endif()
+    message(STATUS "Ruby tests disabled: Ruby interpreter not found.")
+  else()
+    execute_process(COMMAND ${RUBY_EXECUTABLE} -rffi -e "puts FFI"
+                    RESULT_VARIABLE result
+                    OUTPUT_QUIET
+                    ERROR_QUIET)
+    if(result)
+      message(WARNING "CMake failed: Ruby FFI dependencies is required.  Run 'gem install ffi' to install FFI dependency")
+    else()
+      message(STATUS "Found Ruby. Generating Ruby bindings.")
+      list(APPEND all_ffig_bindings "RUBY")
+    endif()
   endif()
 endif()
 
 # Look for Java
-find_package(Java)
-find_package(Java COMPONENTS Runtime)
-find_package(Java COMPONENTS Development)
-if(NOT Java_FOUND)
-  message(STATUS "Java tests disabled: Java SDK not found.")
-else()
-  include(UseJava)
-  # FIXME: append JAVA to all_ffig_bindings once we have a test.
+if(NOT FFIG_DISABLE_JAVA)
+  find_package(Java)
+  find_package(Java COMPONENTS Runtime)
+  find_package(Java COMPONENTS Development)
+  if(NOT Java_FOUND)
+    if(FFIG_REQUIRE_JAVA)
+      message(FATAL_ERROR "CMake failed: Java SDK not found but is required by this build.")
+    endif()
+    message(STATUS "Java tests disabled: Java SDK not found.")
+  else()
+    message("Found Java SDK. Generating Java bindings.")
+    include(UseJava)
+    # FIXME: append JAVA to all_ffig_bindings once we have a test.
+  endif()
 endif()
 
 # Look for Lua
 # FIXME: Make this less hacky, ideally using a real CMake module
-execute_process(COMMAND luajit -e "print('testing')" 
-                RESULT_VARIABLE result 
-                OUTPUT_QUIET 
-                ERROR_QUIET)
-if(result)
-  message(STATUS "Lua tests disabled: luajit cannot execute a simple Lua script.")
-else()
-  set(LuaJIT_FOUND 1)
-  set(LuaJIT_EXECUTABLE "luajit")
-  # FIXME: Get Lua bindings working well enough to work with Shape classes and 
-  # add LUA to all_ffig_bindings.
+if(NOT FFIG_DISABLE_LUA)
+  execute_process(COMMAND luajit -e "print('testing')"
+                  RESULT_VARIABLE result
+                  OUTPUT_QUIET
+                  ERROR_QUIET)
+  if(result)
+    if(FFIG_REQUIRE_LUA)
+      message(FATAL_ERROR "CMake failed: luajit not found but is required by this build.")
+    endif()
+    message(STATUS "Lua tests disabled: luajit cannot execute a simple Lua script.")
+  else()
+    message(STATUS "Found luajit. Generating Lua bindings.")
+    set(LuaJIT_FOUND 1)
+    set(LuaJIT_EXECUTABLE "luajit")
+    # FIXME: Get Lua bindings working well enough to work with Shape classes and
+    # add LUA to all_ffig_bindings.
+  endif()
 endif()
 
 # Look for C#
 # FIXME: Make this less hacky, ideally using a real CMake module
-execute_process(COMMAND dotnet --version 
-                RESULT_VARIABLE result 
-                OUTPUT_QUIET 
-                ERROR_QUIET)
-if(result)
-  message(STATUS "Dotnet tests disabled: dotnet executable not found.")
-else()
-  set(dotnet_FOUND 1)
-  list(APPEND all_ffig_bindings "DOTNET")
+if(NOT FFIG_DISABLE_DOTNET)
+  execute_process(COMMAND dotnet --version
+                  RESULT_VARIABLE result
+                  OUTPUT_QUIET
+                  ERROR_QUIET)
+  if(result)
+    if(FFIG_REQUIRE_DOTNET)
+      message(FATAL_ERROR "CMake failed: dotnet executable not found but is required by this build.")
+    endif()
+    message(STATUS "Dotnet tests disabled: dotnet executable not found.")
+  else()
+    message(STATUS "Found dotnet executable. Generating dotnet bindings.")
+    set(dotnet_FOUND 1)
+    list(APPEND all_ffig_bindings "DOTNET")
+  endif()
 endif()
 
 
@@ -144,26 +179,26 @@ endif()
 file(GLOB_RECURSE FFIG_SOURCE ${CMAKE_CURRENT_LIST_DIR}/ffig/*)
 
 # Add FFIG build targets
-ffig_add_library(NAME Shape 
-                 INPUTS tests/input/Shape.h 
+ffig_add_library(NAME Shape
+                 INPUTS tests/input/Shape.h
                  ${all_ffig_bindings})
 
-ffig_add_library(NAME Tree 
-                 INPUTS tests/input/Tree.h 
-                 CPP 
-                 D 
+ffig_add_library(NAME Tree
+                 INPUTS tests/input/Tree.h
+                 CPP
+                 D
                  DOTNET
-                 PYTHON 
+                 PYTHON
                  SWIFT)
 
-ffig_add_library(NAME Asset 
-                 INPUTS tests/input/Asset.h 
+ffig_add_library(NAME Asset
+                 INPUTS tests/input/Asset.h
                  LUA
                  PYTHON
                  JAVA)
 
-ffig_add_library(NAME Animal 
-                 INPUTS tests/input/Animal.h 
+ffig_add_library(NAME Animal
+                 INPUTS tests/input/Animal.h
                  PYTHON)
 
 ffig_add_library(NAME Number
@@ -181,7 +216,7 @@ add_test(
   NAME test_cppmodel
   COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_CURRENT_LIST_DIR}/tests/cppmodel
   WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/ffig)
-set_property(TEST test_cppmodel 
+set_property(TEST test_cppmodel
   PROPERTY LABELS INFRASTRUCTURE)
 
 add_test(
@@ -195,93 +230,92 @@ add_test(
   NAME test_python_bindings
   COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_CURRENT_LIST_DIR}/tests
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-set_property(TEST test_python_bindings 
+set_property(TEST test_python_bindings
              PROPERTY LABELS PYTHON)
 
 add_test(
   NAME test_cpp_mocks
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestShapeMocks
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-set_property(TEST test_cpp_mocks 
+set_property(TEST test_cpp_mocks
              PROPERTY LABELS MOCKS)
 
 add_test(
   NAME test_cpp_circle
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestCppCircle
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-set_property(TEST test_cpp_circle 
+set_property(TEST test_cpp_circle
              PROPERTY LABELS CPP)
 
 add_test(
   NAME test_tree_capi
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestTreeCAPI
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-set_property(TEST test_tree_capi 
+set_property(TEST test_tree_capi
              PROPERTY LABELS C)
 
 add_test(
   NAME test_number_capi
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestNumberCAPI
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-set_property(TEST test_number_capi 
+set_property(TEST test_number_capi
              PROPERTY LABELS C)
 
 add_test(
   NAME test_cpp_tree
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestCppTree
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-set_property(TEST test_cpp_tree 
+set_property(TEST test_cpp_tree
              PROPERTY LABELS CPP)
 
 if(dotnet_FOUND)
   include(dotnet)
   set(CMAKE_DOTNET_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-  
-  add_dotnet_project(NAME Shape.net 
+
+  add_dotnet_project(NAME Shape.net
     DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/Shape
-    SOURCES 
+    SOURCES
     ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.cs
   )
-  
-  add_dotnet_project(NAME Tree.net 
+
+  add_dotnet_project(NAME Tree.net
     DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/Tree
-    SOURCES 
+    SOURCES
     ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.cs
   )
-  
-  add_dotnet_project(NAME Number.net 
+
+  add_dotnet_project(NAME Number.net
     DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/Number
-    SOURCES 
+    SOURCES
     ${CMAKE_CURRENT_BINARY_DIR}/generated/Number.cs
   )
- 
-  add_dotnet_project(NAME TestShape.net 
+
+  add_dotnet_project(NAME TestShape.net
     DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestShape
-    SOURCES 
+    SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestShape/TestShape.cs
   )
   add_dependencies(TestShape.net Shape.net)
 
-  add_dotnet_project(NAME TestNumber.net 
+  add_dotnet_project(NAME TestNumber.net
     DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestNumber
-    SOURCES 
+    SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestNumber/TestNumber.cs
   )
   add_dependencies(TestNumber.net Number.net)
-  
-  add_dotnet_project(NAME TestTree.net 
+
+  add_dotnet_project(NAME TestTree.net
     DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestTree
-    SOURCES 
+    SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestTree/TestTree.cs
   )
   add_dependencies(TestTree.net Tree.net)
 
-  
   add_test(
     NAME test_shape_dotnet
-    COMMAND dotnet test --no-build --no-restore -o . 
+    COMMAND dotnet test --no-build --no-restore -o .
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/TestShape.net)
-  set_property(TEST test_shape_dotnet 
+  set_property(TEST test_shape_dotnet
                PROPERTY LABELS DOTNET)
   set_test_shared_library_path(
     TEST_NAME test_shape_dotnet 
@@ -291,17 +325,17 @@ if(dotnet_FOUND)
     NAME test_number_dotnet
     COMMAND dotnet test --no-build --no-restore -o .
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/TestNumber.net)
-  set_property(TEST test_number_dotnet 
+  set_property(TEST test_number_dotnet
                PROPERTY LABELS DOTNET)
   set_test_shared_library_path(
     TEST_NAME test_number_dotnet 
     DLL_PATH ${CMAKE_CURRENT_BINARY_DIR}/generated)
-  
+
   add_test(
     NAME test_tree_dotnet
     COMMAND dotnet test --no-build --no-restore -o .
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/TestTree.net)
-  set_property(TEST test_tree_dotnet 
+  set_property(TEST test_tree_dotnet
                PROPERTY LABELS DOTNET)
   set_test_shared_library_path(
     TEST_NAME test_tree_dotnet 
@@ -309,13 +343,13 @@ if(dotnet_FOUND)
 
 endif()
 
-if(Swift_FOUND)                                                             
- 
+if(Swift_FOUND)
+
   set(SWIFT_TREE_MODULE ${CMAKE_CURRENT_BINARY_DIR}/generated/Swift/Tree)
   add_custom_command(
     OUTPUT ${SWIFT_TREE_MODULE}
     COMMAND swiftc ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.swift
-      -import-objc-header ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree-Bridging-Header.h 
+      -import-objc-header ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree-Bridging-Header.h
       -Xcc -I${CMAKE_CURRENT_LIST_DIR}/ffig/include/
       -L${CMAKE_CURRENT_BINARY_DIR}/generated/
       -lTree_c
@@ -326,7 +360,7 @@ if(Swift_FOUND)
       -o ${SWIFT_TREE_MODULE}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
     DEPENDS Tree_c
-      ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree-Bridging-Header.h 
+      ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree-Bridging-Header.h
       ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.swift)
   add_custom_target(SwiftTree ALL DEPENDS ${SWIFT_TREE_MODULE})
 
@@ -335,9 +369,9 @@ if(Swift_FOUND)
     OUTPUT ${SWIFT_TREE_TEST}
     COMMAND swiftc ${CMAKE_CURRENT_LIST_DIR}/tests/swift/TestTree/main.swift
     ${CMAKE_CURRENT_BINARY_DIR}/generated/Swift/Tree
-    -I${CMAKE_CURRENT_BINARY_DIR}/generated/Swift 
+    -I${CMAKE_CURRENT_BINARY_DIR}/generated/Swift
     -L${CMAKE_CURRENT_BINARY_DIR}/generated
-    -lTree_c 
+    -lTree_c
     -o ${SWIFT_TREE_TEST}
     DEPENDS Tree_c ${SWIFT_TREE_MODULE}
       ${CMAKE_CURRENT_LIST_DIR}/tests/swift/TestTree/main.swift)
@@ -349,15 +383,15 @@ if(Swift_FOUND)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/Swift)
   set_property(TEST test_swift_tree
     PROPERTY LABELS SWIFT)
-  set_property(TEST test_swift_tree 
+  set_property(TEST test_swift_tree
                PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
-  
-  
+
+
   set(SWIFT_SHAPE_MODULE ${CMAKE_CURRENT_BINARY_DIR}/generated/Swift/Shape)
   add_custom_command(
     OUTPUT ${SWIFT_SHAPE_MODULE}
     COMMAND swiftc ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.swift
-      -import-objc-header ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape-Bridging-Header.h 
+      -import-objc-header ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape-Bridging-Header.h
       -Xcc -I${CMAKE_CURRENT_LIST_DIR}/ffig/include/
       -L${CMAKE_CURRENT_BINARY_DIR}/generated/
       -lShape_c
@@ -368,7 +402,7 @@ if(Swift_FOUND)
       -o ${SWIFT_SHAPE_MODULE}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
     DEPENDS Shape_c
-      ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape-Bridging-Header.h 
+      ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape-Bridging-Header.h
       ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.swift)
   add_custom_target(SwiftShape ALL DEPENDS ${SWIFT_SHAPE_MODULE})
 
@@ -377,9 +411,9 @@ if(Swift_FOUND)
     OUTPUT ${SWIFT_SHAPE_TEST}
     COMMAND swiftc ${CMAKE_CURRENT_LIST_DIR}/tests/swift/TestShape/main.swift
     ${CMAKE_CURRENT_BINARY_DIR}/generated/Swift/Shape
-    -I${CMAKE_CURRENT_BINARY_DIR}/generated/Swift 
+    -I${CMAKE_CURRENT_BINARY_DIR}/generated/Swift
     -L${CMAKE_CURRENT_BINARY_DIR}/generated
-    -lShape_c 
+    -lShape_c
     -o ${SWIFT_SHAPE_TEST}
     DEPENDS Shape_c ${SWIFT_SHAPE_MODULE}
       ${CMAKE_CURRENT_LIST_DIR}/tests/swift/TestShape/main.swift)
@@ -391,7 +425,7 @@ if(Swift_FOUND)
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/Swift)
   set_property(TEST test_swift_shape
     PROPERTY LABELS SWIFT)
-  set_property(TEST test_swift_shape 
+  set_property(TEST test_swift_shape
                PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
 endif()
 
@@ -400,37 +434,37 @@ if(Java_FOUND)
 
   find_jar(JNA_JAR NAMES jna jna-4.5.1 PATHS ${FFIG_JAR_PATH})
   if(NOT JNA_JAR)
-    message(FATAL_ERROR 
+    message(FATAL_ERROR
       "Could NOT find JNA library. "
-      "Run git submodules update --init to get JARs")
+      "Run git submodule update --init to get JARs")
   endif()
-  
+
   find_jar(JUNIT_JAR NAMES junit junit-4.12 PATHS ${FFIG_JAR_PATH})
   if(NOT JUNIT_JAR)
-    message(FATAL_ERROR 
+    message(FATAL_ERROR
       "Could NOT find JUnit library. "
-      "Run git submodules update --init to get JARs")
+      "Run git submodule update --init to get JARs")
   endif()
-  
+
   find_jar(HAMCREST_JAR NAMES hamcrest hamcrest-all-1.3 PATHS ${FFIG_JAR_PATH})
   if(NOT HAMCREST_JAR)
-    message(FATAL_ERROR 
+    message(FATAL_ERROR
       "Could NOT find Hamcrest library. "
-      "Run git submodules update --init to get JARs")
+      "Run git submodule update --init to get JARs")
   endif()
 
   # FIXME: Move JAR creation to ffig.cmake - requires passing JAR_PATH.
-  add_jar(Asset 
-          ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.java 
+  add_jar(Asset
+          ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.java
           OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated
           INCLUDE_JARS ${JNA_JAR})
 
-  add_jar(TestAsset 
-          tests/java/TestAsset.java 
+  add_jar(TestAsset
+          tests/java/TestAsset.java
           OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated
-          INCLUDE_JARS 
-            ${JNA_JAR} 
-            ${JUNIT_JAR} 
+          INCLUDE_JARS
+            ${JNA_JAR}
+            ${JUNIT_JAR}
             ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.jar)
 
   list(APPEND JAVA_JARS
@@ -452,9 +486,9 @@ if(Java_FOUND)
     NAME test_java_asset
     COMMAND echo ${Java_JAVA_EXECUTABLE} -classpath ${JAVA_CLASSPATH} org.junit.runner.JUnitCore TestAsset
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-  set_property(TEST test_java_asset 
+  set_property(TEST test_java_asset
     PROPERTY LABELS JAVA)
-  set_property(TEST test_java_asset 
+  set_property(TEST test_java_asset
                 PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
 endif()
 
@@ -463,7 +497,7 @@ add_test(
   COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
   ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Tree.d.expected
   ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.d)
-set_property(TEST test_d_tree_output 
+set_property(TEST test_d_tree_output
              PROPERTY LABELS D TEXT)
 
 if(LuaJIT_FOUND)
@@ -472,9 +506,9 @@ if(LuaJIT_FOUND)
     NAME test_asset_lua
     COMMAND ${LuaJIT_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/tests/test_asset_bindings.lua
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-  set_property(TEST test_asset_lua 
+  set_property(TEST test_asset_lua
                PROPERTY LABELS LUA)
-  set_property(TEST test_asset_lua 
+  set_property(TEST test_asset_lua
                PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
 endif()
 
