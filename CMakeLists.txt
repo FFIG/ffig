@@ -27,20 +27,9 @@ include_directories(externals/variant/include)
 # FIXME: Use FFIG to get this path.
 include_directories(ffig/include)
 
-# Check that the found version of Python==3 on Windows.
-# Trust the user if they have supplied their own.
-# FIXME: Get to the bottom of the libclang/ctypes issues with Python2 on Windows.
+# Detect Python if it's not user-specified.
 if(NOT PYTHON_EXECUTABLE)
   find_package(PythonInterp REQUIRED)
-  if(WIN32)
-    execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; assert sys.version_info[0] == 3"
-                    RESULT_VARIABLE result
-                    OUTPUT_QUIET
-                    ERROR_QUIET)
-    if(result)
-      message(FATAL_ERROR "CMake failed: Python 3 is required for Windows.")
-    endif()
-  endif()
 else()
   execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import this"
                   RESULT_VARIABLE result
@@ -48,6 +37,20 @@ else()
                   ERROR_QUIET)
   if(result)
     message(FATAL_ERROR "CMake failed: ${PYTHON_EXECUTABLE} cannot execute a simple Python script.")
+  endif()
+endif()
+
+# Robustly detect Python version
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -c "import sys; sys.exit(sys.version_info[0])"
+  RESULT_VARIABLE result
+  OUTPUT_QUIET
+  ERROR_QUIET)
+set(PYTHON_VERSION_MAJOR ${result})
+# Check that the found version of Python==3 on Windows.
+# FIXME: Get to the bottom of the libclang/ctypes issues with Python2 on Windows.
+if(WIN32)
+  if(NOT ${PYTHON_VERSION_MAJOR} STREQUAL 3)
+    message(FATAL_ERROR "CMake failed: Python 3 is required for Windows.")
   endif()
 endif()
 
@@ -134,7 +137,7 @@ if(NOT FFIG_DISABLE_JAVA)
     message(STATUS "Java tests disabled: Java SDK not found.")
   else()
     if(NOT FFIG_REQUIRE_JAVA)
-      message("Found Java SDK. Generating Java bindings.")
+      message(STATUS "Found Java SDK. Generating Java bindings.")
     endif()
     include(UseJava)
     # FIXME: append JAVA to all_ffig_bindings once we have a test.
@@ -186,11 +189,8 @@ if(NOT FFIG_DISABLE_DOTNET)
 endif()
 
 # Look for Boost Python - needs Python libs and Boost.
-# FIXME: Get boost-python compiling/linking.
 if(NOT FFIG_DISABLE_BOOST_PYTHON)
   find_package(PythonLibs)
-  message("Include dirs of Python: " ${PYTHON_INCLUDE_DIRS} )
-  message("Libs of Python: " ${PYTHON_LIBRARIES} )
   if(NOT PythonLibs_FOUND)
     if(FFIG_REQUIRE_BOOST_PYTHON)
       message(FATAL_ERROR "CMake failed: Python libraries not found but are required by this build.")
@@ -198,7 +198,11 @@ if(NOT FFIG_DISABLE_BOOST_PYTHON)
       message(STATUS "boost::python tests disabled: Python libraries not found.")
     endif()
   else()
-    find_package(Boost COMPONENTS python)
+    if(${PYTHON_VERSION_MAJOR} STREQUAL "3")
+      find_package(Boost COMPONENTS python36)
+    else()
+      find_package(Boost COMPONENTS python)
+    endif()
     if(NOT Boost_FOUND)
       if(FFIG_REQUIRE_BOOST_PYTHON)
         message(FATAL_ERROR "CMake failed: Boost libraries not found but are required by this build.")
@@ -565,12 +569,16 @@ if(Go_FOUND AND NOT WIN32)
 endif()
 
 if(BOOST_PYTHON_Found)
-  message("Building tests for boost::python")
   add_library(Shape_py SHARED ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape_py.cpp)
   target_include_directories(Shape_py PRIVATE ${PYTHON_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
   target_link_libraries(Shape_py ${PYTHON_LIBRARIES})
   target_link_libraries(Shape_py ${Boost_LIBRARIES})
   set_property(TARGET Shape_py PROPERTY PREFIX "")
+  if(WIN32)
+    set_property(TARGET Shape_py PROPERTY SUFFIX ".dll")
+  else()
+    set_property(TARGET Shape_py PROPERTY SUFFIX ".so")
+  endif()
 
   add_custom_command(TARGET Shape_py
     POST_BUILD
