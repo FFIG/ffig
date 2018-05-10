@@ -53,7 +53,7 @@ endif()
 
 # FFIG won't work without Python and a C++ compiler so we can assume
 # support for Python and C++ must exist.
-set(all_ffig_bindings "PYTHON;CPP;CPP_MOCKS")
+set(all_ffig_bindings "PYTHON;CPP;CPP_MOCKS;BOOST_PYTHON")
 
 # Look for Go
 # FIXME: Make this less hacky, ideally using a real CMake module
@@ -182,6 +182,34 @@ if(NOT FFIG_DISABLE_DOTNET)
     endif()
     set(dotnet_FOUND 1)
     list(APPEND all_ffig_bindings "DOTNET")
+  endif()
+endif()
+
+# Look for Boost Python - needs Python libs and Boost.
+# FIXME: Get boost-python compiling/linking.
+if(NOT FFIG_DISABLE_BOOST_PYTHON)
+  find_package(PythonLibs)
+  message("Include dirs of Python: " ${PYTHON_INCLUDE_DIRS} )
+  message("Libs of Python: " ${PYTHON_LIBRARIES} )
+  if(NOT PythonLibs_FOUND)
+    if(FFIG_REQUIRE_BOOST_PYTHON)
+      message(FATAL_ERROR "CMake failed: Python libraries not found but are required by this build.")
+    else()  
+      message(STATUS "boost::python tests disabled: Python libraries not found.")
+    endif()
+  else()
+    find_package(Boost COMPONENTS python)
+    if(NOT Boost_FOUND)
+      if(FFIG_REQUIRE_BOOST_PYTHON)
+        message(FATAL_ERROR "CMake failed: Boost libraries not found but are required by this build.")
+      else()  
+        message(STATUS "boost::python tests disabled: Boost libraries not found.")
+      endif()
+    else()
+      message(STATUS "Found boost::python. Generating boost::python bindings.")
+      list(APPEND all_ffig_bindings "BOOST_PYTHON")
+      set(BOOST_PYTHON_Found 1)
+    endif()
   endif()
 endif()
 
@@ -535,3 +563,24 @@ endif()
 if(Go_FOUND AND NOT WIN32)
   add_subdirectory(tests/go)
 endif()
+
+if(BOOST_PYTHON_Found)
+  message("Building tests for boost::python")
+  add_library(Shape_py SHARED ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape_py.cpp)
+  target_include_directories(Shape_py PRIVATE ${PYTHON_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+  target_link_libraries(Shape_py ${PYTHON_LIBRARIES})
+  target_link_libraries(Shape_py ${Boost_LIBRARIES})
+  set_property(TARGET Shape_py PROPERTY PREFIX "")
+
+  add_custom_command(TARGET Shape_py
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Shape_py> ${CMAKE_CURRENT_BINARY_DIR}/generated)
+
+  # FIXME: Use the existing Python tests with boost::python.
+  add_test(
+    NAME test_boost_python_bindings
+    COMMAND python -c "import Shape_py; c = Shape_py.Circle(3); print('A %s with radius 3 has area %f' % (c.name, c.area))"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
+  set_property(TEST test_boost_python_bindings PROPERTY LABELS BOOST_PYTHON)
+endif()
+

@@ -29,7 +29,7 @@
 # * CPP_MOCKS - creates myModuleName_mocks.h
 
 function(ffig_add_library)
-  set(options RUBY PYTHON CPP CPP_MOCKS GO LUA DOTNET D SWIFT JAVA)
+  set(options BOOST_PYTHON RUBY PYTHON CPP CPP_MOCKS GO LUA DOTNET D SWIFT JAVA)
   set(oneValueArgs NAME INPUTS)
   cmake_parse_arguments(ffig_add_library "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -41,6 +41,10 @@ function(ffig_add_library)
   set(ffig_outputs "${CMAKE_CURRENT_BINARY_DIR}/generated/${module}_c.h;${CMAKE_CURRENT_BINARY_DIR}/generated/${module}_c.cpp")  
   set(ffig_output_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
 
+  if(ffig_add_library_BOOST_PYTHON)
+    set(ffig_invocation "${ffig_invocation};boost_python")
+    set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/${module}_py.cpp")
+  endif()
   if(ffig_add_library_RUBY)
     set(ffig_invocation "${ffig_invocation};ruby")
     set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/${module}.rb")

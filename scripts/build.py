@@ -17,11 +17,6 @@ def check_for_executable(exe_name, args=['--version']):
 
 
 def process_optional_bindings(required, disabled):
-    if disabled is None:
-        disabled = []
-    if required is None:
-        required = []
-
     output = []
 
     for lang in required:
@@ -33,7 +28,8 @@ def process_optional_bindings(required, disabled):
 
 
 def main():
-    optional_languages = ('dotnet', 'go', 'lua', 'java', 'swift', 'ruby')
+    optional_languages = ('dotnet', 'go', 'lua', 'java',
+                          'swift', 'ruby', 'boost_python')
 
     import argparse
     parser = argparse.ArgumentParser()
@@ -81,17 +77,22 @@ def main():
     for lang in optional_languages:
         group = parser.add_mutually_exclusive_group()
         group.add_argument(
-            '--disable-{}'.format(lang),
+            '--disable_{}'.format(lang),
             dest='disabled_bindings',
             action='append_const',
             const=lang,
             help='Disable generation of bindings for {}'.format(lang))
         group.add_argument(
-            '--require-{}'.format(lang),
+            '--require_{}'.format(lang),
             dest='required_bindings',
             action='append_const',
             const=lang,
             help='Require generation of bindings for {}'.format(lang))
+
+    parser.add_argument(
+        '--nodetect',
+        action='store_true',
+        help='Disable generation of all optional bindings not explicitly activated')
 
     args = parser.parse_args()
     args.platform = platform.system()
@@ -138,9 +139,15 @@ def main():
             '-DPYTHON_EXECUTABLE={}'.format(args.python_path))
 
     # Add required / disabled binding options
+    required_bindings = args.required_bindings or []
+    disabled_bindings = args.disabled_bindings or []
+
+    if args.nodetect:
+        disabled_bindings += [o for o in optional_languages
+                              if o not in required_bindings]
+
     cmake_invocation.extend(
-        process_optional_bindings(
-            args.required_bindings, args.disabled_bindings))
+        process_optional_bindings(required_bindings, disabled_bindings))
 
     subprocess.check_call(cmake_invocation, cwd=src_dir)
     subprocess.check_call(
