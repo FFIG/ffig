@@ -292,17 +292,17 @@ set_property(TEST test_cpp_circle
              PROPERTY LABELS CPP)
 
 add_test(
-  NAME test_tree_capi
+  NAME test_capi_tree
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestTreeCAPI
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-set_property(TEST test_tree_capi
+set_property(TEST test_capi_tree
              PROPERTY LABELS C)
 
 add_test(
-  NAME test_number_capi
+  NAME test_capi_number
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tests/src/TestNumberCAPI
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-set_property(TEST test_number_capi
+set_property(TEST test_capi_number
              PROPERTY LABELS C)
 
 add_test(
@@ -356,33 +356,33 @@ if(dotnet_FOUND)
   add_dependencies(TestTree.net Tree.net)
 
   add_test(
-    NAME test_shape_dotnet
+    NAME test_dotnet_shape
     COMMAND dotnet test --no-build --no-restore -o .
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/TestShape.net)
-  set_property(TEST test_shape_dotnet
+  set_property(TEST test_dotnet_shape
                PROPERTY LABELS DOTNET)
   set_test_shared_library_path(
-    TEST_NAME test_shape_dotnet 
+    TEST_NAME test_dotnet_shape 
     DLL_PATH ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
   add_test(
-    NAME test_number_dotnet
+    NAME test_dotnet_number
     COMMAND dotnet test --no-build --no-restore -o .
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/TestNumber.net)
-  set_property(TEST test_number_dotnet
+  set_property(TEST test_dotnet_number
                PROPERTY LABELS DOTNET)
   set_test_shared_library_path(
-    TEST_NAME test_number_dotnet 
+    TEST_NAME test_dotnet_number 
     DLL_PATH ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
   add_test(
-    NAME test_tree_dotnet
+    NAME test_dotnet_tree
     COMMAND dotnet test --no-build --no-restore -o .
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated/TestTree.net)
-  set_property(TEST test_tree_dotnet
+  set_property(TEST test_dotnet_tree
                PROPERTY LABELS DOTNET)
   set_test_shared_library_path(
-    TEST_NAME test_tree_dotnet 
+    TEST_NAME test_dotnet_tree 
     DLL_PATH ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
 endif()
@@ -547,12 +547,12 @@ set_property(TEST test_d_tree_output
 if(LuaJIT_FOUND)
   # FIXME: The relative paths here (and in the lua test file) are very brittle.
   add_test(
-    NAME test_asset_lua
+    NAME test_lua_asset
     COMMAND ${LuaJIT_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/tests/test_asset_bindings.lua
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-  set_property(TEST test_asset_lua
+  set_property(TEST test_lua_asset
                PROPERTY LABELS LUA)
-  set_property(TEST test_asset_lua
+  set_property(TEST test_lua_asset
                PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
 endif()
 
