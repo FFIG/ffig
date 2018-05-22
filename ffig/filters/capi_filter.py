@@ -465,6 +465,8 @@ def to_java_output_param(t):
         return "DoubleByReference"
     if t.kind == TypeKind.POINTER:
         return "PointerByReference"
+    if t.kind == TypeKind.RECORD:
+        return "PointerByReference"
     raise Exception(
         'Type {} has no defined java output parameter translation (adding one may be trivial)'.format(
             t.name))
@@ -472,11 +474,13 @@ def to_java_output_param(t):
 
 def to_java_output_value(t, rv):
     if t.kind == TypeKind.INT:
-        return "IntByReference {} = new IntByReference();".format(rv)
+        return "IntByReference {} = new IntByReference()".format(rv)
     if t.kind == TypeKind.DOUBLE:
-        return "DoubleByReference {} = new DoubleByReference();".format(rv)
+        return "DoubleByReference {} = new DoubleByReference()".format(rv)
     if t.kind == TypeKind.POINTER:
-        return "PointerByReference {} = new PointerByReference();".format(rv)
+        return "PointerByReference {} = new PointerByReference()".format(rv)
+    if t.kind == TypeKind.RECORD:
+        return "PointerByReference {} = new PointerByReference()".format(rv)
     raise Exception(
         'Type {} has no defined java output value translation (adding one may be trivial)'.format(
             t.name))
@@ -490,6 +494,10 @@ def to_java_return_type(t):
     if t.kind == TypeKind.POINTER:
         if t.pointee.kind == TypeKind.CHAR_S:
             return "String"
+        if t.pointee.kind == TypeKind.RECORD:
+            return t.pointee.name.replace('const ', '')
+    if t.kind == TypeKind.RECORD:
+        return t.name
     raise Exception(
         'Type {} has no defined java return type translation (adding one may be trivial)'.format(
             t.name))
@@ -517,6 +525,12 @@ def to_java_return_value(t, rv):
     if t.kind == TypeKind.POINTER:
         if t.pointee.kind == TypeKind.CHAR_S:
             return "{}.getValue().getString(0)".format(rv)
+        if t.pointee.kind == TypeKind.RECORD:
+            return 'new {}({}.getValue())'.format(
+                t.pointee.name.replace(
+                    'const ', ''), rv)
+    if t.kind == TypeKind.RECORD:
+        return 'new {}({}.getValue())'.format(t.name, rv)
     raise Exception(
         'Type {} has no defined java return value translation (adding one may be trivial)'.format(
             t.name))

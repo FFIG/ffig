@@ -140,7 +140,7 @@ if(NOT FFIG_DISABLE_JAVA)
       message(STATUS "Found Java SDK. Generating Java bindings.")
     endif()
     include(UseJava)
-    # FIXME: append JAVA to all_ffig_bindings once we have a test.
+    list(APPEND all_ffig_bindings "JAVA")
   endif()
 endif()
 
@@ -232,6 +232,7 @@ ffig_add_library(NAME Tree
                  CPP
                  D
                  DOTNET
+                 JAVA
                  PYTHON
                  SWIFT)
 
@@ -248,6 +249,7 @@ ffig_add_library(NAME Animal
 ffig_add_library(NAME Number
                  INPUTS tests/input/Number.h
                  DOTNET
+                 JAVA
                  PYTHON)
 
 enable_testing()
@@ -498,11 +500,16 @@ if(Java_FOUND)
   endif()
 
   # FIXME: Move JAR creation to ffig.cmake - requires passing JAR_PATH.
-  add_jar(Asset
-          ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.java
-          OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated
-          INCLUDE_JARS ${JNA_JAR})
-
+  FILE(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Asset")
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.jar
+    COMMAND ${Java_JAVAC_EXECUTABLE} 
+            -d ${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Asset -cp ${CMAKE_CURRENT_LIST_DIR}/externals/ffig-jars/jna.jar ${CMAKE_CURRENT_BINARY_DIR}/generated/java/src/Asset/*.java
+    COMMAND ${Java_JAR_EXECUTABLE} -cfM Asset.jar -C ${CMAKE_BINARY_DIR}/generated/java/classes/Asset .
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
+    DEPENDS Asset_c)
+  add_custom_target(Asset_jar ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.jar)
+  
   add_jar(TestAsset
           tests/java/TestAsset.java
           OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated
@@ -510,29 +517,115 @@ if(Java_FOUND)
             ${JNA_JAR}
             ${JUNIT_JAR}
             ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.jar)
+  
+  FILE(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Shape")
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.jar
+    COMMAND ${Java_JAVAC_EXECUTABLE} 
+            -d ${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Shape -cp ${CMAKE_CURRENT_LIST_DIR}/externals/ffig-jars/jna.jar ${CMAKE_CURRENT_BINARY_DIR}/generated/java/src/Shape/*.java
+    COMMAND ${Java_JAR_EXECUTABLE} -cfM Shape.jar -C ${CMAKE_BINARY_DIR}/generated/java/classes/Shape .
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
+    DEPENDS Shape_c)
+  add_custom_target(Shape_jar ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.jar)
+  
+  add_jar(TestShape
+          tests/java/TestShape.java
+          OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated
+          INCLUDE_JARS
+            ${JNA_JAR}
+            ${JUNIT_JAR}
+            ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.jar)
+  
+  FILE(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Tree")
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.jar
+    COMMAND ${Java_JAVAC_EXECUTABLE} 
+            -d ${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Tree -cp ${CMAKE_CURRENT_LIST_DIR}/externals/ffig-jars/jna.jar ${CMAKE_CURRENT_BINARY_DIR}/generated/java/src/Tree/*.java
+    COMMAND ${Java_JAR_EXECUTABLE} -cfM Tree.jar -C ${CMAKE_BINARY_DIR}/generated/java/classes/Tree .
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
+    DEPENDS Tree_c)
+  add_custom_target(Tree_jar ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.jar)
+  
+  add_jar(TestTree
+          tests/java/TestTree.java
+          OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated
+          INCLUDE_JARS
+            ${JNA_JAR}
+            ${JUNIT_JAR}
+            ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.jar)
+  
+  FILE(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Number")
+  add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/Number.jar
+    COMMAND ${Java_JAVAC_EXECUTABLE} 
+            -d ${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Number -cp ${CMAKE_CURRENT_LIST_DIR}/externals/ffig-jars/jna.jar ${CMAKE_CURRENT_BINARY_DIR}/generated/java/src/Number/*.java
+    COMMAND ${Java_JAR_EXECUTABLE} -cfM Number.jar -C ${CMAKE_BINARY_DIR}/generated/java/classes/Number .
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
+    DEPENDS Number_c)
+  add_custom_target(Number_jar ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/Number.jar)
+  
+  add_jar(TestNumber
+          tests/java/TestNumber.java
+          OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated
+          INCLUDE_JARS
+            ${JNA_JAR}
+            ${JUNIT_JAR}
+            ${CMAKE_CURRENT_BINARY_DIR}/generated/Number.jar)
 
   list(APPEND JAVA_JARS
        ${JNA_JAR}
        ${JUNIT_JAR}
        ${HAMCREST_JAR}
        ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.jar
-       ${CMAKE_CURRENT_BINARY_DIR}/generated/TestAsset.jar)
+       ${CMAKE_CURRENT_BINARY_DIR}/generated/Number.jar
+       ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.jar
+       ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.jar)
 
+  #FIXME: Use JOIN when CMake 3.12 is available.
   if(WIN32)
-    set(SEPARATOR ";")
+    #list(JOIN ${JAVA_JARS} ; JAVA_CLASSPATH)
+    set(JAVA_CLASSPATH "TestAsset.jar;Asset.jar;TestShape.jar;Shape.jar;TestNumber.jar;Number.jar;TestTree.jar;Tree.jar;${JNA_JAR};${JUNIT_JAR};${HAMCREST_JAR}")
   else()
-    set(SEPARATOR ":")
+    #list(JOIN ${JAVA_JARS} : JAVA_CLASSPATH)
+    set(JAVA_CLASSPATH "TestAsset.jar:Asset.jar:TestShape.jar:Shape.jar:TestNumber.jar:Number.jar:TestTree.jar:Tree.jar:${JNA_JAR}:${JUNIT_JAR}:${HAMCREST_JAR}")
   endif()
 
-  set(JAVA_CLASSPATH $<JOIN:${JAVA_JARS},${SEPARATOR}>)
+  message(STATUS "${Java_JAVA_EXECUTABLE} -classpath ${JAVA_CLASSPATH} org.junit.runner.JUnitCore TestAsset")
 
   add_test(
     NAME test_java_asset
-    COMMAND echo ${Java_JAVA_EXECUTABLE} -classpath ${JAVA_CLASSPATH} org.junit.runner.JUnitCore TestAsset
+    COMMAND ${Java_JAVA_EXECUTABLE} -classpath ${JAVA_CLASSPATH} org.junit.runner.JUnitCore TestAsset
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
   set_property(TEST test_java_asset
     PROPERTY LABELS JAVA)
   set_property(TEST test_java_asset
+                PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
+  
+  add_test(
+    NAME test_java_shape
+    COMMAND ${Java_JAVA_EXECUTABLE} -classpath ${JAVA_CLASSPATH} org.junit.runner.JUnitCore TestShape
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
+  set_property(TEST test_java_shape
+    PROPERTY LABELS JAVA)
+  set_property(TEST test_java_shape
+                PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
+  
+  add_test(
+    NAME test_java_tree
+    COMMAND ${Java_JAVA_EXECUTABLE} -classpath ${JAVA_CLASSPATH} org.junit.runner.JUnitCore TestTree
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
+  set_property(TEST test_java_tree
+    PROPERTY LABELS JAVA)
+  set_property(TEST test_java_tree
+                PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
+
+  add_test(
+    NAME test_java_number
+    COMMAND ${Java_JAVA_EXECUTABLE} -classpath ${JAVA_CLASSPATH} org.junit.runner.JUnitCore TestNumber
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
+  set_property(TEST test_java_number
+    PROPERTY LABELS JAVA)
+  set_property(TEST test_java_number
                 PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
 endif()
 

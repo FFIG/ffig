@@ -85,8 +85,8 @@ function(ffig_add_library)
     set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/${module}.swift;${ffig_output_dir}/${module}-Bridging-Header.h")
   endif()
   if(ffig_add_library_JAVA)
-    set(ffig_invocation "${ffig_invocation};java.tmpl")
-    set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/${module}.java")
+    set(ffig_invocation "${ffig_invocation};java")
+    # FIXME: Declare Java bindings outputs correctly - hard as full set depends on input file content.
   endif()
 
   add_custom_command(OUTPUT ${ffig_outputs}
