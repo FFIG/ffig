@@ -76,7 +76,6 @@ def write_bindings_to_disk(
     - output_dir where to write to
     """
 
-    bindings.extend("_c.cpp.tmpl _c.h.tmpl".split())
     bindings = list(set(bindings))
 
     for binding in bindings:

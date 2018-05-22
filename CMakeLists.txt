@@ -11,6 +11,10 @@ else()
   add_compile_options("-std=c++14")
 endif()
 
+set(FFIG_JNA_JAR_PATH ${CMAKE_CURRENT_SOURCE_DIR}/externals/ffig-jars/jna.jar)
+set(FFIG_JAR_PATH ${CMAKE_CURRENT_SOURCE_DIR}/externals/ffig-jars)
+set(FFIG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+
 if(NOT WIN32)
   set(CMAKE_CXX_FLAGS_ASAN "-g -fno-omit-frame-pointer -O0 -fsanitize=address")
   set(CMAKE_C_FLAGS_ASAN "-g -fno-omit-frame-pointer -O0 -fsanitize=address")
@@ -476,8 +480,6 @@ if(Swift_FOUND)
 endif()
 
 if(Java_FOUND)
-  set(FFIG_JAR_PATH ${CMAKE_CURRENT_SOURCE_DIR}/externals/ffig-jars)
-
   find_jar(JNA_JAR NAMES jna jna-4.5.1 PATHS ${FFIG_JAR_PATH})
   if(NOT JNA_JAR)
     message(FATAL_ERROR
@@ -498,17 +500,6 @@ if(Java_FOUND)
       "Could NOT find Hamcrest library. "
       "Run git submodule update --init to get JARs")
   endif()
-
-  # FIXME: Move JAR creation to ffig.cmake - requires passing JAR_PATH.
-  FILE(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Asset")
-  add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.jar
-    COMMAND ${Java_JAVAC_EXECUTABLE} 
-            -d ${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Asset -cp ${CMAKE_CURRENT_LIST_DIR}/externals/ffig-jars/jna.jar ${CMAKE_CURRENT_BINARY_DIR}/generated/java/src/Asset/*.java
-    COMMAND ${Java_JAR_EXECUTABLE} -cfM Asset.jar -C ${CMAKE_BINARY_DIR}/generated/java/classes/Asset .
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
-    DEPENDS Asset_c)
-  add_custom_target(Asset_jar ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.jar)
   
   add_jar(TestAsset
           tests/java/TestAsset.java
@@ -518,16 +509,6 @@ if(Java_FOUND)
             ${JUNIT_JAR}
             ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.jar)
   
-  FILE(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Shape")
-  add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.jar
-    COMMAND ${Java_JAVAC_EXECUTABLE} 
-            -d ${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Shape -cp ${CMAKE_CURRENT_LIST_DIR}/externals/ffig-jars/jna.jar ${CMAKE_CURRENT_BINARY_DIR}/generated/java/src/Shape/*.java
-    COMMAND ${Java_JAR_EXECUTABLE} -cfM Shape.jar -C ${CMAKE_BINARY_DIR}/generated/java/classes/Shape .
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
-    DEPENDS Shape_c)
-  add_custom_target(Shape_jar ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.jar)
-  
   add_jar(TestShape
           tests/java/TestShape.java
           OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated
@@ -535,16 +516,6 @@ if(Java_FOUND)
             ${JNA_JAR}
             ${JUNIT_JAR}
             ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.jar)
-  
-  FILE(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Tree")
-  add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.jar
-    COMMAND ${Java_JAVAC_EXECUTABLE} 
-            -d ${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Tree -cp ${CMAKE_CURRENT_LIST_DIR}/externals/ffig-jars/jna.jar ${CMAKE_CURRENT_BINARY_DIR}/generated/java/src/Tree/*.java
-    COMMAND ${Java_JAR_EXECUTABLE} -cfM Tree.jar -C ${CMAKE_BINARY_DIR}/generated/java/classes/Tree .
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
-    DEPENDS Tree_c)
-  add_custom_target(Tree_jar ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.jar)
   
   add_jar(TestTree
           tests/java/TestTree.java
@@ -554,16 +525,6 @@ if(Java_FOUND)
             ${JUNIT_JAR}
             ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.jar)
   
-  FILE(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Number")
-  add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated/Number.jar
-    COMMAND ${Java_JAVAC_EXECUTABLE} 
-            -d ${CMAKE_CURRENT_BINARY_DIR}/generated/java/classes/Number -cp ${CMAKE_CURRENT_LIST_DIR}/externals/ffig-jars/jna.jar ${CMAKE_CURRENT_BINARY_DIR}/generated/java/src/Number/*.java
-    COMMAND ${Java_JAR_EXECUTABLE} -cfM Number.jar -C ${CMAKE_BINARY_DIR}/generated/java/classes/Number .
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated
-    DEPENDS Number_c)
-  add_custom_target(Number_jar ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/generated/Number.jar)
-  
   add_jar(TestNumber
           tests/java/TestNumber.java
           OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated
@@ -572,14 +533,14 @@ if(Java_FOUND)
             ${JUNIT_JAR}
             ${CMAKE_CURRENT_BINARY_DIR}/generated/Number.jar)
 
-  list(APPEND JAVA_JARS
-       ${JNA_JAR}
-       ${JUNIT_JAR}
-       ${HAMCREST_JAR}
-       ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.jar
-       ${CMAKE_CURRENT_BINARY_DIR}/generated/Number.jar
-       ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.jar
-       ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.jar)
+# list(APPEND JAVA_JARS
+#      ${JNA_JAR}
+#      ${JUNIT_JAR}
+#      ${HAMCREST_JAR}
+#      ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.jar
+#      ${CMAKE_CURRENT_BINARY_DIR}/generated/Number.jar
+#      ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.jar
+#      ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.jar)
 
   #FIXME: Use JOIN when CMake 3.12 is available.
   if(WIN32)
@@ -589,8 +550,6 @@ if(Java_FOUND)
     #list(JOIN ${JAVA_JARS} : JAVA_CLASSPATH)
     set(JAVA_CLASSPATH "TestAsset.jar:Asset.jar:TestShape.jar:Shape.jar:TestNumber.jar:Number.jar:TestTree.jar:Tree.jar:${JNA_JAR}:${JUNIT_JAR}:${HAMCREST_JAR}")
   endif()
-
-  message(STATUS "${Java_JAVA_EXECUTABLE} -classpath ${JAVA_CLASSPATH} org.junit.runner.JUnitCore TestAsset")
 
   add_test(
     NAME test_java_asset
@@ -662,21 +621,6 @@ if(Go_FOUND AND NOT WIN32)
 endif()
 
 if(BOOST_PYTHON_Found)
-  add_library(Shape_py SHARED ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape_py.cpp)
-  target_include_directories(Shape_py PRIVATE ${PYTHON_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-  target_link_libraries(Shape_py ${PYTHON_LIBRARIES})
-  target_link_libraries(Shape_py ${Boost_LIBRARIES})
-  set_property(TARGET Shape_py PROPERTY PREFIX "")
-  if(WIN32)
-    set_property(TARGET Shape_py PROPERTY SUFFIX ".dll")
-  else()
-    set_property(TARGET Shape_py PROPERTY SUFFIX ".so")
-  endif()
-
-  add_custom_command(TARGET Shape_py
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Shape_py> ${CMAKE_CURRENT_BINARY_DIR}/generated)
-
   # FIXME: Use the existing Python tests with boost::python.
   add_test(
     NAME test_boost_python_bindings
