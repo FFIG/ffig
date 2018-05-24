@@ -148,6 +148,27 @@ if(NOT FFIG_DISABLE_JAVA)
   endif()
 endif()
 
+# Look for Rust
+# FIXME: Make this less hacky, ideally using a real CMake module
+if(NOT FFIG_DISABLE_RUST)
+  execute_process(COMMAND rustc -V
+                  RESULT_VARIABLE result
+                  OUTPUT_QUIET
+                  ERROR_QUIET)
+  if(result)
+    if(FFIG_REQUIRE_LUA)
+      message(FATAL_ERROR "CMake failed: Rust compiler not found but is required by this build.")
+    endif()
+    message(STATUS "Rust tests disabled: Rust compiler not found.")
+  else()
+    if(NOT FFIG_REQUIRE_RUST)
+      message(STATUS "Found rustc. Generating Rust bindings.")
+    endif()
+    set(Rust_FOUND 1)
+    list(APPEND all_ffig_bindings "RUST")
+  endif()
+endif()
+
 # Look for Lua
 # FIXME: Make this less hacky, ideally using a real CMake module
 if(NOT FFIG_DISABLE_LUA)

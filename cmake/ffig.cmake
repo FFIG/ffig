@@ -29,7 +29,7 @@
 # * CPP_MOCKS - creates myModuleName_mocks.h
 
 function(ffig_add_library)
-  set(options BOOST_PYTHON RUBY PYTHON CPP CPP_MOCKS GO LUA DOTNET D SWIFT JAVA)
+  set(options BOOST_PYTHON RUBY PYTHON CPP CPP_MOCKS GO LUA DOTNET D SWIFT JAVA RUST)
   set(oneValueArgs NAME INPUTS)
   cmake_parse_arguments(ffig_add_library "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -138,6 +138,21 @@ function(ffig_add_library)
       DEPENDS ${ffig_output_dir}/${module_lower}/__init__.py 
               ${ffig_output_dir}/${module_lower}/_py2.py 
               ${ffig_output_dir}/${module_lower}/_py3.py)
+  endif()
+  
+  #
+  # Rust bindings
+  #
+  if(ffig_add_library_RUST)
+    # Run FFIG to generate Rust bindings,
+    add_custom_command(
+      OUTPUT ${ffig_output_dir}/rust/${module}.rs 
+      COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} -o ${ffig_output_dir} -b rust
+      DEPENDS ${input} ${FFIG_SOURCE}
+      WORKING_DIRECTORY ${FFIG_ROOT}
+      COMMENT "Generating Rust bindings for ${module}")
+    
+    add_custom_target(${module}.ffig.rust ALL DEPENDS ${ffig_output_dir}/rust/${module}.rs)
   endif()
 
   #
