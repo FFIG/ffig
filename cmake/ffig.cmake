@@ -29,7 +29,7 @@
 # * CPP_MOCKS - creates myModuleName_mocks.h
 
 function(ffig_add_library)
-  set(options BOOST_PYTHON RUBY PYTHON CPP CPP_MOCKS GO LUA DOTNET D SWIFT JAVA)
+  set(options BOOST_PYTHON RUBY PYTHON CPP CPP_MOCKS GO LUA DOTNET D SWIFT JAVA JULIA)
   set(oneValueArgs NAME INPUTS)
   cmake_parse_arguments(ffig_add_library "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -207,6 +207,19 @@ function(ffig_add_library)
 
     set_target_properties(${module}_py PROPERTIES 
       LIBRARY_OUTPUT_DIRECTORY ${ffig_output_dir})
+  endif()
+  
+  if(ffig_add_library_JULIA)
+    add_custom_command(
+      OUTPUT ${ffig_output_dir}/${module}.jl
+      COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} 
+      -o ${ffig_output_dir} -b julia
+      DEPENDS ${input} ${FFIG_SOURCE}
+      WORKING_DIRECTORY ${FFIG_ROOT}
+      COMMENT "Generating Julia source for ${module}")
+
+    add_custom_target(${module}.ffig.julia.source ALL
+      DEPENDS ${ffig_output_dir}/${module}.jl)
   endif()
 
 endfunction()

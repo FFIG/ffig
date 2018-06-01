@@ -592,3 +592,38 @@ def to_swift_return_value(t, rv):
             return t.pointee.name.replace('const ', '') + "(fromCPtr: rv!)"
     raise Exception(
         'Type {} has no defined Swift return value translation (adding one may be trivial)'.format(t.name))
+
+def to_julia_return_type(t):
+    if t.kind == TypeKind.DOUBLE:
+        return "Float64"
+    if t.kind == TypeKind.INT:
+        return "Int32"
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "Cstring"
+    raise Exception(
+        'Type {} has no defined Julia return type translation (adding one may be trivial)'.format(t.name))
+
+def to_julia_param_type(t):
+    if t.kind == TypeKind.DOUBLE:
+        return "Float64"
+    if t.kind == TypeKind.INT:
+        return "Int32"
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "Cstring"
+    raise Exception(
+        'Type {} has no defined Julia parameter type translation (adding one may be trivial)'.format(t.name))
+
+def to_julia_return_value(t, rv):
+    if t.kind == TypeKind.INT:
+        return rv
+    if t.kind == TypeKind.DOUBLE:
+        return rv
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "unsafe_string({})".format(rv)
+    raise Exception(
+        'Type {} has no defined julia return value translation (adding one may be trivial)'.format(
+            t.name))
+

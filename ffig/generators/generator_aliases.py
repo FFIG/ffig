@@ -5,6 +5,7 @@ import ffig.generators
 
 aliases = {
     'dotnet': ('cs.tmpl', 'dotnet (C#) bindings'),
+    'julia': ('jl.tmpl', 'Julia bindings'),
     'lua': ('lua.tmpl', 'Lua bindings'),
     'ruby': ('rb.tmpl', 'Ruby bindings'),
 }

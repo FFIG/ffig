@@ -29,7 +29,8 @@ def process_optional_bindings(required, disabled):
 
 def main():
     optional_languages = ('dotnet', 'go', 'lua', 'java',
-                          'swift', 'ruby', 'boost_python')
+                          'swift', 'ruby', 'boost_python',
+                          'julia')
 
     import argparse
     parser = argparse.ArgumentParser()
@@ -119,7 +120,7 @@ def main():
 
     if not os.path.exists(os.path.join(src_dir, args.out_dir)):
         os.makedirs(os.path.join(src_dir, args.out_dir))
-    
+
     if args.venv:
         python_executable = args.python_path if args.python_path else 'python'
         subprocess.check_call(

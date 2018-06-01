@@ -17,10 +17,10 @@ matrix:
       script:
         # FIXME: Get boost::python to work in the face of a user-provided python binary.
         - docker run ffig-ci /bin/bash -c "./scripts/build.py -t --require_boost_python --nodetect"
-        - docker run ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python2 --venv --disable_boost_python --require_java --require_dotnet --require_lua --require_swift --require_ruby --require_go"
-        - docker run ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python3 --venv --disable_boost_python --require_java --require_dotnet --require_lua --require_swift --require_ruby --require_go"
-        - docker run ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python2 --venv --disable_boost_python --require_java --require_dotnet --require_lua --require_swift --require_ruby --require_go"
-        - docker run ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python3 --venv --disable_boost_python --require_java --require_dotnet --require_lua --require_swift --require_ruby --require_go"
+        - docker run ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python2 --venv --disable_boost_python --require_java --require_dotnet --require_lua --require_swift --require_ruby --require_go --require_julia"
+        - docker run ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python3 --venv --disable_boost_python --require_java --require_dotnet --require_lua --require_swift --require_ruby --require_go --require_julia"
+        - docker run ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python2 --venv --disable_boost_python --require_java --require_dotnet --require_lua --require_swift --require_ruby --require_go --require_julia"
+        - docker run ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python3 --venv --disable_boost_python --require_java --require_dotnet --require_lua --require_swift --require_ruby --require_go --require_julia"
         - ./scripts/codechecks.py
 
     - os: osx

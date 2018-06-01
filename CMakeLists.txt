@@ -171,6 +171,28 @@ if(NOT FFIG_DISABLE_LUA)
   endif()
 endif()
 
+# Look for Julia
+# FIXME: Make this less hacky, ideally using a real CMake module
+if(NOT FFIG_DISABLE_JULIA)
+  execute_process(COMMAND julia -e "print(2+2)"
+                  RESULT_VARIABLE result
+                  OUTPUT_QUIET
+                  ERROR_QUIET)
+  if(result)
+    if(FFIG_REQUIRE_JULIA)
+      message(FATAL_ERROR "CMake failed: Julia not found but is required by this build.")
+    endif()
+    message(STATUS "Julia tests disabled: julia cannot execute a simple Julia script.")
+  else()
+    if(NOT FFIG_REQUIRE_JULIA)
+      message(STATUS "Found Julia. Generating Julia bindings.")
+    endif()
+    set(Julia_FOUND 1)
+    set(Julia_EXECUTABLE "julia")
+    list(APPEND all_ffig_bindings "JULIA")
+  endif()
+endif()
+
 # Look for C#
 # FIXME: Make this less hacky, ideally using a real CMake module
 if(NOT FFIG_DISABLE_DOTNET)
@@ -629,3 +651,12 @@ if(BOOST_PYTHON_Found)
   set_property(TEST test_boost_python_bindings PROPERTY LABELS BOOST_PYTHON)
 endif()
 
+if(Julia_FOUND)
+  add_test(
+      NAME test_julia_bindings
+      COMMAND ${Julia_EXECUTABLE} tests/julia/TestShape.jl
+      WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+    set_property(TEST test_julia_bindings PROPERTY LABELS JULIA)
+    set_property(TEST test_julia_bindings
+                 PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
+endif()
