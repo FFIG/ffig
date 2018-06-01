@@ -38,6 +38,8 @@
 // Manual edits will be lost.
 #include <boost/python.hpp>
 #include "{{module.name}}.h"
+#include <boost/python/exception_translator.hpp>
+#include <exception>
 
 BOOST_PYTHON_MODULE({{module.name}}_py)
 {
@@ -49,11 +51,20 @@ BOOST_PYTHON_MODULE({{module.name}}_py)
   {
     {% for method in class.methods %}
     {% if method.is_property %}
-    {{method.return_type}} {{method.name}}({{method_parameters(method)}}) {
+    {{method.return_type}} {{method.name}}(){% if method.is_const %} const{% endif %}{% if method.is_noexcept %} noexcept{% endif %} {
+      return this->get_override("{{method.name}}")();
+    }
+
+    {{method.return_type}} default_{{method.name}}(){% if method.is_const %} const{% endif %}{% if method.is_noexcept %} noexcept{% endif %} {
+      return this->get_override("{{method.name}}")();
+    }
+
+    {% else %}
+    {{method.return_type}} {{method.name}}({{method_parameters(method)}}){% if method.is_const %} const{% endif %}{% if method.is_noexcept %} noexcept{% endif %} {
       return this->get_override("{{method.name}}")({{method_values(method)}});
     }
 
-    {{method.return_type}} default_{{method.name}}({{method_parameters(method)}}) {
+    {{method.return_type}} default_{{method.name}}({{method_parameters(method)}}){% if method.is_const %} const{% endif %}{% if method.is_noexcept %} noexcept{% endif %} {
       return this->get_override("{{method.name}}")({{method_values(method)}});
     }
 
@@ -65,6 +76,8 @@ BOOST_PYTHON_MODULE({{module.name}}_py)
     {% for method in class.methods %}
     {% if method.is_property %}
     .add_property("{{method.name}}", &{{class.name}}::{{method.name}}, &{{class.name}}Wrap::default_{{method.name}})
+    {% else %}
+    .def("{{method.name}}", &{{class.name}}::{{method.name}}, &{{class.name}}Wrap::default_{{method.name}})
     {% endif %}
     {% endfor %}
   ;

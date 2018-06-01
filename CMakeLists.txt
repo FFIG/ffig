@@ -236,7 +236,9 @@ if(NOT FFIG_DISABLE_BOOST_PYTHON)
         message(STATUS "boost::python tests disabled: Boost libraries not found.")
       endif()
     else()
-      message(STATUS "Found boost::python. Generating boost::python bindings.")
+      if(NOT FFIG_REQUIRE_BOOST_PYTHON)
+        message(STATUS "Found boost::python. Generating boost::python bindings.")
+      endif()
       list(APPEND all_ffig_bindings "BOOST_PYTHON")
       set(BOOST_PYTHON_Found 1)
     endif()
@@ -646,9 +648,10 @@ if(BOOST_PYTHON_Found)
   # FIXME: Use the existing Python tests with boost::python.
   add_test(
     NAME test_boost_python_bindings
-    COMMAND python -c "import Shape_py; c = Shape_py.Circle(3); print('A %s with radius 3 has area %f' % (c.name, c.area))"
+    COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_CURRENT_LIST_DIR}/tests/boost_python
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-  set_property(TEST test_boost_python_bindings PROPERTY LABELS BOOST_PYTHON)
+  set_property(TEST test_boost_python_bindings
+    PROPERTY LABELS BOOST_PYTHON)
 endif()
 
 if(Julia_FOUND)
