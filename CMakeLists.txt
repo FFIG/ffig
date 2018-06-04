@@ -257,6 +257,7 @@ ffig_add_library(NAME Shape
 
 ffig_add_library(NAME Tree
                  INPUTS tests/input/Tree.h
+                 BOOST_PYTHON
                  CPP
                  D
                  DOTNET
@@ -272,10 +273,12 @@ ffig_add_library(NAME Asset
 
 ffig_add_library(NAME Animal
                  INPUTS tests/input/Animal.h
-                 PYTHON)
+                 PYTHON
+                 BOOST_PYTHON)
 
 ffig_add_library(NAME Number
                  INPUTS tests/input/Number.h
+                 BOOST_PYTHON
                  DOTNET
                  JAVA
                  PYTHON)

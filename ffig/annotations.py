@@ -18,6 +18,8 @@ def apply_class_annotations(model_class):
             m.is_property = True
         if m.is_pure_virtual:
             model_class.is_abstract = True
+        if m.is_virtual:
+            model_class.is_virtual = True
 
         if m.return_type.kind == TypeKind.VOID:
             m.returns_void = True

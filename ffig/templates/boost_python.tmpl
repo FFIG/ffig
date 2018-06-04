@@ -44,50 +44,59 @@
 BOOST_PYTHON_MODULE({{module.name}}_py)
 {
   using namespace boost::python;
-
 {% for class in classes %}
-{% if class.is_abstract %}
+  {% if class.is_virtual %}
   struct {{class.name}}Wrap : {{class.name}}, wrapper<{{class.name}}>
   {
     {% for method in class.methods %}
     {% if method.is_property %}
     {{method.return_type}} {{method.name}}(){% if method.is_const %} const{% endif %}{% if method.is_noexcept %} noexcept{% endif %} {
+      {% if not method.is_pure_virtual %}if (override f = this->get_override("f"))
+        return f();{% endif %}
       return this->get_override("{{method.name}}")();
     }
 
     {{method.return_type}} default_{{method.name}}(){% if method.is_const %} const{% endif %}{% if method.is_noexcept %} noexcept{% endif %} {
-      return this->get_override("{{method.name}}")();
+      return {{class.name}}::{{method.name}}();
     }
 
     {% else %}
     {{method.return_type}} {{method.name}}({{method_parameters(method)}}){% if method.is_const %} const{% endif %}{% if method.is_noexcept %} noexcept{% endif %} {
+      {% if not method.is_pure_virtual %}if (override f = this->get_override("{{method.name}}"))
+        return f({{method_values(method)}});{% endif %}
       return this->get_override("{{method.name}}")({{method_values(method)}});
     }
 
     {{method.return_type}} default_{{method.name}}({{method_parameters(method)}}){% if method.is_const %} const{% endif %}{% if method.is_noexcept %} noexcept{% endif %} {
-      return this->get_override("{{method.name}}")({{method_values(method)}});
+      return {{class.name}}::{{method.name}}({{method_values(method)}});
     }
 
     {% endif %}
     {% endfor %}
   };
+  {% endif %}
   
-  class_<{{class.name}}, boost::noncopyable>("{{class.name}}", no_init)
+  {% if class.is_abstract %}class_<{{class.name}}, boost::noncopyable>("{{class.name}}", no_init)
+  {% else %}class_<{{class.name}}>("{{class.name}}"{% for constructor in class.constructors %}, init<{{method_arguments(constructor)}}>(){% endfor %}){% endif %}
     {% for method in class.methods %}
     {% if method.is_property %}
-    .add_property("{{method.name}}", &{{class.name}}::{{method.name}}, &{{class.name}}Wrap::default_{{method.name}})
+    .add_property("{{method.name}}", &{{class.name}}::{{method.name}} 
+                  {% if method.is_virtual and not method.is_pure_virtual %}, &{{class.name}}Wrap::default_{{method.name}}{% endif %}
+                  {% if method.returns_sub_object %}return_internal_reference<1, with_custodian_and_ward_postcall<0, 1> >(){% endif %}
+    )
     {% else %}
-    .def("{{method.name}}", &{{class.name}}::{{method.name}}, &{{class.name}}Wrap::default_{{method.name}})
+    .def("{{method.name}}", &{{class.name}}::{{method.name}} 
+         {% if method.is_virtual and not method.is_pure_virtual %}, &{{class.name}}Wrap::default_{{method.name}}{% endif %}
+         {% if method.returns_sub_object %}, return_internal_reference<1, with_custodian_and_ward_postcall<0, 1> >(){% endif %}
+    )
     {% endif %}
     {% endfor %}
   ;
-  
-{% endif %}
 
 {% for impl in class.impls %}
   class_<{{impl.name}}, bases<{{class.name}}> >("{{impl.name}}"{% for constructor in impl.constructors %}, init<{{method_arguments(constructor)}}>(){% endfor %})
   ;
-
 {% endfor %}
+
 {% endfor %}
 }
