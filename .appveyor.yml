@@ -7,4 +7,4 @@ install:
   - cmd: C:\Python36-x64\python -m pip install jinja2 nose pycodestyle
   
 build_script:
-  - cmd: python scripts\build.py -t --python-path "C:\\Python36-x64\\python" --disable_java --require_dotnet
+  - cmd: python scripts\build.py -t --python-path "C:\\Python36-x64\\python" --disable_java --require_dotnet --clean

@@ -252,38 +252,31 @@ endif()
 # The variable FFIG_SOURCE is used by ffig.cmake and is only needed when developing FFIG.
 file(GLOB_RECURSE FFIG_SOURCE ${CMAKE_CURRENT_LIST_DIR}/ffig/*)
 
-# Add FFIG build targets
-ffig_add_library(NAME Shape
-                 INPUTS tests/input/Shape.h
-                 ${all_ffig_bindings})
+# Add FFIG c-library build targets
+ffig_add_c_library(NAME Shape INPUTS tests/input/Shape.h)
+ffig_add_c_library(NAME Number INPUTS tests/input/Number.h)
+ffig_add_c_library(NAME Tree INPUTS tests/input/Tree.h)
+ffig_add_c_library(NAME Asset INPUTS tests/input/Asset.h)
+ffig_add_c_library(NAME Animal INPUTS tests/input/Animal.h)
 
-ffig_add_library(NAME Tree
-                 INPUTS tests/input/Tree.h
-                 BOOST_PYTHON
-                 CPP
-                 D
-                 DOTNET
-                 JAVA
-                 PYTHON
-                 SWIFT)
+# Add FFIG c++-library build targets
+ffig_add_cpp_library(NAME Shape INPUTS tests/input/Shape.h)
+ffig_add_cpp_library(NAME Number INPUTS tests/input/Number.h)
+ffig_add_cpp_library(NAME Tree INPUTS tests/input/Tree.h)
+ffig_add_cpp_library(NAME Asset INPUTS tests/input/Asset.h)
 
-ffig_add_library(NAME Asset
-                 INPUTS tests/input/Asset.h
-                 LUA
-                 PYTHON
-                 JAVA)
+# Add FFIG c++-mocks build targets
+ffig_add_cpp_mocks_library(NAME Shape INPUTS tests/input/Shape.h)
+ffig_add_cpp_mocks_library(NAME Number INPUTS tests/input/Number.h)
+ffig_add_cpp_mocks_library(NAME Tree INPUTS tests/input/Tree.h)
+ffig_add_cpp_mocks_library(NAME Asset INPUTS tests/input/Asset.h)
 
-ffig_add_library(NAME Animal
-                 INPUTS tests/input/Animal.h
-                 PYTHON
-                 BOOST_PYTHON)
-
-ffig_add_library(NAME Number
-                 INPUTS tests/input/Number.h
-                 BOOST_PYTHON
-                 DOTNET
-                 JAVA
-                 PYTHON)
+# Add FFIG python-library build targets
+ffig_add_python_library(NAME Shape INPUTS tests/input/Shape.h)
+ffig_add_python_library(NAME Number INPUTS tests/input/Number.h)
+ffig_add_python_library(NAME Tree INPUTS tests/input/Tree.h)
+ffig_add_python_library(NAME Asset INPUTS tests/input/Asset.h)
+ffig_add_python_library(NAME Animal INPUTS tests/input/Animal.h)
 
 enable_testing()
 add_subdirectory(tests/src)
@@ -349,6 +342,10 @@ set_property(TEST test_cpp_tree
 
 if(dotnet_FOUND)
 
+  ffig_add_dotnet_library(NAME Shape INPUTS tests/input/Shape.h)
+  ffig_add_dotnet_library(NAME Tree INPUTS tests/input/Tree.h)
+  ffig_add_dotnet_library(NAME Number INPUTS tests/input/Number.h)
+  
   add_dotnet_project(NAME TestShape.net
     DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestShape
     SOURCES
@@ -403,6 +400,9 @@ if(dotnet_FOUND)
 endif()
 
 if(Swift_FOUND)
+  
+  ffig_add_swift_library(NAME Shape INPUTS tests/input/Shape.h)
+  ffig_add_swift_library(NAME Tree INPUTS tests/input/Tree.h)
 
   set(SWIFT_TREE_MODULE ${CMAKE_CURRENT_BINARY_DIR}/generated/Swift/Tree)
   add_custom_command(
@@ -489,6 +489,11 @@ if(Swift_FOUND)
 endif()
 
 if(Java_FOUND)
+  ffig_add_java_library(NAME Shape INPUTS tests/input/Shape.h)
+  ffig_add_java_library(NAME Tree INPUTS tests/input/Tree.h)
+  ffig_add_java_library(NAME Number INPUTS tests/input/Number.h)
+  ffig_add_java_library(NAME Asset INPUTS tests/input/Asset.h)
+  
   find_jar(JNA_JAR NAMES jna jna-4.5.1 PATHS ${FFIG_JAR_PATH})
   if(NOT JNA_JAR)
     message(FATAL_ERROR
@@ -597,6 +602,8 @@ if(Java_FOUND)
                 PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
 endif()
 
+# Unconditionally generate d bindings as nothing is (currently) built, just generated.
+ffig_add_d_library(NAME Tree INPUTS tests/input/Tree.h)
 add_test(
   NAME test_d_tree_output
   COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
@@ -606,7 +613,8 @@ set_property(TEST test_d_tree_output
              PROPERTY LABELS D TEXT)
 
 if(LuaJIT_FOUND)
-  # FIXME: The relative paths here (and in the lua test file) are very brittle.
+  ffig_add_lua_library(NAME Asset INPUTS tests/input/Asset.h)
+  
   add_test(
     NAME test_lua_asset
     COMMAND ${LuaJIT_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/tests/test_asset_bindings.lua
@@ -618,6 +626,8 @@ if(LuaJIT_FOUND)
 endif()
 
 if(Ruby_FOUND)
+  ffig_add_ruby_library(NAME Shape INPUTS tests/input/Shape.h)
+
   add_test(
     NAME test_ruby_bindings
     COMMAND ${RUBY_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/tests/TestShape.rb
@@ -626,11 +636,16 @@ if(Ruby_FOUND)
 endif()
 
 if(Go_FOUND AND NOT WIN32)
+  ffig_add_go_library(NAME Shape INPUTS tests/input/Shape.h)
   add_subdirectory(tests/go)
 endif()
 
 if(BOOST_PYTHON_Found)
-  # FIXME: Use the existing Python tests with boost::python.
+  ffig_add_boost_python_library(NAME Shape INPUTS tests/input/Shape.h)
+  ffig_add_boost_python_library(NAME Tree INPUTS tests/input/Tree.h)
+  ffig_add_boost_python_library(NAME Number INPUTS tests/input/Number.h)
+  ffig_add_boost_python_library(NAME Animal INPUTS tests/input/Animal.h)
+  
   add_test(
     NAME test_boost_python_bindings
     COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_CURRENT_LIST_DIR}/tests/boost_python
@@ -640,6 +655,8 @@ if(BOOST_PYTHON_Found)
 endif()
 
 if(Julia_FOUND)
+  ffig_add_julia_library(NAME Shape INPUTS tests/input/Shape.h)
+  
   add_test(
       NAME test_julia_bindings
       COMMAND ${Julia_EXECUTABLE} tests/julia/TestShape.jl
