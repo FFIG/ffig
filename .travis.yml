@@ -29,14 +29,13 @@ matrix:
       install:
         - brew update
         - brew install ninja && brew upgrade python && brew install python@2
-        - brew cask install caskroom/cask/dotnet
         - /usr/local/opt/python@2/bin/pip2 install --user --upgrade pip
         - /usr/local/opt/python@2/bin/pip2 install --user jinja2 nose pycodestyle
         - pip3 install --user --upgrade pip && pip3 install --user jinja2 nose pycodestyle
         - gem install ffi
       script:
-        - ./scripts/build.py -t
-        - ./scripts/build.py -t --python-path python3
+        - ./scripts/build.py -t --disable_boost_python --disable_dotnet
+        - ./scripts/build.py -t --disable_boost_python --disable_dotnet --python-path python3
 
 notifications:
   slack:

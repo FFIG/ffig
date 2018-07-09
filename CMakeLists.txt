@@ -14,6 +14,7 @@ endif()
 set(FFIG_JNA_JAR_PATH ${CMAKE_CURRENT_SOURCE_DIR}/externals/ffig-jars/jna.jar)
 set(FFIG_JAR_PATH ${CMAKE_CURRENT_SOURCE_DIR}/externals/ffig-jars)
 set(FFIG_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_DOTNET_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
 if(NOT WIN32)
   set(CMAKE_CXX_FLAGS_ASAN "-g -fno-omit-frame-pointer -O0 -fsanitize=address")
@@ -23,8 +24,9 @@ if(NOT WIN32)
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
-include(ffig)
 include(utils)
+include(dotnet)
+include(ffig)
 
 include_directories(externals/catch2/single_include)
 include_directories(externals/variant/include)
@@ -346,26 +348,6 @@ set_property(TEST test_cpp_tree
              PROPERTY LABELS CPP)
 
 if(dotnet_FOUND)
-  include(dotnet)
-  set(CMAKE_DOTNET_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/generated)
-
-  add_dotnet_project(NAME Shape.net
-    DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/Shape
-    SOURCES
-    ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.cs
-  )
-
-  add_dotnet_project(NAME Tree.net
-    DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/Tree
-    SOURCES
-    ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.cs
-  )
-
-  add_dotnet_project(NAME Number.net
-    DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/Number
-    SOURCES
-    ${CMAKE_CURRENT_BINARY_DIR}/generated/Number.cs
-  )
 
   add_dotnet_project(NAME TestShape.net
     DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestShape

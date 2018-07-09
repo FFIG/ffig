@@ -42,10 +42,6 @@ function(ffig_add_library)
   set(ffig_invocation "-i;${input};-m;${module};-o;${ffig_output_dir};-b;_c.h.tmpl;_c.cpp.tmpl")
   set(ffig_outputs "${ffig_output_dir}/${module}_c.h;${ffig_output_dir}/${module}_c.cpp")  
 
-  if(ffig_add_library_DOTNET)
-    set(ffig_invocation "${ffig_invocation};dotnet")
-    set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/${module}.cs")
-  endif()
   if(ffig_add_library_CPP_MOCKS)
     set(ffig_invocation "${ffig_invocation};_mocks.h.tmpl")
     set(ffig_outputs "${ffig_outputs};${ffig_output_dir}/${module}_mocks.h")
@@ -220,6 +216,31 @@ function(ffig_add_library)
 
     add_custom_target(${module}.ffig.julia.source ALL
       DEPENDS ${ffig_output_dir}/${module}.jl)
+  endif()
+  
+  # FIXME: Do not check dotnet_FOUND. 
+  # Requesting dotnet bindings with no dotnet is user-error.
+  if(ffig_add_library_DOTNET AND dotnet_FOUND)
+    add_custom_command(
+      OUTPUT ${ffig_output_dir}/${module}.net/${module}.cs ${ffig_output_dir}/${module}.net/${module}.net.csproj
+      COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} -o ${ffig_output_dir} -b dotnet
+      DEPENDS ${input} ${FFIG_SOURCE}
+      WORKING_DIRECTORY ${FFIG_ROOT}
+      COMMENT "Generating C# source for ${module}")
+
+    add_custom_target(${module}.ffig.net.source ALL
+      DEPENDS ${ffig_output_dir}/${module}.net/${module}.cs ${ffig_output_dir}/${module}.net/${module}.net.csproj)
+  
+    # Invoke dotnet directly as add_dotnet_project contains a copy which does not get ordered correctly.
+    # FIXME: Work out why the copy performed by add_dotnet_project is incorrectly ordered on Windows.
+    add_custom_command(
+      OUTPUT ${module}.net.dll
+      COMMAND dotnet build -o .
+      WORKING_DIRECTORY ${ffig_output_dir}/${module}.net)
+
+    add_custom_target(${module}.net DEPENDS ${module}.net.dll)
+
+    add_dependencies(${module}.net ${module}.ffig.net.source)
   endif()
 
 endfunction()
