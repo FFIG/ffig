@@ -43,7 +43,6 @@ function(ffig_add_c_library)
   add_custom_command(OUTPUT ${ffig_output_dir}/${module}_c.h ${ffig_output_dir}/${module}_c.cpp
     COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} -o ${ffig_output_dir} -b _c.h.tmpl _c.cpp.tmpl
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${input} ${ffig_output_dir}/
-
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
     COMMENT "Generating FFIG bindings for ${module}: ${ffig_outputs}")
