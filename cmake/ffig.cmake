@@ -372,11 +372,11 @@ function(ffig_add_dotnet_library)
   # Invoke dotnet directly as add_dotnet_project contains a copy which does not get ordered correctly.
   # FIXME: Work out why the copy performed by add_dotnet_project is incorrectly ordered on Windows.
   add_custom_command(
-    OUTPUT ${module}.net.dll
+    OUTPUT ${ffig_output_dir}/${module}.net/${module}.net.dll
     COMMAND dotnet build -o .
     WORKING_DIRECTORY ${ffig_output_dir}/${module}.net)
 
-  add_custom_target(${module}.net DEPENDS ${module}.net.dll)
+  add_custom_target(${module}.net DEPENDS ${ffig_output_dir}/${module}.net/${module}.net.dll)
 
   add_dependencies(${module}.net ${module}.ffig.net.source)
 endfunction()
