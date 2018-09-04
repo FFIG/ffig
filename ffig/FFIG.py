@@ -5,7 +5,11 @@
 # generate a c-api and language bindings.
 
 import argparse
+import ffig.annotations
 import ffig.clang as clang
+import ffig.cppmodel
+import ffig.filters.capi_filter
+import ffig.generators
 import inspect
 import jinja2
 import logging
@@ -16,17 +20,13 @@ import sys
 
 logging.basicConfig(level=logging.WARNING)
 
-import ffig.annotations
-import ffig.cppmodel
-import ffig.filters.capi_filter
-import ffig.generators
-
 clang.cindex.Config.set_compatibility_check(False)
 
 
 def find_clang_library_path():
     paths = [
-        '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib',
+        '/Applications/Xcode.app/Contents/Developer/Toolchains/'
+        'XcodeDefault.xctoolchain/usr/lib',
         '/Library/Developer/CommandLineTools/usr/lib',
     ]
     for path in paths:
@@ -100,7 +100,8 @@ def build_model_from_source(
     ffig_include_dir = os.path.join(os.path.dirname(__file__), 'include')
     tu = clang.cindex.TranslationUnit.from_source(
         path_to_source,
-        '-x c++ -std=c++14 -stdlib=libc++ -I{}'.format(ffig_include_dir).split(),
+        '-x c++ -std=c++14 -stdlib=libc++ -I{}'.format(
+            ffig_include_dir).split(),
         unsaved_files=unsaved_files)
 
     model = ffig.cppmodel.Model(tu)
