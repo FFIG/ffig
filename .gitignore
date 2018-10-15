@@ -24,7 +24,13 @@ demos/Shape_cpp.h
 demos/Shape_mocks.h
 demos/cmake_install.cmake
 demos/libShape_c.dylib
-build
+build_out
 .vscode/tags
 *.iml
 .idea/
+bazel-bin
+bazel-genfiles
+bazel-testlogs
+bazel-out
+bazel-genfiles
+bazel-ffig

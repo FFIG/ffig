@@ -51,7 +51,7 @@ def main():
     parser.add_argument(
         '-o',
         help='output dir (relative to source dir)',
-        default='build',
+        default='build_out',
         dest='out_dir')
     parser.add_argument(
         '-c',
