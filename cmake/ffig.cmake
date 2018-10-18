@@ -26,6 +26,7 @@
 # FIXME: relax constraints on INPUTS
 
 set(ffig_output_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+set(_FFIG_INCLUDE_DIR "${FFIG_ROOT}/ffig/include")
 
 function(ffig_add_c_library)
   set(options)
@@ -40,8 +41,10 @@ function(ffig_add_c_library)
   set(ffig_invocation "-i;${input};-m;${module};-o;${ffig_output_dir};-b;_c.h.tmpl;_c.cpp.tmpl")
   set(ffig_outputs "${ffig_output_dir}/${module}_c.h;${ffig_output_dir}/${module}_c.cpp")
 
-  add_custom_command(OUTPUT ${ffig_output_dir}/${module}_c.h ${ffig_output_dir}/${module}_c.cpp
-    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} -o ${ffig_output_dir} -b _c.h.tmpl _c.cpp.tmpl
+  add_custom_command(
+    OUTPUT ${ffig_output_dir}/${module}_c.h ${ffig_output_dir}/${module}_c.cpp
+    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} 
+    -o ${ffig_output_dir} -b _c.h.tmpl _c.cpp.tmpl --cflag=-I${_FFIG_INCLUDE_DIR} 
     COMMAND ${CMAKE_COMMAND} -E copy_if_different ${input} ${ffig_output_dir}/
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
@@ -77,8 +80,8 @@ function(ffig_add_java_library)
 
   add_custom_command(
     OUTPUT ${ffig_output_dir}/java/src/${module}/${module}CLibrary.java
-    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module}
-    -o ${ffig_output_dir} -b java
+    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} 
+    -o ${ffig_output_dir} -b java --cflag=-I${_FFIG_INCLUDE_DIR} 
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${FFIG_ROOT}
     COMMENT "Generating java source for ${module}")
@@ -89,7 +92,7 @@ function(ffig_add_java_library)
   add_custom_command(
     OUTPUT ${ffig_output_dir}/${module}.jar
     COMMAND ${Java_JAVAC_EXECUTABLE}
-    -d ${ffig_output_dir}/java/classes/${module}
+    -d ${ffig_output_dir}/java/classes/${module} 
     -cp ${FFIG_JNA_JAR_PATH}
     ${ffig_output_dir}/java/src/${module}/*.java
     COMMAND ${Java_JAR_EXECUTABLE} -cfM ${module}.jar
@@ -113,7 +116,8 @@ function(ffig_add_cpp_library)
 
   add_custom_command(
     OUTPUT ${ffig_output_dir}/${module}_cpp.h
-    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} -o ${ffig_output_dir} -b _cpp.h.tmpl
+    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} 
+    -o ${ffig_output_dir} -b _cpp.h.tmpl --cflag=-I${_FFIG_INCLUDE_DIR}  
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${FFIG_ROOT}
     COMMENT "Generating C++ bindings for ${module}")
@@ -132,7 +136,8 @@ function(ffig_add_cpp_mocks_library)
 
   add_custom_command(
     OUTPUT ${ffig_output_dir}/${module}_mocks.h
-    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} -o ${ffig_output_dir} -b _mocks.h.tmpl
+    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} 
+    -o ${ffig_output_dir} -b _mocks.h.tmpl --cflag=-I${_FFIG_INCLUDE_DIR}  
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${FFIG_ROOT}
     COMMENT "Generating C++ mocks for ${module}")
@@ -151,7 +156,8 @@ function(ffig_add_swift_library)
 
   add_custom_command(
     OUTPUT ${ffig_output_dir}/${module}.swift ${ffig_output_dir}/${module}-Bridging-Header.h
-    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} -o ${ffig_output_dir} -b swift
+    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} 
+    -o ${ffig_output_dir} -b swift --cflag=-I${_FFIG_INCLUDE_DIR}  
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${FFIG_ROOT}
     COMMENT "Generating Swift source for ${module}")
@@ -172,7 +178,7 @@ function(ffig_add_boost_python_library)
   add_custom_command(
     OUTPUT ${ffig_output_dir}/${module}_py.cpp
     COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module}
-    -o ${ffig_output_dir} -b boost_python
+    -o ${ffig_output_dir} -b boost_python --cflag=-I${_FFIG_INCLUDE_DIR}  
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${FFIG_ROOT}
     COMMENT "Generating boost::python source for ${module}")
@@ -197,8 +203,10 @@ function(ffig_add_boost_python_library)
   # Requesting dotnet bindings with no dotnet is user-error.
   if(ffig_add_library_DOTNET AND dotnet_FOUND)
     add_custom_command(
-      OUTPUT ${ffig_output_dir}/${module}.net/${module}.cs ${ffig_output_dir}/${module}.net/${module}.net.csproj
-      COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} -o ${ffig_output_dir} -b dotnet
+      OUTPUT ${ffig_output_dir}/${module}.net/${module}.cs
+      ${ffig_output_dir}/${module}.net/${module}.net.csproj
+      COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} 
+      -o ${ffig_output_dir} -b dotnet --cflag=-I${_FFIG_INCLUDE_DIR}  
       DEPENDS ${input} ${FFIG_SOURCE}
       WORKING_DIRECTORY ${FFIG_ROOT}
       COMMENT "Generating C# source for ${module}")
@@ -242,7 +250,8 @@ function(ffig_add_python_library)
     OUTPUT ${ffig_output_dir}/${module_lower}/__init__.py
     ${ffig_output_dir}/${module_lower}/_py2.py
     ${ffig_output_dir}/${module_lower}/_py3.py
-    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} -o ${ffig_output_dir} -b python
+    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} 
+    -o ${ffig_output_dir} -b python --cflag=-I${_FFIG_INCLUDE_DIR}  
     COMMAND ${PYTHON_EXECUTABLE} -m pycodestyle --ignore=E501 ${ffig_output_dir}/${module_lower}
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${FFIG_ROOT}
@@ -265,7 +274,8 @@ function(ffig_add_d_library)
 
   add_custom_command(
     OUTPUT ${ffig_output_dir}/${module}.d
-    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} -o ${ffig_output_dir} -b d.tmpl
+    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} 
+    -o ${ffig_output_dir} -b d.tmpl --cflag=-I${_FFIG_INCLUDE_DIR}  
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${FFIG_ROOT}
     COMMENT "Generating D bindings for ${module}")
@@ -284,7 +294,8 @@ function(ffig_add_ruby_library)
 
   add_custom_command(
     OUTPUT ${ffig_output_dir}/${module}.rb
-    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} -o ${ffig_output_dir} -b ruby
+    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} 
+    -o ${ffig_output_dir} -b ruby --cflag=-I${_FFIG_INCLUDE_DIR}  
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${FFIG_ROOT}
     COMMENT "Generating Ruby bindings for ${module}")
@@ -303,7 +314,8 @@ function(ffig_add_lua_library)
 
   add_custom_command(
     OUTPUT ${ffig_output_dir}/${module}.lua
-    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} -o ${ffig_output_dir} -b lua
+    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} 
+    -o ${ffig_output_dir} -b lua --cflag=-I${_FFIG_INCLUDE_DIR}  
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${FFIG_ROOT}
     COMMENT "Generating LuaJIT bindings for ${module}")
@@ -322,7 +334,8 @@ function(ffig_add_go_library)
 
   add_custom_command(
     OUTPUT ${ffig_output_dir}/src/${module}/${module}.go
-    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} -o ${ffig_output_dir} -b go
+    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} 
+    -o ${ffig_output_dir} -b go --cflag=-I${_FFIG_INCLUDE_DIR}  
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${FFIG_ROOT}
     COMMENT "Generating Go bindings for ${module}")
@@ -342,7 +355,7 @@ function(ffig_add_julia_library)
   add_custom_command(
     OUTPUT ${ffig_output_dir}/${module}.jl
     COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module}
-    -o ${ffig_output_dir} -b julia
+    -o ${ffig_output_dir} -b julia --cflag=-I${_FFIG_INCLUDE_DIR}
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${FFIG_ROOT}
     COMMENT "Generating Julia source for ${module}")
@@ -360,8 +373,10 @@ function(ffig_add_dotnet_library)
   set(input ${ffig_add_dotnet_library_INPUTS})
   string(TOLOWER "${module}" module_lower)
   add_custom_command(
-    OUTPUT ${ffig_output_dir}/${module}.net/${module}.cs ${ffig_output_dir}/${module}.net/${module}.net.csproj
-    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} -o ${ffig_output_dir} -b dotnet
+    OUTPUT ${ffig_output_dir}/${module}.net/${module}.cs
+    ${ffig_output_dir}/${module}.net/${module}.net.csproj
+    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module} 
+    -o ${ffig_output_dir} -b dotnet --cflag=-I${_FFIG_INCLUDE_DIR}  
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${FFIG_ROOT}
     COMMENT "Generating C# source for ${module}")

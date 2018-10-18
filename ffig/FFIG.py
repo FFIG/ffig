@@ -86,6 +86,7 @@ def write_bindings_to_disk(
 def build_model_from_source(
         path_to_source,
         module_name,
+        cflags=None,
         unsaved_files=None):
     """
     Input:
@@ -97,11 +98,12 @@ def build_model_from_source(
     Returns:
     - model built from a clang.cindex TranslationUnit with a name from args
     """
+    cflags = cflags or []
+
     ffig_include_dir = os.path.join(os.path.dirname(__file__), 'include')
     tu = clang.cindex.TranslationUnit.from_source(
         path_to_source,
-        '-x c++ -std=c++14 -stdlib=libc++ -I{}'.format(
-            ffig_include_dir).split(),
+        ['-x', 'c++', '-std=c++14', '-stdlib=libc++'] + cflags,
         unsaved_files=unsaved_files)
 
     model = ffig.cppmodel.Model(tu)
@@ -150,7 +152,7 @@ def run(args):
     # FIXME: Loop over files and extend the model once we can handle multiple
     # input files.
     input_file = os.path.join(cwd, args.inputs[0])
-    m = build_model_from_source(input_file, args.module_name)
+    m = build_model_from_source(input_file, args.module_name, args.cflags)
     classes = m.classes
     api_classes = collect_api_and_obj_classes(classes, 'FFIG:EXPORT')
 
@@ -200,6 +202,12 @@ def main():
         help='module name for generated files',
         dest='module_name',
         required=True)
+    parser.add_argument(
+        '--cflag',
+        help='Compiler flags for clang',
+        default=[],
+        dest='cflags',
+        action='append')
 
     args = parser.parse_args()
 

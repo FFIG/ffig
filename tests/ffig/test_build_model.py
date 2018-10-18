@@ -6,7 +6,7 @@ def test_build_model_from_str():
     source = 'class A{}; void foo();'
     filename = 'test.cpp'
     model = ffig.FFIG.build_model_from_source(filename, 'test_source',
-            [(filename, source)])
+            unsaved_files=[(filename, source)])
 
     assert_equals(
             str(model),
