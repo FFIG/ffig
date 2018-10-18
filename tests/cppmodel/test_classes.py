@@ -142,7 +142,7 @@ def test_class_member_data():
     class A {};
     class B {
         int x_;
-        B b_;
+        A a_;
     };
     """
 
@@ -156,8 +156,8 @@ def test_class_member_data():
     assert c.members[0].name == "x_"
 
     assert c.members[1].type.kind == TypeKind.RECORD
-    assert c.members[1].type.name == "B"
-    assert c.members[1].name == "b_"
+    assert c.members[1].type.name == "A"
+    assert c.members[1].name == "a_"
 
 
 def test_string_representation():
