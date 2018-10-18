@@ -21,7 +21,7 @@ py_binary(
 
 ffig_c_library(
     name="Shape", 
-    hdrs=["tests/input/Shape.h"],
+    srcs=["tests/input/Shape.h"],
     copts=["-Itests/input", "-Iffig/include","-std=c++14"],
     deps=[":libffig"]
     )
