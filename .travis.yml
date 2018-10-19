@@ -21,6 +21,7 @@ matrix:
         - docker run ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python3 --venv --disable_boost_python --require_java --require_dotnet --require_lua --require_swift --require_ruby --require_go"
         - docker run ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python2 --venv --disable_boost_python --require_java --require_dotnet --require_lua --require_swift --require_ruby --require_go "
         - docker run ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python3 --venv --disable_boost_python --require_java --require_dotnet --require_lua --require_swift --require_ruby --require_go "
+        - docker run ffig-ci /bin/bash -c "bazel build :all"
         - ./scripts/codechecks.py
 
     - os: osx
