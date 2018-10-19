@@ -1,6 +1,6 @@
 # Sandbox for Bazel build rules for FFIG.
 
-load("//:ffig.bzl", "ffig_c_library")
+load("//:ffig.bzl", "ffig_c_library", "ffig_csharp_src", "ffig_py_src")
 
 filegroup(
     name = "ffig_headers",
@@ -31,6 +31,50 @@ ffig_c_library(
         "-Iffig/include",
         "-std=c++14",
         "-DShape_c_EXPORTS"
+    ],
+    deps = [":libffig"],
+)
+
+ffig_csharp_src(
+    name = "Shape.net.src",
+    srcs = ["tests/input/Shape.h"],
+    copts = [
+        "-Itests/input",
+        "-Iffig/include",
+        "-std=c++14",
+    ],
+    deps = [":libffig"],
+)
+
+ffig_py_src(
+    name = "Shape.py.src",
+    srcs = ["tests/input/Shape.h"],
+    copts = [
+        "-Itests/input",
+        "-Iffig/include",
+        "-std=c++14",
+    ],
+    deps = [":libffig"],
+)
+
+ffig_c_library(
+    name = "Tree",
+    srcs = ["tests/input/Tree.h"],
+    copts = [
+        "-Itests/input",
+        "-Iffig/include",
+        "-std=c++14",
+    ],
+    deps = [":libffig"],
+)
+
+ffig_csharp_src(
+    name = "Tree.net.src",
+    srcs = ["tests/input/Tree.h"],
+    copts = [
+        "-Itests/input",
+        "-Iffig/include",
+        "-std=c++14",
     ],
     deps = [":libffig"],
 )
