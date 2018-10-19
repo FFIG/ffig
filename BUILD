@@ -30,6 +30,7 @@ ffig_c_library(
         "-Itests/input",
         "-Iffig/include",
         "-std=c++14",
+        "-DShape_c_EXPORTS"
     ],
     deps = [":libffig"],
 )
