@@ -1,7 +1,7 @@
 LIBFFIG = "//:libffig"
 FFIG_PY = "//:ffig_py"
 
-def ffig_c_library(name, srcs = None, deps = None, copts = None):
+def ffig_c_library(name, module, srcs = None, deps = None, copts = None):
     if len(srcs) != 1:
         fail("ffig_c_library only supports a single source file.")
 
@@ -14,14 +14,14 @@ def ffig_c_library(name, srcs = None, deps = None, copts = None):
 
     # Generate C source with FFIG.
     # $(@D) is the output directory for the target package.
-    genfiles = [name + "_c.h", name + "_c.cpp"]
+    genfiles = [module + "_c.h", module + "_c.cpp"]
     cflags = " ".join(["--cflag={}".format(copt) for copt in copts])
     native.genrule(
         name = "_" + name + "_c_srcs",
         cmd = "{} -i {} -m {} -o $(@D) -b _c.h.tmpl _c.cpp.tmpl {}".format(
             ffig_py_path,
             source_files,
-            name,
+            module,
             cflags,
         ),
         srcs = srcs + ["//:ffig_headers"],
@@ -45,7 +45,7 @@ def ffig_c_library(name, srcs = None, deps = None, copts = None):
         srcs = [":" + name + "_c.so"],
     )
 
-def ffig_csharp_src(name, srcs = None, deps = None, copts = None):
+def ffig_csharp_src(name, module, srcs = None, deps = None, copts = None):
   if len(srcs) != 1:
     fail("ffig_csharp_src only supports a single source file.")
 
@@ -58,14 +58,14 @@ def ffig_csharp_src(name, srcs = None, deps = None, copts = None):
 
   # Generate C# source with FFIG.
   # $(@D) is the output directory for the target package.
-  genfiles = [name + ".cs"]
+  genfiles = [module + ".cs"]
   cflags = " ".join(["--cflag={}".format(copt) for copt in copts])
   native.genrule(
       name = name,
       cmd = "{} -i {} -m {} -o $(@D) -b cs.tmpl {}".format(
           ffig_py_path,
           source_files,
-          name,
+          module,
           cflags,
           ),
       srcs = srcs + ["//:ffig_headers"],
@@ -73,7 +73,7 @@ def ffig_csharp_src(name, srcs = None, deps = None, copts = None):
       tools = [FFIG_PY, LIBFFIG],
       )
 
-def ffig_py_src(name, srcs = None, deps = None, copts = None):
+def ffig_py_src(name, module, srcs = None, deps = None, copts = None):
   if len(srcs) != 1:
     fail("ffig_py_src only supports a single source file.")
 
@@ -86,14 +86,42 @@ def ffig_py_src(name, srcs = None, deps = None, copts = None):
 
   # Generate C# source with FFIG.
   # $(@D) is the output directory for the target package.
-  genfiles = [name+"/_py2.py", name+"/_py3.py", name+"/__init__.py"]
+  genfiles = [module+"/_py2.py", module+"/_py3.py", module+"/__init__.py"]
   cflags = " ".join(["--cflag={}".format(copt) for copt in copts])
   native.genrule(
       name = name,
       cmd = "{} -i {} -m {} -o $(@D) -b python {}".format(
           ffig_py_path,
           source_files,
-          name,
+          module,
+          cflags,
+          ),
+      srcs = srcs + ["//:ffig_headers"],
+      outs = genfiles,
+      tools = [FFIG_PY, LIBFFIG],
+      )
+
+def ffig_swift_src(name, module, srcs = None, deps = None, copts = None):
+  if len(srcs) != 1:
+    fail("ffig_swift_src only supports a single source file.")
+
+  srcs = srcs or []
+  deps = deps or []
+  copts = copts or []
+
+  ffig_py_path = "$(location {})".format(FFIG_PY)
+  source_files = " ".join(["$(locations {})".format(src) for src in srcs])
+
+  # Generate C# source with FFIG.
+  # $(@D) is the output directory for the target package.
+  genfiles = [module+".swift", module+"-Bridging-Header.h"]
+  cflags = " ".join(["--cflag={}".format(copt) for copt in copts])
+  native.genrule(
+      name = name,
+      cmd = "{} -i {} -m {} -o $(@D) -b swift {}".format(
+          ffig_py_path,
+          source_files,
+          module,
           cflags,
           ),
       srcs = srcs + ["//:ffig_headers"],

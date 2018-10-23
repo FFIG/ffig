@@ -1,6 +1,10 @@
 # Sandbox for Bazel build rules for FFIG.
 
-load("//:ffig.bzl", "ffig_c_library", "ffig_csharp_src", "ffig_py_src")
+load("//:ffig.bzl", 
+     "ffig_c_library", 
+     "ffig_csharp_src", 
+     "ffig_py_src", 
+     "ffig_swift_src")
 
 filegroup(
     name = "ffig_headers",
@@ -25,6 +29,7 @@ py_binary(
 
 ffig_c_library(
     name = "Shape",
+    module = "Shape",
     srcs = ["tests/input/Shape.h"],
     copts = [
         "-Itests/input",
@@ -37,6 +42,7 @@ ffig_c_library(
 
 ffig_csharp_src(
     name = "Shape.net.src",
+    module = "Shape",
     srcs = ["tests/input/Shape.h"],
     copts = [
         "-Itests/input",
@@ -48,6 +54,7 @@ ffig_csharp_src(
 
 ffig_py_src(
     name = "Shape.py.src",
+    module = "Shape",
     srcs = ["tests/input/Shape.h"],
     copts = [
         "-Itests/input",
@@ -57,20 +64,10 @@ ffig_py_src(
     deps = [":libffig"],
 )
 
-ffig_c_library(
-    name = "Tree",
-    srcs = ["tests/input/Tree.h"],
-    copts = [
-        "-Itests/input",
-        "-Iffig/include",
-        "-std=c++14",
-    ],
-    deps = [":libffig"],
-)
-
-ffig_csharp_src(
-    name = "Tree.net.src",
-    srcs = ["tests/input/Tree.h"],
+ffig_swift_src(
+    name = "Shape.swift.src",
+    module = "Shape",
+    srcs = ["tests/input/Shape.h"],
     copts = [
         "-Itests/input",
         "-Iffig/include",
