@@ -18,4 +18,3 @@ build_script:
   - sh: docker run --cap-add SYS_PTRACE ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python2 --venv"
   - sh: docker run --cap-add SYS_PTRACE ffig-ci /bin/bash -c "./scripts/build.py -t --python-path python3 --venv"
   - sh: docker run --cap-add SYS_PTRACE ffig-ci /bin/bash -c "./scripts/build.py -T \"CPP|MOCKS\" -c ASAN --python-path python3 --venv"
-

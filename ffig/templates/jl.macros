@@ -1,0 +1,16 @@
+{% import 'ffig.macros' as ffig_macros %}
+
+{#
+ # method_parameter_types:
+ #   Generates a list of parameter types suitable for use in a function
+ #   declaration or definition. Commas are inserted between each element
+ #   of the list. Leading and trailing commas can be added by setting
+ #   leading_comma or trailing_comma to True as appropriate. This is useful
+ #   if there are other parameters that must be declared.
+ #}
+{% macro method_parameter_types(method, leading_comma=False, trailing_comma=False) %}
+    {% call(arg) ffig_macros.comma_separated_list(method.arguments, leading_comma, trailing_comma) -%}
+        {{arg.type | to_julia_param_type}}
+    {%- endcall %}
+{% endmacro %}
+

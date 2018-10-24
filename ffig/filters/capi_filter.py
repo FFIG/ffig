@@ -219,7 +219,7 @@ def to_output_py2_ctype(t):
         if t.pointee.kind == TypeKind.RECORD:
             return 'c_object_p'
     if t.kind == TypeKind.RECORD:
-            return 'c_object_p'
+        return 'c_object_p'
     raise Exception(
         'No ctypes equivalent is defined for type {}'.format(
             t.name))
@@ -465,6 +465,8 @@ def to_java_output_param(t):
         return "DoubleByReference"
     if t.kind == TypeKind.POINTER:
         return "PointerByReference"
+    if t.kind == TypeKind.RECORD:
+        return "PointerByReference"
     raise Exception(
         'Type {} has no defined java output parameter translation (adding one may be trivial)'.format(
             t.name))
@@ -472,11 +474,13 @@ def to_java_output_param(t):
 
 def to_java_output_value(t, rv):
     if t.kind == TypeKind.INT:
-        return "IntByReference {} = new IntByReference();".format(rv)
+        return "IntByReference {} = new IntByReference()".format(rv)
     if t.kind == TypeKind.DOUBLE:
-        return "DoubleByReference {} = new DoubleByReference();".format(rv)
+        return "DoubleByReference {} = new DoubleByReference()".format(rv)
     if t.kind == TypeKind.POINTER:
-        return "PointerByReference {} = new PointerByReference();".format(rv)
+        return "PointerByReference {} = new PointerByReference()".format(rv)
+    if t.kind == TypeKind.RECORD:
+        return "PointerByReference {} = new PointerByReference()".format(rv)
     raise Exception(
         'Type {} has no defined java output value translation (adding one may be trivial)'.format(
             t.name))
@@ -490,6 +494,10 @@ def to_java_return_type(t):
     if t.kind == TypeKind.POINTER:
         if t.pointee.kind == TypeKind.CHAR_S:
             return "String"
+        if t.pointee.kind == TypeKind.RECORD:
+            return t.pointee.name.replace('const ', '')
+    if t.kind == TypeKind.RECORD:
+        return t.name
     raise Exception(
         'Type {} has no defined java return type translation (adding one may be trivial)'.format(
             t.name))
@@ -517,6 +525,105 @@ def to_java_return_value(t, rv):
     if t.kind == TypeKind.POINTER:
         if t.pointee.kind == TypeKind.CHAR_S:
             return "{}.getValue().getString(0)".format(rv)
+        if t.pointee.kind == TypeKind.RECORD:
+            return 'new {}({}.getValue())'.format(
+                t.pointee.name.replace(
+                    'const ', ''), rv)
+    if t.kind == TypeKind.RECORD:
+        return 'new {}({}.getValue())'.format(t.name, rv)
     raise Exception(
         'Type {} has no defined java return value translation (adding one may be trivial)'.format(
             t.name))
+
+
+def to_swift_param(arg):
+    t = arg.type
+    a = arg.name
+    if t.kind == TypeKind.DOUBLE:
+        return "_ {}:Double".format(a)
+    if t.kind == TypeKind.INT:
+        return "_ {}:Int32".format(a)
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "_ {}:String".format(a)
+        if t.pointee.kind == TypeKind.RECORD:
+            return "_ " + a + ":" + t.pointee.name.replace('const ', '')
+    raise Exception(
+        'Type {} has no defined Swift parameter translation (adding one may be trivial)'.format(t.name))
+
+
+def to_swift_arg(arg):
+    t = arg.type
+    a = arg.name
+    if t.kind == TypeKind.DOUBLE:
+        return a
+    if t.kind == TypeKind.INT:
+        return a
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.RECORD:
+            return "{}.obj_".format(a)
+    raise Exception(
+        'Type {} has no defined Swift arg translation (adding one may be trivial)'.format(t.name))
+
+
+def to_swift_return_type(t):
+    if t.kind == TypeKind.DOUBLE:
+        return "Double"
+    if t.kind == TypeKind.INT:
+        return "Int32"
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "String"
+        if t.pointee.kind == TypeKind.RECORD:
+            return t.pointee.name.replace('const ', '')
+    raise Exception(
+        'Type {} has no defined Swift return type translation (adding one may be trivial)'.format(t.name))
+
+
+def to_swift_return_value(t, rv):
+    if t.kind == TypeKind.DOUBLE:
+        return rv
+    if t.kind == TypeKind.INT:
+        return rv
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "String(cString:rv!)"
+        if t.pointee.kind == TypeKind.RECORD:
+            return t.pointee.name.replace('const ', '') + "(fromCPtr: rv!)"
+    raise Exception(
+        'Type {} has no defined Swift return value translation (adding one may be trivial)'.format(t.name))
+
+def to_julia_return_type(t):
+    if t.kind == TypeKind.DOUBLE:
+        return "Float64"
+    if t.kind == TypeKind.INT:
+        return "Int32"
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "Cstring"
+    raise Exception(
+        'Type {} has no defined Julia return type translation (adding one may be trivial)'.format(t.name))
+
+def to_julia_param_type(t):
+    if t.kind == TypeKind.DOUBLE:
+        return "Float64"
+    if t.kind == TypeKind.INT:
+        return "Int32"
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "Cstring"
+    raise Exception(
+        'Type {} has no defined Julia parameter type translation (adding one may be trivial)'.format(t.name))
+
+def to_julia_return_value(t, rv):
+    if t.kind == TypeKind.INT:
+        return rv
+    if t.kind == TypeKind.DOUBLE:
+        return rv
+    if t.kind == TypeKind.POINTER:
+        if t.pointee.kind == TypeKind.CHAR_S:
+            return "unsafe_string({})".format(rv)
+    raise Exception(
+        'Type {} has no defined julia return value translation (adding one may be trivial)'.format(
+            t.name))
+

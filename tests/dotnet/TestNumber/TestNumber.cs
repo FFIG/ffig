@@ -1,12 +1,12 @@
 using Number_c;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace TestFFIG
 {
-    [TestClass]
+    [TestFixture]
     public class TestNumber
     {
-        [TestMethod]
+        [Test]
         public void NumberValue()
         {
           var number = new Number(8);
@@ -14,7 +14,7 @@ namespace TestFFIG
           Assert.AreEqual(number.value(), 8);
         }
         
-        [TestMethod]
+        [Test]
         public void NumberNext()
         {
           var number = new Number(8);

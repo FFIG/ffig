@@ -4,7 +4,10 @@ import sys
 
 
 def main(args):
-    subprocess.check_call("docker pull ffig/ffig-base".split())
+    if '--local' in args:
+        args = [a for a in args if a != '--local']
+    else:
+        subprocess.check_call("docker pull ffig/ffig-base".split())
     subprocess.check_call("docker build -t ffig_local .".split())
     subprocess.check_call(['docker',
                            'run',

@@ -7,16 +7,20 @@
 #define {{module.name}}_RC_SUCCESS 0
 #define {{module.name}}_RC_FAIL 1
 
-// FIXME: Use something nicer than _MBCS to see if we are on VS
-#ifdef _MBCS
+#ifdef _MSC_VER
 #ifdef {{module.name}}_c_EXPORTS
 #define EXPORT extern "C" __declspec(dllexport)
 #else
 #define EXPORT extern "C" __declspec(dllimport)
 #endif
 #else
+#ifdef __cplusplus
 #define EXPORT extern "C" __attribute__((visibility("default")))
+#else
+#define EXPORT
 #endif
+#endif
+
 {% for class in classes %}
 struct {{module.name}}_{{class.name}}_t;
 typedef struct {{module.name}}_{{class.name}}_t* {{module.name}}_{{class.name}};

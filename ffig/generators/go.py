@@ -56,4 +56,4 @@ def go_generator(module_name, binding, api_classes, env, output_dir):
 
 
 def setup_plugin(context):
-    context.register(go_generator, ['go'])
+    context.register(go_generator, [('go', 'Go bindings using CGo')])

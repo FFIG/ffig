@@ -2,6 +2,7 @@ import os
 import sys
 from ffig.clang.cindex import AccessSpecifier
 from ffig.clang.cindex import CursorKind
+from ffig.clang.cindex import Diagnostic
 from ffig.clang.cindex import ExceptionSpecificationKind
 from ffig.clang.cindex import TypeKind
 
@@ -56,7 +57,8 @@ class _Function(object):
         self.name = cursor.spelling
         arguments = [x.spelling or None for x in cursor.get_arguments()]
         argument_types = [Type(x) for x in cursor.type.argument_types()]
-        self.is_noexcept = (cursor.exception_specification_kind == ExceptionSpecificationKind.BASIC_NOEXCEPT)
+        self.is_noexcept = (cursor.exception_specification_kind ==
+                            ExceptionSpecificationKind.BASIC_NOEXCEPT)
         self.return_type = Type(cursor.type.get_result())
         self.arguments = []
         self.annotations = _get_annotations(cursor)
@@ -162,11 +164,29 @@ class Model(object):
         self.filename = translation_unit.spelling
         self.functions = []
         self.classes = []
+
+        def is_error_in_current_file(diagnostic):
+            if str(diagnostic.location.file) != str(translation_unit.spelling):
+                return False
+            if diagnostic.severity == Diagnostic.Error:
+                return True
+            if diagnostic.severity == Diagnostic.Fatal:
+                return True
+            return False
+
+        errors = [
+            d for d in translation_unit.diagnostics if is_error_in_current_file(d)]
+        if errors:
+            raise ValueError('Errors in source file:\{}'.format(
+                '\n'.join(str(e) for e in errors)))
+
         self.add_child_nodes(translation_unit.cursor, [])
 
     def __repr__(self):
         return "<cppmodel.Model filename={}, classes={}, functions={}>".format(
-            self.filename, [c.name for c in self.classes], [f.name for f in self.functions])
+            self.filename,
+            [c.name for c in self.classes],
+            [f.name for f in self.functions])
 
     def extend(self, translation_unit):
         m = Model(translation_unit)

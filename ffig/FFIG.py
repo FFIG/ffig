@@ -5,7 +5,11 @@
 # generate a c-api and language bindings.
 
 import argparse
+import ffig.annotations
 import ffig.clang as clang
+import ffig.cppmodel
+import ffig.filters.capi_filter
+import ffig.generators
 import inspect
 import jinja2
 import logging
@@ -16,17 +20,13 @@ import sys
 
 logging.basicConfig(level=logging.WARNING)
 
-import ffig.annotations
-import ffig.cppmodel
-import ffig.filters.capi_filter
-import ffig.generators
-
 clang.cindex.Config.set_compatibility_check(False)
 
 
 def find_clang_library_path():
     paths = [
-        '/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib',
+        '/Applications/Xcode.app/Contents/Developer/Toolchains/'
+        'XcodeDefault.xctoolchain/usr/lib',
         '/Library/Developer/CommandLineTools/usr/lib',
     ]
     for path in paths:
@@ -76,7 +76,6 @@ def write_bindings_to_disk(
     - output_dir where to write to
     """
 
-    bindings.extend("_c.cpp.tmpl _c.h.tmpl".split())
     bindings = list(set(bindings))
 
     for binding in bindings:
@@ -87,6 +86,7 @@ def write_bindings_to_disk(
 def build_model_from_source(
         path_to_source,
         module_name,
+        cflags=None,
         unsaved_files=None):
     """
     Input:
@@ -98,10 +98,12 @@ def build_model_from_source(
     Returns:
     - model built from a clang.cindex TranslationUnit with a name from args
     """
+    cflags = cflags or []
+
     ffig_include_dir = os.path.join(os.path.dirname(__file__), 'include')
     tu = clang.cindex.TranslationUnit.from_source(
         path_to_source,
-        '-x c++ -std=c++14 -stdlib=libc++ -I{}'.format(ffig_include_dir).split(),
+        ['-x', 'c++', '-std=c++14', '-stdlib=libc++'] + cflags,
         unsaved_files=unsaved_files)
 
     model = ffig.cppmodel.Model(tu)
@@ -150,7 +152,7 @@ def run(args):
     # FIXME: Loop over files and extend the model once we can handle multiple
     # input files.
     input_file = os.path.join(cwd, args.inputs[0])
-    m = build_model_from_source(input_file, args.module_name)
+    m = build_model_from_source(input_file, args.module_name, args.cflags)
     classes = m.classes
     api_classes = collect_api_and_obj_classes(classes, 'FFIG:EXPORT')
 
@@ -200,6 +202,12 @@ def main():
         help='module name for generated files',
         dest='module_name',
         required=True)
+    parser.add_argument(
+        '--cflag',
+        help='Compiler flags for clang',
+        default=[],
+        dest='cflags',
+        action='append')
 
     args = parser.parse_args()
 
