@@ -28,3 +28,9 @@ build_out
 .vscode/tags
 *.iml
 .idea/
+bazel-bin
+bazel-genfiles
+bazel-testlogs
+bazel-out
+bazel-genfiles
+bazel-ffig
