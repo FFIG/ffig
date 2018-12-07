@@ -1,5 +1,6 @@
 FROM ffig/ffig-base
-MAINTAINER FFIG <support@ffig.org>
+LABEL maintainer="FFIG <support@ffig.org>"
+
 
 RUN add-apt-repository ppa:openjdk-r/ppa; \
 add-apt-repository ppa:webupd8team/java; \
