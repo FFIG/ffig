@@ -222,7 +222,7 @@ if(NOT FFIG_DISABLE_BOOST_PYTHON)
   if(NOT PythonLibs_FOUND)
     if(FFIG_REQUIRE_BOOST_PYTHON)
       message(FATAL_ERROR "CMake failed: Python libraries not found but are required by this build.")
-    else()  
+    else()
       message(STATUS "boost::python tests disabled: Python libraries not found.")
     endif()
   else()
@@ -234,7 +234,7 @@ if(NOT FFIG_DISABLE_BOOST_PYTHON)
     if(NOT Boost_FOUND)
       if(FFIG_REQUIRE_BOOST_PYTHON)
         message(FATAL_ERROR "CMake failed: Boost libraries not found but are required by this build.")
-      else()  
+      else()
         message(STATUS "boost::python tests disabled: Boost libraries not found.")
       endif()
     else()
@@ -345,7 +345,7 @@ if(dotnet_FOUND)
   ffig_add_dotnet_library(NAME Shape INPUTS tests/input/Shape.h)
   ffig_add_dotnet_library(NAME Tree INPUTS tests/input/Tree.h)
   ffig_add_dotnet_library(NAME Number INPUTS tests/input/Number.h)
-  
+
   add_dotnet_project(NAME TestShape.net
     DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/tests/dotnet/TestShape
     SOURCES
@@ -374,7 +374,7 @@ if(dotnet_FOUND)
   set_property(TEST test_dotnet_shape
                PROPERTY LABELS DOTNET)
   set_test_shared_library_path(
-    TEST_NAME test_dotnet_shape 
+    TEST_NAME test_dotnet_shape
     DLL_PATH ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
   add_test(
@@ -384,7 +384,7 @@ if(dotnet_FOUND)
   set_property(TEST test_dotnet_number
                PROPERTY LABELS DOTNET)
   set_test_shared_library_path(
-    TEST_NAME test_dotnet_number 
+    TEST_NAME test_dotnet_number
     DLL_PATH ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
   add_test(
@@ -394,13 +394,13 @@ if(dotnet_FOUND)
   set_property(TEST test_dotnet_tree
                PROPERTY LABELS DOTNET)
   set_test_shared_library_path(
-    TEST_NAME test_dotnet_tree 
+    TEST_NAME test_dotnet_tree
     DLL_PATH ${CMAKE_CURRENT_BINARY_DIR}/generated)
 
 endif()
 
 if(Swift_FOUND)
-  
+
   ffig_add_swift_library(NAME Shape INPUTS tests/input/Shape.h)
   ffig_add_swift_library(NAME Tree INPUTS tests/input/Tree.h)
 
@@ -493,7 +493,7 @@ if(Java_FOUND)
   ffig_add_java_library(NAME Tree INPUTS tests/input/Tree.h)
   ffig_add_java_library(NAME Number INPUTS tests/input/Number.h)
   ffig_add_java_library(NAME Asset INPUTS tests/input/Asset.h)
-  
+
   find_jar(JNA_JAR NAMES jna jna-4.5.1 PATHS ${FFIG_JAR_PATH})
   if(NOT JNA_JAR)
     message(FATAL_ERROR
@@ -514,7 +514,7 @@ if(Java_FOUND)
       "Could NOT find Hamcrest library. "
       "Run git submodule update --init to get JARs")
   endif()
-  
+
   add_jar(TestAsset
           tests/java/TestAsset.java
           OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated
@@ -522,7 +522,7 @@ if(Java_FOUND)
             ${JNA_JAR}
             ${JUNIT_JAR}
             ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.jar)
-  
+
   add_jar(TestShape
           tests/java/TestShape.java
           OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated
@@ -530,7 +530,7 @@ if(Java_FOUND)
             ${JNA_JAR}
             ${JUNIT_JAR}
             ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.jar)
-  
+
   add_jar(TestTree
           tests/java/TestTree.java
           OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated
@@ -538,7 +538,7 @@ if(Java_FOUND)
             ${JNA_JAR}
             ${JUNIT_JAR}
             ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.jar)
-  
+
   add_jar(TestNumber
           tests/java/TestNumber.java
           OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/generated
@@ -573,7 +573,7 @@ if(Java_FOUND)
     PROPERTY LABELS JAVA)
   set_property(TEST test_java_asset
                 PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
-  
+
   add_test(
     NAME test_java_shape
     COMMAND ${Java_JAVA_EXECUTABLE} -classpath ${JAVA_CLASSPATH} org.junit.runner.JUnitCore TestShape
@@ -582,7 +582,7 @@ if(Java_FOUND)
     PROPERTY LABELS JAVA)
   set_property(TEST test_java_shape
                 PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_CURRENT_BINARY_DIR}/generated")
-  
+
   add_test(
     NAME test_java_tree
     COMMAND ${Java_JAVA_EXECUTABLE} -classpath ${JAVA_CLASSPATH} org.junit.runner.JUnitCore TestTree
@@ -612,9 +612,19 @@ add_test(
 set_property(TEST test_d_tree_output
              PROPERTY LABELS D TEXT)
 
+# Unconditionally generate Rust bindings as nothing is (currently) built, just generated.
+ffig_add_rust_library(NAME Tree INPUTS tests/input/Tree.h)
+add_test(
+  NAME test_rust_tree_output
+  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
+  ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Tree.rs.expected
+  ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.rs)
+set_property(TEST test_rust_tree_output
+             PROPERTY LABELS RUST TEXT)
+
 if(LuaJIT_FOUND)
   ffig_add_lua_library(NAME Asset INPUTS tests/input/Asset.h)
-  
+
   add_test(
     NAME test_lua_asset
     COMMAND ${LuaJIT_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/tests/test_asset_bindings.lua
@@ -645,7 +655,7 @@ if(BOOST_PYTHON_Found)
   ffig_add_boost_python_library(NAME Tree INPUTS tests/input/Tree.h)
   ffig_add_boost_python_library(NAME Number INPUTS tests/input/Number.h)
   ffig_add_boost_python_library(NAME Animal INPUTS tests/input/Animal.h)
-  
+
   add_test(
     NAME test_boost_python_bindings
     COMMAND ${PYTHON_EXECUTABLE} -m nose -v ${CMAKE_CURRENT_LIST_DIR}/tests/boost_python
@@ -656,7 +666,7 @@ endif()
 
 if(Julia_FOUND)
   ffig_add_julia_library(NAME Shape INPUTS tests/input/Shape.h)
-  
+
   add_test(
       NAME test_julia_bindings
       COMMAND ${Julia_EXECUTABLE} tests/julia/TestShape.jl

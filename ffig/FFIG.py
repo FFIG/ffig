@@ -100,7 +100,6 @@ def build_model_from_source(
     """
     cflags = cflags or []
 
-    ffig_include_dir = os.path.join(os.path.dirname(__file__), 'include')
     tu = clang.cindex.TranslationUnit.from_source(
         path_to_source,
         ['-x', 'c++', '-std=c++14', '-stdlib=libc++'] + cflags,

@@ -1,0 +1,12 @@
+{% for class in classes -%}
+pub struct {{class.name}} {
+}
+
+impl {{class.name}} {
+{% for method in class.methods %}
+  pub fn {{method.name}}() {
+  }
+
+{% endfor %}
+}
+{% endfor %}

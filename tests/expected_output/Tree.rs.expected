@@ -1,0 +1,17 @@
+pub struct Tree {
+}
+
+impl Tree {
+  pub fn left_subtree() {
+  }
+
+  pub fn right_subtree() {
+  }
+
+  pub fn data() {
+  }
+
+  pub fn set_data() {
+  }
+
+}
