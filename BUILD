@@ -55,7 +55,7 @@ ffig_py_src(
     name = "Shape.py.src",
     srcs = ["tests/input/Shape.h"],
     copts = FFIG_C_OPTS,
-    module = "Shape",
+    module = "shape",
 )
 
 ffig_swift_src(
