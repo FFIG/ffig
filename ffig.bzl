@@ -1,7 +1,21 @@
 LIBFFIG = "//:libffig"
 FFIG_PY = "//:ffig_py"
 
-def _ffig_gen_src(name, srcs, module, templates, copts, genfiles):
+def _ffig_gen_src(name, srcs=None, deps=None, module=None, templates=None, copts=None, genfiles=None):
+    srcs = srcs or []
+    deps = deps or []
+    copts = copts or []
+    
+    if len(srcs) != 1:
+        fail("ffig code generation only supports a single source file.")
+    
+    if not module:
+      fail("module must be supplied")
+    if not templates:
+      fail("templates must be supplied")
+    if not genfiles:
+      fail("genfiles must be supplied")
+    
     ffig_py_path = "$(location {})".format(FFIG_PY)
     source_files = " ".join(["$(locations {})".format(src) for src in srcs])
     cflags = " ".join(["--cflag={}".format(copt) for copt in copts])
@@ -23,30 +37,28 @@ def _ffig_gen_src(name, srcs, module, templates, copts, genfiles):
     )
 
 def ffig_c_library(name, module, srcs = None, deps = None, copts = None):
-    if len(srcs) != 1:
-        fail("ffig_c_library only supports a single source file.")
-
     srcs = srcs or []
     deps = deps or []
     copts = copts or []
-
+    
+    c_srcs = [module + "_c.h", module + "_c.cpp"]
+    
     # Generate source with FFIG.
-    genfiles = [module + "_c.h", module + "_c.cpp"]
     _ffig_gen_src(
         name = "_" + name + "_c_srcs",
         srcs = srcs,
         module = module,
         templates = ["_c.h.tmpl", "_c.cpp.tmpl"],
         copts = copts,
-        genfiles = genfiles,
+        genfiles = c_srcs,
     )
 
     # Build a C DSO for FFIG's generated C-API.
     native.cc_binary(
         name = name + "_c.so",
         linkshared = 1,
-        srcs = genfiles + srcs,
-        deps = deps,
+        srcs = c_srcs + srcs,
+        deps = deps + ["//:libffig"],
         copts = copts,
     )
 
@@ -58,77 +70,41 @@ def ffig_c_library(name, module, srcs = None, deps = None, copts = None):
     )
 
 def ffig_csharp_src(name, module, srcs = None, deps = None, copts = None):
-    if len(srcs) != 1:
-        fail("ffig_csharp_src only supports a single source file.")
-
-    srcs = srcs or []
-    deps = deps or []
-    copts = copts or []
-
-    # Generate source with FFIG.
-    genfiles = [module + ".cs"]
     _ffig_gen_src(
         name = "_" + name + "_c_srcs",
         srcs = srcs,
         module = module,
         templates = ["cs.tmpl"],
         copts = copts,
-        genfiles = genfiles,
+    genfiles = [module + ".cs"]
     )
 
 def ffig_py_src(name, module, srcs = None, deps = None, copts = None):
-    if len(srcs) != 1:
-        fail("ffig_py_src only supports a single source file.")
-
-    srcs = srcs or []
-    deps = deps or []
-    copts = copts or []
-
-    # Generate source with FFIG.
-    genfiles = [module + "/_py2.py", module + "/_py3.py", module + "/__init__.py"]
     _ffig_gen_src(
         name = "_" + name + "_c_srcs",
         srcs = srcs,
         module = module,
         templates = ["python"],
         copts = copts,
-        genfiles = genfiles,
+    genfiles = [module + "/_py2.py", module + "/_py3.py", module + "/__init__.py"]
     )
 
 def ffig_swift_src(name, module, srcs = None, deps = None, copts = None):
-    if len(srcs) != 1:
-        fail("ffig_swift_src only supports a single source file.")
-
-    srcs = srcs or []
-    deps = deps or []
-    copts = copts or []
-
-    # Generate source with FFIG.
-    genfiles = [module + ".swift", module + "-Bridging-Header.h"]
     _ffig_gen_src(
         name = "_" + name + "_c_srcs",
         srcs = srcs,
         module = module,
         templates = ["swift"],
         copts = copts,
-        genfiles = genfiles,
+        genfiles = [module + ".swift", module + "-Bridging-Header.h"]
     )
 
 def ffig_ruby_src(name, module, srcs = None, deps = None, copts = None):
-    if len(srcs) != 1:
-        fail("ffig_ruby_src only supports a single source file.")
-
-    srcs = srcs or []
-    deps = deps or []
-    copts = copts or []
-
-    # Generate source with FFIG.
-    genfiles = [module + ".rb"]
     _ffig_gen_src(
         name = "_" + name + "_c_srcs",
         srcs = srcs,
         module = module,
         templates = ["ruby"],
         copts = copts,
-        genfiles = genfiles,
+        genfiles = [module + ".rb"]
     )

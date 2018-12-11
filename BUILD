@@ -1,4 +1,4 @@
-# Sandbox for Bazel build rules for FFIG.
+# Uses of Bazel build rules for FFIG.
 
 load(
     "//:ffig.bzl",
@@ -30,63 +30,44 @@ py_binary(
     main = "__main__.py",
 )
 
+FFIG_C_OPTS = [
+    "-Itests/input",
+    "-Iffig/include",
+    "-std=c++14",
+    "-DShape_c_EXPORTS",
+]
+
 ffig_c_library(
     name = "Shape",
     srcs = ["tests/input/Shape.h"],
-    copts = [
-        "-Itests/input",
-        "-Iffig/include",
-        "-std=c++14",
-        "-DShape_c_EXPORTS",
-    ],
+    copts = FFIG_C_OPTS,
     module = "Shape",
-    deps = [":libffig"],
 )
 
 ffig_csharp_src(
     name = "Shape.net.src",
     srcs = ["tests/input/Shape.h"],
-    copts = [
-        "-Itests/input",
-        "-Iffig/include",
-        "-std=c++14",
-    ],
+    copts = FFIG_C_OPTS,
     module = "Shape",
-    deps = [":libffig"],
 )
 
 ffig_py_src(
     name = "Shape.py.src",
     srcs = ["tests/input/Shape.h"],
-    copts = [
-        "-Itests/input",
-        "-Iffig/include",
-        "-std=c++14",
-    ],
+    copts = FFIG_C_OPTS,
     module = "Shape",
-    deps = [":libffig"],
 )
 
 ffig_swift_src(
     name = "Shape.swift.src",
     srcs = ["tests/input/Shape.h"],
-    copts = [
-        "-Itests/input",
-        "-Iffig/include",
-        "-std=c++14",
-    ],
+    copts = FFIG_C_OPTS,
     module = "Shape",
-    deps = [":libffig"],
 )
 
 ffig_ruby_src(
     name = "Shape.rb.src",
     srcs = ["tests/input/Shape.h"],
-    copts = [
-        "-Itests/input",
-        "-Iffig/include",
-        "-std=c++14",
-    ],
+    copts = FFIG_C_OPTS,
     module = "Shape",
-    deps = [":libffig"],
 )
