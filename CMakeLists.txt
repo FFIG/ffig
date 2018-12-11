@@ -1,5 +1,5 @@
 # FIXME: Work out which CMake version we actually need.
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.12)
 
 set(CMAKE_MACOSX_RPATH 1)
 
@@ -547,22 +547,23 @@ if(Java_FOUND)
             ${JUNIT_JAR}
             ${CMAKE_CURRENT_BINARY_DIR}/generated/Number.jar)
 
-# list(APPEND JAVA_JARS
-#      ${JNA_JAR}
-#      ${JUNIT_JAR}
-#      ${HAMCREST_JAR}
-#      ${CMAKE_CURRENT_BINARY_DIR}/generated/Asset.jar
-#      ${CMAKE_CURRENT_BINARY_DIR}/generated/Number.jar
-#      ${CMAKE_CURRENT_BINARY_DIR}/generated/Shape.jar
-#      ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.jar)
+ list(APPEND JAVA_JARS
+      ${JNA_JAR}
+      ${JUNIT_JAR}
+      ${HAMCREST_JAR}
+      Asset.jar
+      Number.jar
+      Shape.jar
+      Tree.jar
+      TestAsset.jar
+      TestNumber.jar
+      TestShape.jar
+      TestTree.jar)
 
-  #FIXME: Use JOIN when CMake 3.12 is available.
   if(WIN32)
-    #list(JOIN ${JAVA_JARS} ; JAVA_CLASSPATH)
-    set(JAVA_CLASSPATH "TestAsset.jar;Asset.jar;TestShape.jar;Shape.jar;TestNumber.jar;Number.jar;TestTree.jar;Tree.jar;${JNA_JAR};${JUNIT_JAR};${HAMCREST_JAR}")
+    list(JOIN JAVA_JARS ; JAVA_CLASSPATH)
   else()
-    #list(JOIN ${JAVA_JARS} : JAVA_CLASSPATH)
-    set(JAVA_CLASSPATH "TestAsset.jar:Asset.jar:TestShape.jar:Shape.jar:TestNumber.jar:Number.jar:TestTree.jar:Tree.jar:${JNA_JAR}:${JUNIT_JAR}:${HAMCREST_JAR}")
+    list(JOIN JAVA_JARS : JAVA_CLASSPATH)
   endif()
 
   add_test(
