@@ -29,7 +29,7 @@ matrix:
       osx_image: xcode9.3
       install:
         - brew update
-        - brew install ninja && brew upgrade python && brew install python@2
+        - brew install ninja && brew upgrade python cmake && brew install python@2
         - /usr/local/opt/python@2/bin/pip2 install --user --upgrade pip
         - /usr/local/opt/python@2/bin/pip2 install --user jinja2 nose pycodestyle
         - pip3 install --user --upgrade pip && pip3 install --user jinja2 nose pycodestyle
