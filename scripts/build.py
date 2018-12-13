@@ -95,6 +95,9 @@ def main():
         action='store_true',
         help='Disable generation of all optional bindings not explicitly activated')
 
+    parser.add_argument('--nobazel', action='store_false',
+                        dest='run_bazel', default=True)
+
     args = parser.parse_args()
     args.platform = platform.system()
 
@@ -168,6 +171,9 @@ def main():
         subprocess.check_call(cmake_invocation, cwd=src_dir)
         with open(os.path.join(src_dir, args.out_dir, "build.py.cache.txt"), "w") as cachefile:
             cachefile.write(" ".join(cmake_invocation))
+
+    if args.run_bazel:
+        subprocess.check_call('bazel build :all'.split(), cwd=src_dir)
 
     subprocess.check_call(
         'cmake --build ./{}'.format(args.out_dir).split(), cwd=src_dir)
