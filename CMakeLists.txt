@@ -622,6 +622,17 @@ add_test(
 set_property(TEST test_rust_tree_output
              PROPERTY LABELS RUST TEXT)
 
+# Unconditionally generate Objective-C bindings as nothing is (currently) built, just generated.
+ffig_add_objc_library(NAME Tree INPUTS tests/input/Tree.h)
+#add_test(
+#  NAME test_rust_tree_output
+#  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/scripts/pydiff.py
+#  ${CMAKE_CURRENT_LIST_DIR}/tests/expected_output/Tree.rs.expected
+#  ${CMAKE_CURRENT_BINARY_DIR}/generated/Tree.rs)
+#set_property(TEST test_rust_tree_output
+#             PROPERTY LABELS RUST TEXT)
+
+
 if(LuaJIT_FOUND)
   ffig_add_lua_library(NAME Asset INPUTS tests/input/Asset.h)
 

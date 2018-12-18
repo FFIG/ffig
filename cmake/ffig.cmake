@@ -38,7 +38,6 @@ function(ffig_add_c_library)
   string(TOLOWER "${module}" module_lower)
 
   set(ffig_output_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
-  set(ffig_invocation "-i;${input};-m;${module};-o;${ffig_output_dir};-b;_c.h.tmpl;_c.cpp.tmpl")
   set(ffig_outputs "${ffig_output_dir}/${module}_c.h;${ffig_output_dir}/${module}_c.cpp")
 
   add_custom_command(
@@ -415,4 +414,26 @@ function(ffig_add_dotnet_library)
 
   add_dependencies(${module}.net ${module}.ffig.net.source)
 endfunction()
+
+function(ffig_add_objc_library)
+  set(options)
+  set(oneValueArgs NAME INPUTS)
+  set(multiValueArgs)
+  cmake_parse_arguments(ffig_add_objc_library "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+  set(module ${ffig_add_objc_library_NAME})
+  set(input ${ffig_add_objc_library_INPUTS})
+  string(TOLOWER "${module}" module_lower)
+
+  add_custom_command(
+    OUTPUT ${ffig_output_dir}/${module}_objc.m ${ffig_output_dir}/${module}_objc.h
+    COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module}
+    -o ${ffig_output_dir} -b _objc.m.tmpl _objc.h.tmpl --cflag=-I${_FFIG_INCLUDE_DIR}
+    DEPENDS ${input} ${FFIG_SOURCE}
+    WORKING_DIRECTORY ${FFIG_ROOT}
+    COMMENT "Generating objc source for ${module}")
+
+  add_custom_target(${module}.ffig.objc.source ALL
+    DEPENDS ${ffig_output_dir}/${module}_objc.m ${ffig_output_dir}/${module}_objc.h)
+endfunction()
+
 
