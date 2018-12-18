@@ -427,7 +427,7 @@ function(ffig_add_objc_library)
   add_custom_command(
     OUTPUT ${ffig_output_dir}/${module}_objc.m ${ffig_output_dir}/${module}_objc.h
     COMMAND ${PYTHON_EXECUTABLE} -m ffig -i ${input} -m ${module}
-    -o ${ffig_output_dir} -b _objc.m.tmpl _objc.h.tmpl --cflag=-I${_FFIG_INCLUDE_DIR}
+    -o ${ffig_output_dir} -b objc --cflag=-I${_FFIG_INCLUDE_DIR}
     DEPENDS ${input} ${FFIG_SOURCE}
     WORKING_DIRECTORY ${FFIG_ROOT}
     COMMENT "Generating objc source for ${module}")
