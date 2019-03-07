@@ -48,7 +48,7 @@ def ffig_c_library(name, module, srcs = None, deps = None, copts = None):
         name = "_" + name + "_c_srcs",
         srcs = srcs,
         module = module,
-        templates = ["_c.h.tmpl", "_c.cpp.tmpl"],
+        templates = ["c"],
         copts = copts,
         genfiles = c_srcs,
     )

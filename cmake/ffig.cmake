@@ -38,7 +38,7 @@ function(ffig_add_c_library)
   string(TOLOWER "${module}" module_lower)
 
   set(ffig_output_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
-  set(ffig_invocation "-i;${input};-m;${module};-o;${ffig_output_dir};-b;_c.h.tmpl;_c.cpp.tmpl")
+  set(ffig_invocation "-i;${input};-m;${module};-o;${ffig_output_dir};-b;c")
   set(ffig_outputs "${ffig_output_dir}/${module}_c.h;${ffig_output_dir}/${module}_c.cpp")
 
   add_custom_command(
