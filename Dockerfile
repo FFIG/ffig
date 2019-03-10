@@ -1,4 +1,4 @@
-FROM ffig/ffig-base
+FROM ffig/ffig-base:latest
 LABEL maintainer="FFIG <support@ffig.org>"
 
 
