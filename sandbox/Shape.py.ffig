@@ -1,0 +1,24 @@
+import ffig
+
+ffig.src("tests/input/Shape.h")
+
+@ffig.class(clss="Shape")
+class Shape:
+  
+  @ffig.property("Area")
+  def area(self) -> float:     
+    pass
+  
+  @ffig.property("name")
+  def name(self) -> str:
+    pass
+
+
+@ffig.class(clss="Circle")
+class Circle(Shape):
+
+  @ffig.ctor("Shape(double)"):
+  def __init__(self, radius):
+    print("Constructed a Circle with radius {radius}".format(radius=radius))
+    pass
+
